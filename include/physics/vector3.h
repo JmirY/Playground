@@ -1,5 +1,5 @@
-#ifndef VECTOR_H
-#define VECTOR_H
+#ifndef VECTOR3_H
+#define VECTOR3_H
 
 namespace physics
 {
@@ -47,4 +47,4 @@ namespace physics
     };
 } // namespace physics
 
-#endif // VECTOR_H
+#endif // VECTOR3_H
