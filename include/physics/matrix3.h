@@ -16,7 +16,7 @@ namespace physics
 
         /* 행렬의 대각성분을 주어진 값으로 설정한다
             나머지 성분은 0으로 설정한다 */
-        void setDiagonalEntries(float value);
+        void setDiagonal(float value);
 
         /* 행렬의 전치행렬을 반환한다 */
         Matrix3 transpose() const;

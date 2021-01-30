@@ -5,12 +5,12 @@ using namespace physics;
 
 Matrix4::Matrix4()
 {
-    setDiagonalEntries(1.0f);
+    setDiagonal(1.0f);
 }
 
 Matrix4::Matrix4(float value)
 {
-    setDiagonalEntries(value);
+    setDiagonal(value);
 }
 
 Matrix4::Matrix4(float v1, float v2, float v3, float v4)
@@ -36,7 +36,7 @@ Matrix4::Matrix4(float v1, float v2, float v3, float v4)
     entries[15] = v4;
 }
 
-void Matrix4::setDiagonalEntries(float value)
+void Matrix4::setDiagonal(float value)
 {
     entries[0] = value;
     entries[1] = 0.0f;
