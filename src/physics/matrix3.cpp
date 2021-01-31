@@ -157,24 +157,28 @@ Matrix3 Matrix3::operator*(const Matrix3& other) const
 
 void Matrix3::operator*=(const Matrix3& other)
 {
-    entries[0] = entries[0] * other.entries[0] +
+    Matrix3 result;
+
+    result.entries[0] = entries[0] * other.entries[0] +
         entries[1] * other.entries[3] + entries[2] * other.entries[6];
-    entries[1] = entries[0] * other.entries[1] +
+    result.entries[1] = entries[0] * other.entries[1] +
         entries[1] * other.entries[4] + entries[2] * other.entries[7];
-    entries[2] = entries[0] * other.entries[2] +
+    result.entries[2] = entries[0] * other.entries[2] +
         entries[1] * other.entries[5] + entries[2] * other.entries[8];
 
-    entries[3] = entries[3] * other.entries[0] +
+    result.entries[3] = entries[3] * other.entries[0] +
         entries[4] * other.entries[3] + entries[5] * other.entries[6];
-    entries[4] = entries[3] * other.entries[1] +
+    result.entries[4] = entries[3] * other.entries[1] +
         entries[4] * other.entries[4] + entries[5] * other.entries[7];
-    entries[5] = entries[3] * other.entries[2] +
+    result.entries[5] = entries[3] * other.entries[2] +
         entries[4] * other.entries[5] + entries[5] * other.entries[8];
 
-    entries[6] = entries[6] * other.entries[0] +
+    result.entries[6] = entries[6] * other.entries[0] +
         entries[7] * other.entries[3] + entries[8] * other.entries[6];
-    entries[7] = entries[6] * other.entries[1] +
+    result.entries[7] = entries[6] * other.entries[1] +
         entries[7] * other.entries[4] + entries[8] * other.entries[7];
-    entries[8] = entries[6] * other.entries[2] +
+    result.entries[8] = entries[6] * other.entries[2] +
         entries[7] * other.entries[5] + entries[8] * other.entries[8];
+
+    *this = result;
 }
