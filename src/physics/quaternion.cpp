@@ -32,7 +32,7 @@ Quaternion Quaternion::operator*(const Quaternion& other) const
     result.w = w*other.w - x*other.x - y*other.y - z*other.z;
     result.x = w*other.x + x*other.w + y*other.z - z*other.y;
     result.y = w*other.y - x*other.z + y*other.w + z*other.x;
-    result.z = w*other.z + x*other.y - y*other.x - z*other.w;
+    result.z = w*other.z + x*other.y - y*other.x + z*other.w;
 
     return result;
 }
@@ -44,7 +44,7 @@ void Quaternion::operator*=(const Quaternion& other)
     result.w = w*other.w - x*other.x - y*other.y - z*other.z;
     result.x = w*other.x + x*other.w + y*other.z - z*other.y;
     result.y = w*other.y - x*other.z + y*other.w + z*other.x;
-    result.z = w*other.z + x*other.y - y*other.x - z*other.w;
+    result.z = w*other.z + x*other.y - y*other.x + z*other.w;
 
     *this = result;
 }
