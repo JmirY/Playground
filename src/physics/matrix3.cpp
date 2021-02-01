@@ -182,3 +182,12 @@ void Matrix3::operator*=(const Matrix3& other)
 
     *this = result;
 }
+
+Vector3 Matrix3::operator*(const Vector3& vec) const
+{
+    return Vector3(
+        entries[0]*vec.x + entries[1]*vec.y + entries[2]*vec.z,
+        entries[3]*vec.x + entries[4]*vec.y + entries[5]*vec.z,
+        entries[6]*vec.x + entries[7]*vec.y + entries[8]*vec.z
+    );
+}
