@@ -2,6 +2,7 @@
 #define RIGID_BODY_H
 
 #include "vector3.h"
+#include "matrix4.h"
 
 namespace physics
 {
@@ -25,6 +26,9 @@ namespace physics
         /* 선속도 댐핑 */
         float linearDamping;
 
+        /* Local -> World 변환 행렬 */
+        Matrix4 transformMatrix;
+
     public:
         /* 생성자 */
         RigidBody() : linearDamping(0.99f) {}
@@ -32,6 +36,11 @@ namespace physics
         /* 주어진 시간이 흘렀을 때, 강체의 상태를 계산 및 갱신한다 */
         void integrate(float duration);
 
+    private:
+        /* 현재 상태를 참고하여 변환 행렬을 업데이트한다 */
+        void updateTransformMatrix();
+
+    public:
         /* setter */
         void setMass(float value); // 함수 내부에서 질량의 역수로 바꿔 저장한다
         void setInverseMass(float value);
@@ -54,6 +63,9 @@ namespace physics
         Vector3 getVelocity() const;
         Vector3 getAcceleration() const;
         float getLinearDamping() const;
+
+        void getTransformMatrix(float matrix[16]) const;
+        Matrix4 getTransformMatrix() const;
     }; 
 } // namespace physics
 

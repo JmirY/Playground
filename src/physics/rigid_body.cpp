@@ -14,6 +14,16 @@ void RigidBody::integrate(float duration)
 
     /* 속도를 업데이트한다 */
     velocity = velocity * powf(linearDamping, duration) + acceleration * duration;
+
+    /* 변화된 상태에 따라 변환 행렬을 업데이트한다 */
+    updateTransformMatrix();
+}
+
+void RigidBody::updateTransformMatrix()
+{
+    transformMatrix.entries[3] = position.x;
+    transformMatrix.entries[7] = position.y;
+    transformMatrix.entries[11] = position.z;
 }
 
 void RigidBody::setMass(float value)
@@ -95,4 +105,32 @@ Vector3 RigidBody::getAcceleration() const
 float RigidBody::getLinearDamping() const
 {
     return linearDamping;
+}
+
+void RigidBody::getTransformMatrix(float matrix[16]) const
+{
+    matrix[0] = transformMatrix.entries[0];
+    matrix[1] = transformMatrix.entries[4];
+    matrix[2] = transformMatrix.entries[8];
+    matrix[3] = transformMatrix.entries[12];
+
+    matrix[4] = transformMatrix.entries[1];
+    matrix[5] = transformMatrix.entries[5];
+    matrix[6] = transformMatrix.entries[9];
+    matrix[7] = transformMatrix.entries[13];
+
+    matrix[8] = transformMatrix.entries[2];
+    matrix[9] = transformMatrix.entries[6];
+    matrix[10] = transformMatrix.entries[10];
+    matrix[11] = transformMatrix.entries[14];
+
+    matrix[12] = transformMatrix.entries[3];
+    matrix[13] = transformMatrix.entries[7];
+    matrix[14] = transformMatrix.entries[11];
+    matrix[15] = transformMatrix.entries[15];
+}
+
+Matrix4 RigidBody::getTransformMatrix() const
+{
+    return transformMatrix;
 }
