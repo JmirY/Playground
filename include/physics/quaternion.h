@@ -30,9 +30,17 @@ namespace physics
          * 연산자 오버로딩 *
          *****************/
 
+        /* 사원수끼리 더한다 */
+        Quaternion operator+(const Quaternion& other) const;
+        void operator+=(const Quaternion& other);
+
         /* 사원수끼리 곱한다 */
         Quaternion operator*(const Quaternion& other) const;
         void operator*=(const Quaternion& other);
+
+        /* 실수와 곱한다 */
+        Quaternion operator*(const float value) const;
+        void operator*=(const float value);
     };
 } // namespace physics
 

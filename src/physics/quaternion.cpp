@@ -25,6 +25,26 @@ Quaternion Quaternion::rotateByVector(const Vector3& vec) const
     return *this * Quaternion(0.0f, vec.x, vec.y, vec.z);
 }
 
+Quaternion Quaternion::operator+(const Quaternion& other) const
+{
+    Quaternion result;
+
+    result.w = w + other.w;
+    result.x = x + other.x;
+    result.y = y + other.y;
+    result.z = z + other.z;
+
+    return result;
+}
+
+void Quaternion::operator+=(const Quaternion& other)
+{
+    w += other.w;
+    x += other.x;
+    y += other.y;
+    z += other.z;
+}
+
 Quaternion Quaternion::operator*(const Quaternion& other) const
 {
     Quaternion result;
@@ -47,4 +67,24 @@ void Quaternion::operator*=(const Quaternion& other)
     result.z = w*other.z + x*other.y - y*other.x + z*other.w;
 
     *this = result;
+}
+
+Quaternion Quaternion::operator*(const float value) const
+{
+    Quaternion result;
+
+    result.w = w * value;
+    result.x = x * value;
+    result.y = y * value;
+    result.z = z * value;
+
+    return result;
+}
+
+void Quaternion::operator*=(const float value)
+{
+    w *= value;
+    x *= value;
+    y *= value;
+    z *= value;
 }
