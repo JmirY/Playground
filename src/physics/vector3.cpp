@@ -1,4 +1,4 @@
-#include <physics/vector.h>
+#include <physics/vector3.h>
 #include <cmath>
 
 using namespace physics;

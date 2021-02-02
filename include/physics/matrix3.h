@@ -1,6 +1,8 @@
 #ifndef MATRIX3_H
 #define MATRIX3_H
 
+#include "vector3.h"
+
 namespace physics
 {
     class Matrix3
@@ -39,6 +41,9 @@ namespace physics
         /* 행렬끼리 곱하기 */
         Matrix3 operator*(const Matrix3& other) const;
         void operator*=(const Matrix3& other);
+
+        /* 벡터와 곱하기 */
+        Vector3 operator*(const Vector3& vec) const;
     };    
 } // namespace physics
 

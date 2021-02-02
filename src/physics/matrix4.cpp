@@ -299,39 +299,43 @@ Matrix4 Matrix4::operator*(const Matrix4& other) const
 
 void Matrix4::operator*=(const Matrix4& other)
 {
-    entries[0] = entries[0] * other.entries[0] + entries[1] * other.entries[4] +
+    Matrix4 result;
+
+    result.entries[0] = entries[0] * other.entries[0] + entries[1] * other.entries[4] +
         entries[2] * other.entries[8] + entries[3] * other.entries[12];
-    entries[1] = entries[0] * other.entries[1] + entries[1] * other.entries[5] +
+    result.entries[1] = entries[0] * other.entries[1] + entries[1] * other.entries[5] +
         entries[2] * other.entries[9] + entries[3] * other.entries[13];
-    entries[2] = entries[0] * other.entries[2] + entries[1] * other.entries[6] +
+    result.entries[2] = entries[0] * other.entries[2] + entries[1] * other.entries[6] +
         entries[2] * other.entries[10] + entries[3] * other.entries[14];
-    entries[3] = entries[0] * other.entries[3] + entries[1] * other.entries[7] +
+    result.entries[3] = entries[0] * other.entries[3] + entries[1] * other.entries[7] +
         entries[2] * other.entries[11] + entries[3] * other.entries[15];
 
-    entries[4] = entries[4] * other.entries[0] + entries[5] * other.entries[4] +
+    result.entries[4] = entries[4] * other.entries[0] + entries[5] * other.entries[4] +
         entries[6] * other.entries[8] + entries[7] * other.entries[12];
-    entries[5] = entries[4] * other.entries[1] + entries[5] * other.entries[5] +
+    result.entries[5] = entries[4] * other.entries[1] + entries[5] * other.entries[5] +
         entries[6] * other.entries[9] + entries[7] * other.entries[13];
-    entries[6] = entries[4] * other.entries[2] + entries[5] * other.entries[6] +
+    result.entries[6] = entries[4] * other.entries[2] + entries[5] * other.entries[6] +
         entries[6] * other.entries[10] + entries[7] * other.entries[14];
-    entries[7] = entries[4] * other.entries[3] + entries[5] * other.entries[7] +
+    result.entries[7] = entries[4] * other.entries[3] + entries[5] * other.entries[7] +
         entries[6] * other.entries[11] + entries[7] * other.entries[15];
 
-    entries[8] = entries[8] * other.entries[0] + entries[9] * other.entries[4] +
+    result.entries[8] = entries[8] * other.entries[0] + entries[9] * other.entries[4] +
         entries[10] * other.entries[8] + entries[11] * other.entries[12];
-    entries[9] = entries[8] * other.entries[1] + entries[9] * other.entries[5] +
+    result.entries[9] = entries[8] * other.entries[1] + entries[9] * other.entries[5] +
         entries[10] * other.entries[9] + entries[11] * other.entries[13];
-    entries[10] = entries[8] * other.entries[2] + entries[9] * other.entries[6] +
+    result.entries[10] = entries[8] * other.entries[2] + entries[9] * other.entries[6] +
         entries[10] * other.entries[10] + entries[11] * other.entries[14];
-    entries[11] = entries[8] * other.entries[3] + entries[9] * other.entries[7] +
+    result.entries[11] = entries[8] * other.entries[3] + entries[9] * other.entries[7] +
         entries[10] * other.entries[11] + entries[11] * other.entries[15];
 
-    entries[12] = entries[12] * other.entries[0] + entries[13] * other.entries[4] +
+    result.entries[12] = entries[12] * other.entries[0] + entries[13] * other.entries[4] +
         entries[14] * other.entries[8] + entries[15] * other.entries[12];
-    entries[13] = entries[12] * other.entries[1] + entries[13] * other.entries[5] +
+    result.entries[13] = entries[12] * other.entries[1] + entries[13] * other.entries[5] +
         entries[14] * other.entries[9] + entries[15] * other.entries[13];
-    entries[14] = entries[12] * other.entries[2] + entries[13] * other.entries[6] +
+    result.entries[14] = entries[12] * other.entries[2] + entries[13] * other.entries[6] +
         entries[14] * other.entries[10] + entries[15] * other.entries[14];
-    entries[15] = entries[12] * other.entries[3] + entries[13] * other.entries[7] +
+    result.entries[15] = entries[12] * other.entries[3] + entries[13] * other.entries[7] +
         entries[14] * other.entries[11] + entries[15] * other.entries[15];
+
+    *this = result;
 }
