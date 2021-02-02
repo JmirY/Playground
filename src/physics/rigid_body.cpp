@@ -8,22 +8,89 @@ void RigidBody::integrate(float duration)
     /* 강체의 질량이 무한대라면 적분을 하지 않는다 */
     if (inverseMass == 0.0f)
         return;
-    
-    /* 위치를 업데이트한다 */
-    position += velocity * duration;
 
-    /* 속도를 업데이트한다 */
-    velocity = velocity * powf(linearDamping, duration) + acceleration * duration;
+    /* 가속도를 업데이트한다 */
+    prevAcceleration = acceleration;
+    prevAcceleration += force * inverseMass;
+
+    /* 각가속도를 계산한다 */
+    Vector3 angularAcceleration = inverseInertiaTensorWorld * torque;
+
+    /* 속도 & 각속도를 업데이트한다 */
+    velocity += prevAcceleration * duration;
+    rotation += angularAcceleration * duration;
+
+    /* 드래그를 적용한다 */
+    velocity *= powf(linearDamping, duration);
+    rotation *= powf(angularDamping, duration);
+
+    /* 위치 & 방향을 업데이트한다 */
+    position += velocity * duration;
+    orientation += (orientation * Quaternion(0.0f, rotation.x, rotation.y, rotation.z))
+        * (duration / 2.0f);
+
+    /* 사원수를 정규화한다 */
+    orientation.normalize();
 
     /* 변화된 상태에 따라 변환 행렬을 업데이트한다 */
     updateTransformMatrix();
+
+    /* 월드 좌표계 기준의 관성 텐서를 업데이트한다 */
+    transformInertiaTensor();
+
+    /* 강체에 적용된 힘과 토크는 제거한다 */
+    clearForceAndTorque();
+}
+
+void RigidBody::addForceAt(const Vector3& _force, const Vector3& point)
+{
+    force += _force;
+
+    Vector3 pointFromCenter = point - position;
+    torque += pointFromCenter.cross(_force);
+}
+
+void RigidBody::clearForceAndTorque()
+{
+    force = torque = Vector3(0.0f, 0.0f, 0.0f);
 }
 
 void RigidBody::updateTransformMatrix()
 {
+    transformMatrix.entries[0] = 
+        1.0f - 2.0f * (orientation.y*orientation.y + orientation.z*orientation.z);
+    transformMatrix.entries[1] = 
+        2.0f * (orientation.x*orientation.y - orientation.w*orientation.z);
+    transformMatrix.entries[2] = 
+        2.0f * (orientation.x*orientation.z + orientation.w*orientation.y);
     transformMatrix.entries[3] = position.x;
+
+    transformMatrix.entries[4] =
+        2.0f * (orientation.x*orientation.y + orientation.w*orientation.z);
+    transformMatrix.entries[5] =
+        1.0f - 2.0f * (orientation.x*orientation.x + orientation.z*orientation.z);
+    transformMatrix.entries[6] =
+        2.0f * (orientation.y*orientation.z - orientation.w*orientation.x);
     transformMatrix.entries[7] = position.y;
+
+    transformMatrix.entries[8] =
+        2.0f * (orientation.x*orientation.z - orientation.w*orientation.y);
+    transformMatrix.entries[9] =
+        2.0f * (orientation.y*orientation.z + orientation.w*orientation.x);
+    transformMatrix.entries[10] =
+        1.0f - 2.0f * (orientation.x*orientation.x + orientation.y*orientation.y);
     transformMatrix.entries[11] = position.z;
+}
+
+void RigidBody::transformInertiaTensor()
+{
+    /* 변환 행렬 중 회전 변환 행렬만 뽑아낸다 */
+    Matrix3 rotationMatrix;
+    for (int i = 0; i < 3; ++i)
+        for (int j = 0; j < 3; ++j)
+            rotationMatrix.entries[3*i + j] = transformMatrix.entries[4*i + j];
+
+    inverseInertiaTensorWorld = (rotationMatrix * inverseInertiaTensor) * rotationMatrix.transpose();
 }
 
 void RigidBody::setMass(float value)
@@ -36,6 +103,11 @@ void RigidBody::setInverseMass(float value)
     inverseMass = value;
 }
 
+void RigidBody::setInertiaTensor(const Matrix3& mat)
+{
+    inverseInertiaTensor = mat.inverse();
+}
+
 void RigidBody::setPosition(const Vector3& vec)
 {
     position = vec;
@@ -46,6 +118,7 @@ void RigidBody::setPosition(float x, float y, float z)
     position.x = x;
     position.y = y;
     position.z = z;
+    updateTransformMatrix();
 }
 
 void RigidBody::setVelocity(const Vector3& vec)
