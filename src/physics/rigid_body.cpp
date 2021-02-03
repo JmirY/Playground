@@ -9,7 +9,7 @@ void RigidBody::integrate(float duration)
     if (inverseMass == 0.0f)
         return;
 
-    /* 가속도를 업데이트한다 */
+    /* 가속도를 계산한다 */
     prevAcceleration = acceleration;
     prevAcceleration += force * inverseMass;
 
@@ -44,8 +44,9 @@ void RigidBody::integrate(float duration)
 
 void RigidBody::addForceAt(const Vector3& _force, const Vector3& point)
 {
+    /* 힘을 업데이트한다 */
     force += _force;
-
+    /* 토크를 업데이트한다 */
     Vector3 pointFromCenter = point - position;
     torque += pointFromCenter.cross(_force);
 }

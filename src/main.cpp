@@ -7,12 +7,12 @@ int main()
     physics::RigidBody body;
     body.setMass(2.5f);
     body.setInertiaTensor(physics::Matrix3(0.25f));
-    // body.setAcceleration(0.0f, -1.0f, 0.0f);
+    body.setAcceleration(0.0f, -1.0f, 0.0f);
     body.setPosition(0.0f, 1.0f, 0.0f);
-    // body.addForceAt(
-    //     physics::Vector3(0.0f, 0.0f, -200.0f),
-    //     physics::Vector3(0.5f, 0.0f, 0.0f)
-    // );
+    body.addForceAt(
+        physics::Vector3(0.0f, 0.0f, -200.0f),
+        physics::Vector3(0.5f, 0.0f, 0.0f)
+    );
 
     /* Renderer 생성 */
     graphics::Renderer renderer;
@@ -38,7 +38,7 @@ int main()
         /* 오브젝트 렌더 */
         glm::vec3 objectColor(1.0f, 0.5f, 0.3f);
         body.getTransformMatrix(modelMatrix);
-        renderer.renderObject("Sphere", objectColor, modelMatrix);
+        renderer.renderObject("Cube", objectColor, modelMatrix);
 
         /* 시간 계산 */
         curTime = glfwGetTime();
