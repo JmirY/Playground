@@ -339,3 +339,13 @@ void Matrix4::operator*=(const Matrix4& other)
 
     *this = result;
 }
+
+Vector3 Matrix4::operator*(const Vector3& vec) const
+{
+    float w = entries[12]*vec.x + entries[13]*vec.y + entries[14]*vec.z + entries[15];
+    return Vector3(
+        (entries[0]*vec.x + entries[1]*vec.y + entries[2]*vec.z + entries[3]) / w,
+        (entries[4]*vec.x + entries[5]*vec.y + entries[6]*vec.z + entries[7]) / w,
+        (entries[8]*vec.x + entries[9]*vec.y + entries[10]*vec.z + entries[11]) / w
+    );
+}
