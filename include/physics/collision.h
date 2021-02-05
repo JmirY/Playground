@@ -74,7 +74,7 @@ namespace physics
         static bool boxAndPlane(const Box&, const Plane&);
 
         /* 두 박스가 주어진 축에 대해 어느정도 겹치는지 반환한다 */
-        static float overlap(const Box& box1, const Box& box2, const Vector3& axis);
+        static float calcPenetration(const Box& box1, const Box& box2, const Vector3& axis);
     };
 } // namespace physics
 

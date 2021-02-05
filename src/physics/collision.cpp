@@ -118,7 +118,7 @@ bool CollisionDetector::boxAndBox(const Box& box1, const Box& box2)
     /* 모든 축에 대해 겹침 검사 */
     for (int i = 0; i < axes.size(); ++i)
     {
-        float penetration = overlap(box1, box2, axes[i]);
+        float penetration = calcPenetration(box1, box2, axes[i]);
         if (penetration <= 0.0f)
             return false;
     }
@@ -145,7 +145,7 @@ bool CollisionDetector::boxAndPlane(const Box& box, const Plane& plane)
         return false;
 }
 
-float CollisionDetector::overlap(const Box& box1, const Box& box2, const Vector3& axis)
+float CollisionDetector::calcPenetration(const Box& box1, const Box& box2, const Vector3& axis)
 {
     /* 두 박스의 중심 간 거리를 계산한다 */
     Vector3 centerToCenter = box2.body->getPosition() - box1.body->getPosition();
