@@ -1,4 +1,7 @@
 #include <physics/collision.h>
+#include <vector>
+#include <cmath>
+#include <iostream>
 
 using namespace physics;
 
@@ -90,10 +93,58 @@ bool CollisionDetector::sphereAndPlane(const Sphere& sphere, const Plane& plane)
 
 bool CollisionDetector::boxAndBox(const Box& box1, const Box& box2)
 {
+    /* 겹침 검사의 기준이 될 축 저장 */
+    std::vector<Vector3> axes;
 
+    /* box1 의 세 축 저장 */
+    for (int i = 0; i < 3; ++i)
+        axes.push_back(box1.body->getAxis(i));
+
+    /* box2 의 세 축 저장 */
+    for (int i = 0; i < 3; ++i)
+        axes.push_back(box2.body->getAxis(i));
+
+    /* 각 축 사이의 외적 저장 */
+    for (int i = 0; i < 3; ++i)
+    {
+        for (int j = 0; j < 3; ++j)
+        {
+            Vector3 crossProduct = axes[i].cross(axes[3 + j]);
+            crossProduct.normalize();
+            axes.push_back(crossProduct);
+        }
+    }
+
+    /* 모든 축에 대해 겹침 검사 */
+    for (int i = 0; i < axes.size(); ++i)
+    {
+        float penetration = overlap(box1, box2, axes[i]);
+        if (penetration <= 0.0f)
+            return false;
+    }
+
+    /* 모든 축에 걸쳐 겹침이 감지됐다면 충돌이 발생한 것이다 */
+    return true;
 }
 
 bool CollisionDetector::boxAndPlane(const Box& box, const Plane& plane)
 {
 
+}
+
+float CollisionDetector::overlap(const Box& box1, const Box& box2, const Vector3& axis)
+{
+    /* 두 박스의 중심 간 거리를 계산한다 */
+    Vector3 centerToCenter = box2.body->getPosition() - box1.body->getPosition();
+
+    /* 두 박스를 주어진 축에 사영시킨 길이의 합을 계산한다 */
+    float projectedSum = fabs((box1.body->getAxis(0) * box1.halfX).dot(axis))
+        + fabs((box1.body->getAxis(1) * box1.halfY).dot(axis))
+        + fabs((box1.body->getAxis(2) * box1.halfZ).dot(axis))
+        + fabs((box2.body->getAxis(0) * box2.halfX).dot(axis))
+        + fabs((box2.body->getAxis(1) * box2.halfY).dot(axis))
+        + fabs((box2.body->getAxis(2) * box2.halfZ).dot(axis));
+
+    /* "사영시킨 길이의 합 - 중심 간 거리" 가 겹친 정도이다 */
+    return projectedSum - centerToCenter.magnitude();
 }

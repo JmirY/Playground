@@ -51,6 +51,25 @@ void RigidBody::addForceAt(const Vector3& _force, const Vector3& point)
     torque += pointFromCenter.cross(_force);
 }
 
+Vector3 RigidBody::getAxis(int index) const
+{
+    /* 입력값 검사 */
+    if (index < 0 || index > 3)
+    {
+        std::cout << "RigidBody::getAxis::Out of index" << std::endl;
+        return Vector3();
+    }
+
+    Vector3 result(
+        transformMatrix.entries[index],
+        transformMatrix.entries[index + 4],
+        transformMatrix.entries[index + 8]
+    );
+    result.normalize();
+
+    return result;
+}
+
 void RigidBody::clearForceAndTorque()
 {
     force = torque = Vector3(0.0f, 0.0f, 0.0f);

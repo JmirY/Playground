@@ -64,6 +64,10 @@ namespace physics
             인자는 모두 월드 좌표계 기준이다 */
         void addForceAt(const Vector3& force, const Vector3& point);
 
+        /* 로컬 좌표계의 x, y, z 축 중 하나를 월드 좌표계로 변환하고
+            단위 벡터화하여 반환한다. */
+        Vector3 getAxis(int index) const;
+
     private:
         /* 강체에 가해진 힘과 토크를 0 으로 설정한다 */
         void clearForceAndTorque();
