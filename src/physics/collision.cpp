@@ -85,7 +85,7 @@ bool CollisionDetector::sphereAndPlane(const Sphere& sphere, const Plane& plane)
     distance -= plane.offset;
 
     /* 위 값이 구의 반지름보다 작다면 충돌이 발생한 것이다 */
-    if (distance - sphere.radius < 0)
+    if (distance < sphere.radius)
         return true;
     else
         return false;
@@ -129,7 +129,20 @@ bool CollisionDetector::boxAndBox(const Box& box1, const Box& box2)
 
 bool CollisionDetector::boxAndPlane(const Box& box, const Plane& plane)
 {
+    /* 박스와 평면의 거리를 구한다 */
+    float distance = plane.normal.dot(box.body->getPosition());
+    distance -= plane.offset;
+    
+    /* 박스를 평면의 법선에 사영시킨다 */
+    float projected = (box.body->getAxis(0) * box.halfX).dot(plane.normal)
+        + (box.body->getAxis(1) * box.halfY).dot(plane.normal)
+        + (box.body->getAxis(2) * box.halfZ).dot(plane.normal);
 
+    /* 사영시킨 길이가 거리보다 크다면 충돌이 발생한 것이다 */
+    if (projected > distance)
+        return true;
+    else
+        return false;
 }
 
 float CollisionDetector::overlap(const Box& box1, const Box& box2, const Vector3& axis)

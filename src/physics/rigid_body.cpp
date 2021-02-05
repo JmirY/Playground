@@ -1,5 +1,6 @@
 #include <physics/rigid_body.h>
 #include <cmath>
+#include <iostream>
 
 using namespace physics;
 
