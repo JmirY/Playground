@@ -5,13 +5,13 @@
 
 using namespace physics;
 
-Sphere::Sphere(RigidBody* _body, float _radius)
+SphereCollider::SphereCollider(RigidBody* _body, float _radius)
 {
     body = _body;
     radius = _radius;
 }
 
-Box::Box(RigidBody* _body, float _halfX, float _halfY, float _halfZ)
+BoxCollider::BoxCollider(RigidBody* _body, float _halfX, float _halfY, float _halfZ)
 {
     body = _body;
     halfX = _halfX;
@@ -25,7 +25,7 @@ Plane::Plane(Vector3 _normal, float _offset)
     offset = _offset;
 }
 
-bool CollisionDetector::sphereAndBox(const Sphere& sphere, const Box& box)
+bool CollisionDetector::sphereAndBox(const SphereCollider& sphere, const BoxCollider& box)
 {
     /* 구의 중심을 직육면체의 로컬 좌표계로 변환한다 */
     Matrix4 worldToLocal = box.body->getTransformMatrix().inverse();
@@ -64,7 +64,7 @@ bool CollisionDetector::sphereAndBox(const Sphere& sphere, const Box& box)
         return false;
 }
 
-bool CollisionDetector::sphereAndSphere(const Sphere& sphere1, const Sphere& sphere2)
+bool CollisionDetector::sphereAndSphere(const SphereCollider& sphere1, const SphereCollider& sphere2)
 {
     /* 두 구 사이의 거리를 구한다 */
     float distanceSquared =
@@ -78,7 +78,7 @@ bool CollisionDetector::sphereAndSphere(const Sphere& sphere1, const Sphere& sph
         return false;
 }
 
-bool CollisionDetector::sphereAndPlane(const Sphere& sphere, const Plane& plane)
+bool CollisionDetector::sphereAndPlane(const SphereCollider& sphere, const Plane& plane)
 {
     /* 평면의 법선에 대한 구와 평면의 거리를 구한다 */
     float distance = plane.normal.dot(sphere.body->getPosition());
@@ -91,7 +91,7 @@ bool CollisionDetector::sphereAndPlane(const Sphere& sphere, const Plane& plane)
         return false;
 }
 
-bool CollisionDetector::boxAndBox(const Box& box1, const Box& box2)
+bool CollisionDetector::boxAndBox(const BoxCollider& box1, const BoxCollider& box2)
 {
     /* 겹침 검사의 기준이 될 축 저장 */
     std::vector<Vector3> axes;
@@ -127,7 +127,7 @@ bool CollisionDetector::boxAndBox(const Box& box1, const Box& box2)
     return true;
 }
 
-bool CollisionDetector::boxAndPlane(const Box& box, const Plane& plane)
+bool CollisionDetector::boxAndPlane(const BoxCollider& box, const Plane& plane)
 {
     /* 박스와 평면의 거리를 구한다 */
     float distance = plane.normal.dot(box.body->getPosition());
@@ -145,7 +145,7 @@ bool CollisionDetector::boxAndPlane(const Box& box, const Plane& plane)
         return false;
 }
 
-float CollisionDetector::calcPenetration(const Box& box1, const Box& box2, const Vector3& axis)
+float CollisionDetector::calcPenetration(const BoxCollider& box1, const BoxCollider& box2, const Vector3& axis)
 {
     /* 두 박스의 중심 간 거리를 계산한다 */
     Vector3 centerToCenter = box2.body->getPosition() - box1.body->getPosition();

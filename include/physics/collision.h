@@ -17,7 +17,7 @@ namespace physics
         RigidBody* body;
     };
 
-    class Sphere : public Collider
+    class SphereCollider : public Collider
     {
         friend class CollisionDetector;
 
@@ -27,10 +27,10 @@ namespace physics
 
     public:
         /* 생성자 */
-        Sphere(RigidBody* body, float radius);
+        SphereCollider(RigidBody* body, float radius);
     };
 
-    class Box : public Collider
+    class BoxCollider : public Collider
     {
         friend class CollisionDetector;
 
@@ -42,7 +42,7 @@ namespace physics
 
     public:
         /* 생성자 */
-        Box(RigidBody* body, float halfX, float halfY, float halfZ);
+        BoxCollider(RigidBody* body, float halfX, float halfY, float halfZ);
     };
 
     /* 바닥, 벽을 표현하기 위한 반무한체.
@@ -67,14 +67,19 @@ namespace physics
     class CollisionDetector
     {
     public:
-        static bool sphereAndBox(const Sphere&, const Box&);
-        static bool sphereAndSphere(const Sphere&, const Sphere&);
-        static bool sphereAndPlane(const Sphere&, const Plane&);
-        static bool boxAndBox(const Box&, const Box&); // Seperating Axis Theorem 사용
-        static bool boxAndPlane(const Box&, const Plane&);
+        static bool sphereAndBox(const SphereCollider&, const BoxCollider&);
+        static bool sphereAndSphere(const SphereCollider&, const SphereCollider&);
+        static bool sphereAndPlane(const SphereCollider&, const Plane&);
+        /* Seperating Axis Theorem 사용 */
+        static bool boxAndBox(const BoxCollider&, const BoxCollider&);
+        static bool boxAndPlane(const BoxCollider&, const Plane&);
 
         /* 두 박스가 주어진 축에 대해 어느정도 겹치는지 반환한다 */
-        static float calcPenetration(const Box& box1, const Box& box2, const Vector3& axis);
+        static float calcPenetration(
+            const BoxCollider& box1,
+            const BoxCollider& box2,
+            const Vector3& axis
+        );
     };
 } // namespace physics
 
