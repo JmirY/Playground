@@ -276,6 +276,7 @@ float CollisionDetector::calcPenetration(const BoxCollider& box1, const BoxColli
 {
     /* 두 박스의 중심 간 거리를 계산한다 */
     Vector3 centerToCenter = box2.body->getPosition() - box1.body->getPosition();
+    float projectedCenterToCenter = centerToCenter.dot(axis);
 
     /* 두 박스를 주어진 축에 사영시킨 길이의 합을 계산한다 */
     float projectedSum = fabs((box1.body->getAxis(0) * box1.halfX).dot(axis))
@@ -286,7 +287,7 @@ float CollisionDetector::calcPenetration(const BoxCollider& box1, const BoxColli
         + fabs((box2.body->getAxis(2) * box2.halfZ).dot(axis));
 
     /* "사영시킨 길이의 합 - 중심 간 거리" 가 겹친 정도이다 */
-    return projectedSum - centerToCenter.magnitude();
+    return projectedSum - projectedCenterToCenter;
 }
 
 Vector3 CollisionDetector::calcContactPointOnPlane(
@@ -298,36 +299,28 @@ Vector3 CollisionDetector::calcContactPointOnPlane(
 {
     /* 점이 충돌하는 박스의 정점들을 저장한다 */
     Vector3 vertices[8];
+    /* 충돌과 관련된 점이 속하는 직육면체 */
+    const BoxCollider* box;
+
     if (minAxisIdx < 3) // 면이 box1 의 면일 때
-    {
-        vertices[0] = Vector3(-box1.halfX, box1.halfY, box1.halfZ);
-        vertices[1] = Vector3(-box1.halfX, -box1.halfY, box1.halfZ);
-        vertices[2] = Vector3(box1.halfX, -box1.halfY, box1.halfZ);
-        vertices[3] = Vector3(box1.halfX, box1.halfY, box1.halfZ);
-
-        vertices[4] = Vector3(-box1.halfX, box1.halfY, -box1.halfZ);
-        vertices[5] = Vector3(-box1.halfX, -box1.halfY, -box1.halfZ);
-        vertices[6] = Vector3(box1.halfX, -box1.halfY, -box1.halfZ);
-        vertices[7] = Vector3(box1.halfX, box1.halfY, -box1.halfZ);
-        /* 월드 좌표계로 변환한다 */
-        for (int i = 0; i < 8; ++i)
-            vertices[i] = box1.body->getTransformMatrix() * vertices[i];
-    }
+        box = &box2;
     else // 면이 box2 의 면일 때
-    {
-        vertices[0] = Vector3(-box2.halfX, box2.halfY, box2.halfZ);
-        vertices[1] = Vector3(-box2.halfX, -box2.halfY, box2.halfZ);
-        vertices[2] = Vector3(box2.halfX, -box2.halfY, box2.halfZ);
-        vertices[3] = Vector3(box2.halfX, box2.halfY, box2.halfZ);
+        box = &box1;
+    
+    vertices[0] = Vector3(-box->halfX, box->halfY, box->halfZ);
+    vertices[1] = Vector3(-box->halfX, -box->halfY, box->halfZ);
+    vertices[2] = Vector3(box->halfX, -box->halfY, box->halfZ);
+    vertices[3] = Vector3(box->halfX, box->halfY, box->halfZ);
 
-        vertices[4] = Vector3(-box2.halfX, box2.halfY, -box2.halfZ);
-        vertices[5] = Vector3(-box2.halfX, -box2.halfY, -box2.halfZ);
-        vertices[6] = Vector3(box2.halfX, -box2.halfY, -box2.halfZ);
-        vertices[7] = Vector3(box2.halfX, box2.halfY, -box2.halfZ);
-        /* 월드 좌표계로 변환한다 */
-        for (int i = 0; i < 8; ++i)
-            vertices[i] = box2.body->getTransformMatrix() * vertices[i];
-    }
+    vertices[4] = Vector3(-box->halfX, box->halfY, -box->halfZ);
+    vertices[5] = Vector3(-box->halfX, -box->halfY, -box->halfZ);
+    vertices[6] = Vector3(box->halfX, -box->halfY, -box->halfZ);
+    vertices[7] = Vector3(box->halfX, box->halfY, -box->halfZ);
+
+    /* 월드 좌표계로 변환한다 */
+    for (int i = 0; i < 8; ++i)
+        vertices[i] = box->body->getTransformMatrix() * vertices[i];
+
 
     /* 평면과 가장 가까운 정점을 찾는다 */
     float min = axes[minAxisIdx].dot(vertices[0]);
