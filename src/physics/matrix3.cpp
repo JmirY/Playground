@@ -191,3 +191,23 @@ Vector3 Matrix3::operator*(const Vector3& vec) const
         entries[6]*vec.x + entries[7]*vec.y + entries[8]*vec.z
     );
 }
+
+Matrix3 Matrix3::operator*(const float value) const
+{
+    Matrix3 result;
+
+    for (int i = 0; i < 9; ++i)
+    {
+        result.entries[i] *= value;
+    }
+
+    return result;
+}
+
+void Matrix3::operator*=(const float value)
+{
+    for (int i = 0; i < 9; ++i)
+    {
+        entries[i] *= value;
+    }
+}

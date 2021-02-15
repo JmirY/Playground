@@ -44,6 +44,10 @@ namespace physics
 
         /* 벡터와 곱하기 */
         Vector3 operator*(const Vector3& vec) const;
+
+        /* 실수와 곱하기 */
+        Matrix4 operator*(const float value) const;
+        void operator*=(const float value);
     };    
 } // namespace physics
 

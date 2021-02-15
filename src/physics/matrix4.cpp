@@ -349,3 +349,23 @@ Vector3 Matrix4::operator*(const Vector3& vec) const
         (entries[8]*vec.x + entries[9]*vec.y + entries[10]*vec.z + entries[11]) / w
     );
 }
+
+Matrix4 Matrix4::operator*(const float value) const
+{
+    Matrix4 result;
+
+    for (int i = 0; i < 16; ++i)
+    {
+        result.entries[i] *= value;
+    }
+
+    return result;
+}
+
+void Matrix4::operator*=(const float value)
+{
+    for (int i = 0; i < 16; ++i)
+    {
+        entries[i] *= value;
+    }
+}
