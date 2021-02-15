@@ -137,6 +137,16 @@ namespace physics
             int minPenetrationAxisIdx
         );
     };
+
+    class CollisionResolver
+    {
+    public:
+        static void resolveVelocity(Contact*);
+
+    private:
+        static void resolveLinearVelocity(Contact*);
+        static void resolveAngularVelocity(Contact*);
+    };
 } // namespace physics
 
 

@@ -451,3 +451,58 @@ Vector3 CollisionDetector::calcContactPointOnLine(
     /* 두 점의 중간 지점을 반환한다 */
     return (closestPointOne + closestPointTwo) * 0.5f;
 }
+
+void CollisionResolver::resolveVelocity(Contact* contact)
+{
+    resolveLinearVelocity(contact);
+}
+
+void CollisionResolver::resolveLinearVelocity(Contact* contact)
+{
+    RigidBody* body1 = contact->bodies[0];
+    RigidBody* body2 = contact->bodies[1];
+
+    /* 현재의 분리 속도를 계산한다 */
+    float separatingVelocity;
+    if (body2 == nullptr) // 평면과 충돌할 때
+        separatingVelocity = body1->getPosition().dot(contact->normal);
+    else
+        separatingVelocity = (body1->getVelocity() - body2->getVelocity()).dot(contact->normal);
+
+    /* 분리 속도가 양수이면 두 물체는 서로 멀어지고 있는 것이므로 함수를 종료한다*/
+    if (separatingVelocity > 0.0f)
+        return;
+
+    /* 충돌 후 분리 속도를 계산한다 */
+    float newSeparatingVelocity = -1.0f * separatingVelocity * contact->restitution;
+
+    /* 분리 속도의 변화량을 계산한다 */
+    float deltaSeparatingVelocity = newSeparatingVelocity - separatingVelocity;
+
+    /* 두 물체의 역질량의 합을 계산한다 */
+    float totalInverseMass = body1->getInverseMass();
+    if (body2 != nullptr)
+        totalInverseMass += body2->getInverseMass();
+    
+    /* 충격량을 계산한다 */
+    float impulse = deltaSeparatingVelocity / totalInverseMass;
+
+    /* 충격량 벡터를 계산한다 */
+    Vector3 impulseVector = contact->normal * impulse;
+
+    /* 물체에 충격량을 적용한다 */
+    body1->setVelocity(
+        body1->getVelocity() + impulseVector * body1->getInverseMass()
+    );
+    if (body2 != nullptr)
+    {
+        body2->setVelocity(
+            body2->getVelocity() - impulseVector * body2->getInverseMass()
+        );
+    }
+}
+
+void CollisionResolver::resolveAngularVelocity(Contact* contact)
+{
+
+}
