@@ -91,6 +91,9 @@ namespace physics
         void setVelocity(const Vector3& vec);
         void setVelocity(float x, float y, float z);
 
+        void setRotation(const Vector3& vec);
+        void setRotation(float x, float y, float z);
+
         void setAcceleration(const Vector3& vec);
         void setAcceleration(float x, float y, float z);
 
@@ -99,8 +102,11 @@ namespace physics
         /* getter */
         float getMass() const;
         float getInverseMass() const;
+        Matrix3 getInverseInertiaTensor() const;
+        Matrix3 getInverseInertiaTensorWorld() const;
         Vector3 getPosition() const;
         Vector3 getVelocity() const;
+        Vector3 getRotation() const;
         Vector3 getAcceleration() const;
         float getLinearDamping() const;
 
