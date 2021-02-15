@@ -142,9 +142,13 @@ namespace physics
     {
     public:
         static void resolveVelocity(Contact*);
+        static void resolvePenetration(Contact*);
 
     private:
+        /* 두 물체의 충돌 후 선속도를 계산하여 적용한다 */
         static void resolveLinearVelocity(Contact*);
+
+        /* 두 물체의 충돌 후 회전(각속도+선속도)을 계산하여 적용한다 */
         static void resolveAngularVelocity(Contact*);
     };
 } // namespace physics

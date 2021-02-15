@@ -457,6 +457,36 @@ void CollisionResolver::resolveVelocity(Contact* contact)
     resolveLinearVelocity(contact);
 }
 
+void CollisionResolver::resolvePenetration(Contact* contact)
+{
+    RigidBody* body1 = contact->bodies[0];
+    RigidBody* body2 = contact->bodies[1];
+
+    /* 두 물체의 역질량의 합을 계산한다 */
+    float totalInverseMass = body1->getInverseMass();
+    if (body2 != nullptr)
+        totalInverseMass += body2->getInverseMass();
+
+    /* 역질량의 합이 0 이면
+        두 물체가 무한의 질량을 가지는 것이므로 함수를 종료한다 */
+    if (totalInverseMass == 0.0f)
+        return;
+
+    float penetration = contact->penetration / totalInverseMass;
+
+    /* 두 물체의 위치를 질량에 반비례하여 조정한다 */
+    Vector3 deltaPosition = contact->normal * penetration;
+    body1->setPosition(
+        body1->getPosition() + deltaPosition * body1->getInverseMass()
+    );
+    if (body2 != nullptr)
+    {
+        body2->setPosition(
+            body2->getPosition() - deltaPosition * body2->getInverseMass()
+        );
+    }
+}
+
 void CollisionResolver::resolveLinearVelocity(Contact* contact)
 {
     RigidBody* body1 = contact->bodies[0];
@@ -469,7 +499,8 @@ void CollisionResolver::resolveLinearVelocity(Contact* contact)
     else
         separatingVelocity = (body1->getVelocity() - body2->getVelocity()).dot(contact->normal);
 
-    /* 분리 속도가 양수이면 두 물체는 서로 멀어지고 있는 것이므로 함수를 종료한다*/
+    /* 분리 속도가 양수이면
+        두 물체는 서로 멀어지고 있는 것이므로 함수를 종료한다*/
     if (separatingVelocity > 0.0f)
         return;
 
@@ -483,6 +514,11 @@ void CollisionResolver::resolveLinearVelocity(Contact* contact)
     float totalInverseMass = body1->getInverseMass();
     if (body2 != nullptr)
         totalInverseMass += body2->getInverseMass();
+    
+    /* 역질량의 합이 0 이면
+        두 물체가 무한의 질량을 가지는 것이므로 함수를 종료한다 */
+    if (totalInverseMass == 0.0f)
+        return;
     
     /* 충격량을 계산한다 */
     float impulse = deltaSeparatingVelocity / totalInverseMass;
