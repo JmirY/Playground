@@ -1,5 +1,6 @@
 #include <physics/rigid_body.h>
 #include <cmath>
+#include <iostream>
 
 using namespace physics;
 
@@ -49,6 +50,25 @@ void RigidBody::addForceAt(const Vector3& _force, const Vector3& point)
     /* 토크를 업데이트한다 */
     Vector3 pointFromCenter = point - position;
     torque += pointFromCenter.cross(_force);
+}
+
+Vector3 RigidBody::getAxis(int index) const
+{
+    /* 입력값 검사 */
+    if (index < 0 || index > 3)
+    {
+        std::cout << "RigidBody::getAxis::Out of index" << std::endl;
+        return Vector3();
+    }
+
+    Vector3 result(
+        transformMatrix.entries[index],
+        transformMatrix.entries[index + 4],
+        transformMatrix.entries[index + 8]
+    );
+    result.normalize();
+
+    return result;
 }
 
 void RigidBody::clearForceAndTorque()
