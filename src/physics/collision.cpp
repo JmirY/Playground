@@ -454,7 +454,79 @@ Vector3 CollisionDetector::calcContactPointOnLine(
 
 void CollisionResolver::resolveVelocity(Contact* contact)
 {
-    resolveLinearVelocity(contact);
+    RigidBody* body1 = contact->bodies[0];
+    RigidBody* body2 = contact->bodies[1];
+
+    Vector3 contactPointFromCenter1 = contact->contactPoint - body1->getPosition();
+    Vector3 contactPointFromCenter2;
+    if (body2 != nullptr)
+        contactPointFromCenter2 = contact->contactPoint - body2->getPosition();
+
+    /* 두 물체의 충돌점의 속도를 계산한다 */
+    Vector3 contactPointVelocity1 = body1->getVelocity() +
+        body1->getRotation().cross(contactPointFromCenter1);
+
+    Vector3 contactPointVelocity2;
+    if (body2 != nullptr)
+    {
+        contactPointVelocity2 = body2->getVelocity() +
+            body2->getRotation().cross(contactPointFromCenter2);
+    }
+        
+    /* 상대 속도를 계산한다 */
+    Vector3 relativeVelocity = contactPointVelocity2 - contactPointVelocity1;
+
+    /* 두 물체의 역질량의 합을 계산한다 */
+    float totalInverseMass = body1->getInverseMass();
+    if (body2 != nullptr)
+        totalInverseMass += body2->getInverseMass();
+    
+    /* 역질량의 합이 0 이라면
+        두 물체의 질량이 모두 무한대이므로 함수를 종료한다 */
+    if (totalInverseMass == 0.0f)
+        return;
+    
+    /* 충격량의 크기를 계산한다 */
+    float numerator = (relativeVelocity * (1.0f + contact->restitution)).dot(contact->normal);
+
+    Vector3 termInDenominator1 =
+        (body1->getInverseInertiaTensorWorld() * (contactPointFromCenter1.cross(contact->normal * -1.0f))).cross(contactPointFromCenter1);
+    Vector3 termInDenominator2;
+    if (body2 != nullptr) {
+        termInDenominator2 =
+            (body2->getInverseInertiaTensorWorld() * (contactPointFromCenter2.cross(contact->normal * -1.0f))).cross(contactPointFromCenter2);
+    }
+    float denominator = totalInverseMass +
+        (termInDenominator1 + termInDenominator2).dot(contact->normal * -1.0f);
+
+    float impulse = numerator / denominator;
+    Vector3 impulseVector = contact->normal * impulse;
+
+    /* 두 물체의 선속도를 갱신한다 */
+    body1->setVelocity(
+        body1->getVelocity() + impulseVector * body1->getInverseMass()
+    );
+
+    if (body2 != nullptr)
+    {
+        body2->setVelocity(
+            body2->getVelocity() - impulseVector * body2->getInverseMass()
+        );
+    }
+
+    /* 두 물체의 각속도를 갱신한다 */
+    Vector3 contactPointFromCenter = contact->contactPoint - body1->getPosition();
+    body1->setRotation(
+        body1->getRotation() + body1->getInverseInertiaTensorWorld() * impulse * (contactPointFromCenter.cross(contact->normal))
+    );
+
+    if (body2 != nullptr)
+    {
+        contactPointFromCenter = contact->contactPoint - body2->getPosition();
+        body2->setRotation(
+            body2->getRotation() - body2->getInverseInertiaTensorWorld() * impulse * (contactPointFromCenter.cross(contact->normal))
+        );
+    }
 }
 
 void CollisionResolver::resolvePenetration(Contact* contact)
@@ -495,7 +567,7 @@ void CollisionResolver::resolveLinearVelocity(Contact* contact)
     /* 현재의 분리 속도를 계산한다 */
     float separatingVelocity;
     if (body2 == nullptr) // 평면과 충돌할 때
-        separatingVelocity = body1->getPosition().dot(contact->normal);
+        separatingVelocity = body1->getVelocity().dot(contact->normal);
     else
         separatingVelocity = (body1->getVelocity() - body2->getVelocity()).dot(contact->normal);
 
@@ -536,9 +608,4 @@ void CollisionResolver::resolveLinearVelocity(Contact* contact)
             body2->getVelocity() - impulseVector * body2->getInverseMass()
         );
     }
-}
-
-void CollisionResolver::resolveAngularVelocity(Contact* contact)
-{
-
 }
