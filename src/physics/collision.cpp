@@ -211,7 +211,7 @@ bool CollisionDetector::boxAndBox(
     /* 충돌 지점을 찾는다 */
     if (minAxisIdx < 6) // 면-점 접촉일 때
     {
-        newContact->contactPoint = calcContactPointOnPlane(box1, box2, axes, minAxisIdx);
+        newContact->contactPoint = calcContactPointOnPlane(box1, box2, newContact->normal, minAxisIdx);
     }
     else // 선-선 접촉일 때
     {
@@ -293,49 +293,43 @@ float CollisionDetector::calcPenetration(const BoxCollider& box1, const BoxColli
 Vector3 CollisionDetector::calcContactPointOnPlane(
     const BoxCollider& box1,
     const BoxCollider& box2,
-    const std::vector<Vector3>& axes,
+    const Vector3& contactNormal,
     int minAxisIdx
 )
 {
-    /* 점이 충돌하는 박스의 정점들을 저장한다 */
-    Vector3 vertices[8];
-    /* 충돌과 관련된 점이 속하는 직육면체 */
-    const BoxCollider* box;
+    /* 충돌 정점 */
+    Vector3 vertex;
 
-    if (minAxisIdx < 3) // 면이 box1 의 면일 때
-        box = &box2;
-    else // 면이 box2 의 면일 때
-        box = &box1;
-    
-    vertices[0] = Vector3(-box->halfX, box->halfY, box->halfZ);
-    vertices[1] = Vector3(-box->halfX, -box->halfY, box->halfZ);
-    vertices[2] = Vector3(box->halfX, -box->halfY, box->halfZ);
-    vertices[3] = Vector3(box->halfX, box->halfY, box->halfZ);
-
-    vertices[4] = Vector3(-box->halfX, box->halfY, -box->halfZ);
-    vertices[5] = Vector3(-box->halfX, -box->halfY, -box->halfZ);
-    vertices[6] = Vector3(box->halfX, -box->halfY, -box->halfZ);
-    vertices[7] = Vector3(box->halfX, box->halfY, -box->halfZ);
-
-    /* 월드 좌표계로 변환한다 */
-    for (int i = 0; i < 8; ++i)
-        vertices[i] = box->body->getTransformMatrix() * vertices[i];
-
-
-    /* 평면과 가장 가까운 정점을 찾는다 */
-    float min = axes[minAxisIdx].dot(vertices[0]);
-    int minIdx = 0;
-
-    for (int i = 1; i < 8; ++i)
+    if (minAxisIdx < 3) // 충돌면이 box1 의 면일 때
     {
-        if (min > axes[minAxisIdx].dot(vertices[i]))
-        {
-            min = axes[minAxisIdx].dot(vertices[i]);
-            minIdx = i;
-        }
+        vertex = Vector3(box2.halfX, box2.halfY, box2.halfZ);
+
+        if (box2.body->getAxis(0).dot(contactNormal) < 0)
+            vertex.x *= -1.0f;
+        if (box2.body->getAxis(1).dot(contactNormal) < 0)
+            vertex.y *= -1.0f;
+        if (box2.body->getAxis(2).dot(contactNormal) < 0)
+            vertex.z *= -1.0f;
+
+        /* 월드 좌표로 변환한다 */
+        vertex = box2.body->getTransformMatrix() * vertex;
+    }
+    else // 충돌면이 box2 의 면일 때
+    {
+        vertex = Vector3(box1.halfX, box1.halfY, box1.halfZ);
+
+        if (box1.body->getAxis(0).dot(contactNormal) > 0)
+            vertex.x *= -1.0f;
+        if (box1.body->getAxis(1).dot(contactNormal) > 0)
+            vertex.y *= -1.0f;
+        if (box1.body->getAxis(2).dot(contactNormal) > 0)
+            vertex.z *= -1.0f;
+
+        /* 월드 좌표로 변환한다 */
+        vertex = box1.body->getTransformMatrix() * vertex;
     }
 
-    return vertices[minIdx];
+    return vertex;
 }
 
 Vector3 CollisionDetector::calcContactPointOnLine(
@@ -555,57 +549,6 @@ void CollisionResolver::resolvePenetration(Contact* contact)
     {
         body2->setPosition(
             body2->getPosition() - deltaPosition * body2->getInverseMass()
-        );
-    }
-}
-
-void CollisionResolver::resolveLinearVelocity(Contact* contact)
-{
-    RigidBody* body1 = contact->bodies[0];
-    RigidBody* body2 = contact->bodies[1];
-
-    /* 현재의 분리 속도를 계산한다 */
-    float separatingVelocity;
-    if (body2 == nullptr) // 평면과 충돌할 때
-        separatingVelocity = body1->getVelocity().dot(contact->normal);
-    else
-        separatingVelocity = (body1->getVelocity() - body2->getVelocity()).dot(contact->normal);
-
-    /* 분리 속도가 양수이면
-        두 물체는 서로 멀어지고 있는 것이므로 함수를 종료한다*/
-    if (separatingVelocity > 0.0f)
-        return;
-
-    /* 충돌 후 분리 속도를 계산한다 */
-    float newSeparatingVelocity = -1.0f * separatingVelocity * contact->restitution;
-
-    /* 분리 속도의 변화량을 계산한다 */
-    float deltaSeparatingVelocity = newSeparatingVelocity - separatingVelocity;
-
-    /* 두 물체의 역질량의 합을 계산한다 */
-    float totalInverseMass = body1->getInverseMass();
-    if (body2 != nullptr)
-        totalInverseMass += body2->getInverseMass();
-    
-    /* 역질량의 합이 0 이면
-        두 물체가 무한의 질량을 가지는 것이므로 함수를 종료한다 */
-    if (totalInverseMass == 0.0f)
-        return;
-    
-    /* 충격량을 계산한다 */
-    float impulse = deltaSeparatingVelocity / totalInverseMass;
-
-    /* 충격량 벡터를 계산한다 */
-    Vector3 impulseVector = contact->normal * impulse;
-
-    /* 물체에 충격량을 적용한다 */
-    body1->setVelocity(
-        body1->getVelocity() + impulseVector * body1->getInverseMass()
-    );
-    if (body2 != nullptr)
-    {
-        body2->setVelocity(
-            body2->getVelocity() - impulseVector * body2->getInverseMass()
         );
     }
 }

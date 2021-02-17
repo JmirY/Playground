@@ -121,15 +121,15 @@ namespace physics
             const Vector3& axis
         );
         
-        /* 직육면체 사이의 면-점 접촉일 때 충돌 지점을 찾는다 */
+        /* 직육면체의 면-점 접촉일 때 충돌 지점을 찾는다 */
         static Vector3 calcContactPointOnPlane(
             const BoxCollider& box1,
             const BoxCollider& box2,
-            const std::vector<Vector3>& axes,
+            const Vector3& contactNormal,
             int minPenetrationAxisIdx
         );
 
-        /* 직육면체 사이의 선-선 접촉일 때 충돌 지점을 찾는다 */
+        /* 직육면체의 선-선 접촉일 때 충돌 지점을 찾는다 */
         static Vector3 calcContactPointOnLine(
             const BoxCollider& box1,
             const BoxCollider& box2,
@@ -143,13 +143,6 @@ namespace physics
     public:
         static void resolveVelocity(Contact*);
         static void resolvePenetration(Contact*);
-
-    private:
-        /* 두 물체의 충돌 후 선속도를 계산하여 적용한다 */
-        static void resolveLinearVelocity(Contact*);
-
-        /* 두 물체의 충돌 후 회전(각속도+선속도)을 계산하여 적용한다 */
-        static void resolveAngularVelocity(Contact*);
     };
 } // namespace physics
 
