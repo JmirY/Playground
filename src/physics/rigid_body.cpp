@@ -154,6 +154,18 @@ void RigidBody::setVelocity(float x, float y, float z)
     velocity.z = z;
 }
 
+void RigidBody::setRotation(const Vector3& vec)
+{
+    rotation = vec;
+}
+
+void RigidBody::setRotation(float x, float y, float z)
+{
+    rotation.x = x;
+    rotation.y = y;
+    rotation.z = z;
+}
+
 void RigidBody::setAcceleration(const Vector3& vec)
 {
     acceleration = vec;
@@ -181,6 +193,16 @@ float RigidBody::getInverseMass() const
     return inverseMass;
 }
 
+Matrix3 RigidBody::getInverseInertiaTensor() const
+{
+    return inverseInertiaTensor;
+}
+
+Matrix3 RigidBody::getInverseInertiaTensorWorld() const
+{
+    return inverseInertiaTensorWorld;
+}
+
 Vector3 RigidBody::getPosition() const
 {
     return position;
@@ -189,6 +211,11 @@ Vector3 RigidBody::getPosition() const
 Vector3 RigidBody::getVelocity() const
 {
     return velocity;
+}
+
+Vector3 RigidBody::getRotation() const
+{
+    return rotation;
 }
 
 Vector3 RigidBody::getAcceleration() const
