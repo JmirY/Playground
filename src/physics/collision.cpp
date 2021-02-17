@@ -215,7 +215,7 @@ bool CollisionDetector::boxAndBox(
     }
     else // 선-선 접촉일 때
     {
-        newContact->contactPoint = calcContactPointOnLine(box1, box2, axes, minAxisIdx);
+        newContact->contactPoint = calcContactPointOnLine(box1, box2, newContact->normal, minAxisIdx);
     }
     
     contacts.push_back(newContact);
@@ -335,7 +335,7 @@ Vector3 CollisionDetector::calcContactPointOnPlane(
 Vector3 CollisionDetector::calcContactPointOnLine(
     const BoxCollider& box1,
     const BoxCollider& box2,
-    const std::vector<Vector3>& axes,
+    const Vector3& contactNormal,
     int minAxisIdx
 )
 {
@@ -343,18 +343,18 @@ Vector3 CollisionDetector::calcContactPointOnLine(
     Vector3 vertexOne(box1.halfX, box1.halfY, box1.halfZ);
     Vector3 vertexTwo(box2.halfX, box2.halfY, box2.halfZ);
 
-    if (box1.body->getAxis(0).dot(axes[minAxisIdx]) > 0)
+    if (box1.body->getAxis(0).dot(contactNormal) > 0)
         vertexOne.x *= -1.0f;
-    if (box1.body->getAxis(1).dot(axes[minAxisIdx]) > 0)
+    if (box1.body->getAxis(1).dot(contactNormal) > 0)
         vertexOne.y *= -1.0f;
-    if (box1.body->getAxis(2).dot(axes[minAxisIdx]) > 0)
+    if (box1.body->getAxis(2).dot(contactNormal) > 0)
         vertexOne.z *= -1.0f;
 
-    if (box2.body->getAxis(0).dot(axes[minAxisIdx]) < 0)
+    if (box2.body->getAxis(0).dot(contactNormal) < 0)
         vertexTwo.x *= -1.0f;
-    if (box2.body->getAxis(1).dot(axes[minAxisIdx]) < 0)
+    if (box2.body->getAxis(1).dot(contactNormal) < 0)
         vertexTwo.y *= -1.0f;
-    if (box2.body->getAxis(2).dot(axes[minAxisIdx]) < 0)
+    if (box2.body->getAxis(2).dot(contactNormal) < 0)
         vertexTwo.z *= -1.0f;
 
     /* 변의 방향을 찾는다 */

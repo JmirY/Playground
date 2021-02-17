@@ -121,7 +121,7 @@ namespace physics
             const Vector3& axis
         );
         
-        /* 직육면체의 면-점 접촉일 때 충돌 지점을 찾는다 */
+        /* 직육면체의 면-점 접촉일 때 충돌점을 찾는다 */
         static Vector3 calcContactPointOnPlane(
             const BoxCollider& box1,
             const BoxCollider& box2,
@@ -129,11 +129,11 @@ namespace physics
             int minPenetrationAxisIdx
         );
 
-        /* 직육면체의 선-선 접촉일 때 충돌 지점을 찾는다 */
+        /* 직육면체의 선-선 접촉일 때 충돌점을 찾는다 */
         static Vector3 calcContactPointOnLine(
             const BoxCollider& box1,
             const BoxCollider& box2,
-            const std::vector<Vector3>& axes,
+            const Vector3& contactNormal,
             int minPenetrationAxisIdx
         );
     };
