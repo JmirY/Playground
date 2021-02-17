@@ -1,7 +1,7 @@
 #ifndef COLLISION_H
 #define COLLISION_H
 
-#include "rigid_body.h"
+#include "body.h"
 #include <vector>
 
 namespace physics
