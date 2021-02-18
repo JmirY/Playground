@@ -53,8 +53,8 @@ Renderer::Renderer()
     /* Shape 등록 */
     Shape *cube = new Cube();
     Shape *sphere = new Sphere();
-    shapes["Cube"] = cube;
-    shapes["Sphere"] = sphere;
+    shapes[BOX] = cube;
+    shapes[SPHERE] = sphere;
 
     /* 배경 VAO 설정 */
     glGenVertexArrays(1, &backgroundVAO);
@@ -100,7 +100,7 @@ Renderer::~Renderer()
     glfwTerminate();
 }
 
-void Renderer::renderObject(std::string shapeType, glm::vec3 color, float modelMatrix[])
+void Renderer::renderObject(Geometry shapeType, glm::vec3 color, float modelMatrix[])
 {
     /* 변환 행렬 설정 */
     glm::mat4 model = glm::make_mat4(modelMatrix);
@@ -134,7 +134,7 @@ void Renderer::renderObject(std::string shapeType, glm::vec3 color, float modelM
     glBindVertexArray(0);
 }
 
-void Renderer::renderObject(std::string shapeType, glm::vec3 color, glm::mat4 modelMatrix)
+void Renderer::renderObject(Geometry shapeType, glm::vec3 color, glm::mat4 modelMatrix)
 {
     /* 변환 행렬 설정 */
     glm::mat4 view = camera->getViewMatrix();
@@ -191,7 +191,7 @@ void Renderer::renderBackground()
     {
         /* 원점을 지나는 선만 진하게 표시 */
         if (gap == GRID_GAP)
-            objectShader->setVec3("objectColor", glm::vec3(0.2f, 0.2f, 0.2f));
+            objectShader->setVec3("objectColor", glm::vec3(0.35f, 0.35f, 0.35f));
 
         /* +X축 방향 */
         glm::mat4 model(1.0f);
