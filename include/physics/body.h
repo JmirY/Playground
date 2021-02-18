@@ -10,7 +10,7 @@ namespace physics
 {
     class RigidBody
     {
-    protected:
+    protected:        
         /* 질량의 역수.
             적분식에 활용하기 좋고,
             무한대의 질량(ex. 배경)을 표현하기 편하다 */
@@ -75,7 +75,7 @@ namespace physics
         /* 현재 상태를 참고하여 변환 행렬을 업데이트한다 */
         void updateTransformMatrix();
 
-        /* 관성 텐서를 로컬 -> 월드 좌표계 기준으로 변환한다 */
+        /* 관성 모멘트 텐서를 로컬 -> 월드 좌표계 기준으로 변환한다 */
         void transformInertiaTensor();
 
     public:

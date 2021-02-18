@@ -1,7 +1,8 @@
 #ifndef COLLISION_H
 #define COLLISION_H
 
-#include "rigid_body.h"
+#include "body.h"
+#include "../geometry.h"
 #include <vector>
 
 namespace physics
@@ -14,6 +15,11 @@ namespace physics
         충돌체의 속성은 게임 오브젝트로부터 입력받는다 */
     class Collider
     {
+    public:
+        friend class CollisionDetector;
+
+        Geometry geometry;
+
     protected:
         RigidBody* body;
     };

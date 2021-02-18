@@ -7,12 +7,14 @@ using namespace physics;
 
 SphereCollider::SphereCollider(RigidBody* _body, float _radius)
 {
+    geometry = SPHERE;
     body = _body;
     radius = _radius;
 }
 
 BoxCollider::BoxCollider(RigidBody* _body, float _halfX, float _halfY, float _halfZ)
 {
+    geometry = BOX;
     body = _body;
     halfX = _halfX;
     halfY = _halfY;
