@@ -1,5 +1,5 @@
-#ifndef PHYSICS_CONTROLLER_H
-#define PHYSICS_CONTROLLER_H
+#ifndef SIMULATOR_H
+#define SIMULATOR_H
 
 #include "body.h"
 #include "collision.h"
@@ -8,7 +8,7 @@
 
 namespace physics
 {
-    class PhysicsController
+    class Simulator
     {
     public:
         typedef std::vector<RigidBody*> RigidBodies;
@@ -24,10 +24,10 @@ namespace physics
 
     public:
         /* 생성자 */
-        PhysicsController() : groundCollider(Vector3(0.0f, 1.0f, 0.0f), 0.0f) {}
+        Simulator() : groundCollider(Vector3(0.0f, 1.0f, 0.0f), 0.0f) {}
 
         /* 소멸자 */
-        ~PhysicsController();
+        ~Simulator();
 
         /* 주어진 시간 동안의 물리 현상을 시뮬레이팅한다 */
         void simulate(float duration);
@@ -41,4 +41,4 @@ namespace physics
     };
 } // namespace physics
 
-#endif // PHYSICS_CONTROLLER_H
+#endif // SIMULATOR_H

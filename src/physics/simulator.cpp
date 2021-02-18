@@ -1,9 +1,9 @@
-#include <physics/controller.h>
+#include <physics/simulator.h>
 #include <typeinfo>
 
 using namespace physics;
 
-PhysicsController::~PhysicsController()
+Simulator::~Simulator()
 {
     /* 충돌 정보 해제 */
     Contacts::iterator i = contacts.begin();
@@ -21,7 +21,7 @@ PhysicsController::~PhysicsController()
         delete *k;
 }
 
-void PhysicsController::simulate(float duration)
+void Simulator::simulate(float duration)
 {
     /* 물체들을 적분한다 */
     for (RigidBodies::iterator i = bodies.begin(); i != bodies.end(); ++i)
@@ -41,7 +41,7 @@ void PhysicsController::simulate(float duration)
     contacts.clear();
 }
 
-void PhysicsController::addPhysicsObject(Geometry geometry)
+void Simulator::addPhysicsObject(Geometry geometry)
 {
     /* 강체를 생성한다 */
     RigidBody* newBody = new RigidBody;
@@ -68,7 +68,7 @@ void PhysicsController::addPhysicsObject(Geometry geometry)
     colliders.push_back(newCollider);
 }
 
-void PhysicsController::detectCollision()
+void Simulator::detectCollision()
 {
     for (Colliders::iterator i = colliders.begin(); i != colliders.end(); ++i)
     {
