@@ -17,16 +17,17 @@ namespace physics
     {
     public:
         friend class CollisionDetector;
-
-        Geometry geometry;
+        friend class Simulator;
 
     protected:
+        Geometry geometry;
         RigidBody* body;
     };
 
     class SphereCollider : public Collider
     {
         friend class CollisionDetector;
+        friend class Simulator;
 
     protected:
         /* 구의 반지름 */
@@ -40,6 +41,7 @@ namespace physics
     class BoxCollider : public Collider
     {
         friend class CollisionDetector;
+        friend class Simulator;
 
     protected:
         /* x, y, z 축과 평행한 변의 절반 */
