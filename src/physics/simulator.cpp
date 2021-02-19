@@ -41,7 +41,7 @@ void Simulator::simulate(float duration)
     contacts.clear();
 }
 
-void Simulator::addPhysicsObject(Geometry geometry)
+RigidBody* Simulator::addPhysicsObject(Geometry geometry)
 {
     /* 강체를 생성한다 */
     RigidBody* newBody = new RigidBody;
@@ -66,6 +66,8 @@ void Simulator::addPhysicsObject(Geometry geometry)
 
     bodies.push_back(newBody);
     colliders.push_back(newCollider);
+
+    return newBody;
 }
 
 void Simulator::detectCollision()

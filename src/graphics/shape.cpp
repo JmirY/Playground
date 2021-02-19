@@ -92,6 +92,7 @@ void Sphere::generateVertices(float radius, int sectorCount, int stackCount)
     float stackStep = PI / stackCount;
     float sectorAngle, stackAngle;
 
+    vertices.clear();
     for(int i = 0; i <= stackCount; ++i)
     {
         stackAngle = PI / 2 - i * stackStep;        // starting from pi/2 to -pi/2

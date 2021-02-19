@@ -33,7 +33,7 @@ namespace physics
         void simulate(float duration);
 
         /* 새로운 물체를 시뮬레이션에 추가한다 */
-        void addPhysicsObject(Geometry);
+        RigidBody* addPhysicsObject(Geometry);
 
     private:
         /* 충돌을 검출하고 충돌 정보를 contacts 에 저장한다 */

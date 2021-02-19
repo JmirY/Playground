@@ -6,6 +6,7 @@
 #include "shader.h"
 #include "camera.h"
 #include "shape.h"
+#include "../geometry.h"
 #include <map>
 
 namespace graphics
@@ -42,7 +43,7 @@ namespace graphics
     class Renderer
     {
     public:
-        typedef std::map<std::string, Shape*> Shapes;
+        typedef std::map<Geometry, Shape*> Shapes;
 
         /* static 멤버 함수 convertScreenToWorld 에서 사용되므로 static 선언 */
         static int windowWidth, windowHeight;
@@ -64,8 +65,8 @@ namespace graphics
         ~Renderer();
 
         /* 오브젝트 렌더 */
-        void renderObject(std::string shape, glm::vec3 color, float modelMatrix[]);
-        void renderObject(std::string shape, glm::vec3 color, glm::mat4 modelMatrix);
+        void renderObject(Geometry, glm::vec3 color, float modelMatrix[]);
+        void renderObject(Geometry, glm::vec3 color, glm::mat4 modelMatrix);
 
         /* 배경 렌더 */
         void renderBackground();

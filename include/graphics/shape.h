@@ -30,7 +30,6 @@ namespace graphics
         /* 생성자 */
         Shape() {}
 
-    protected:
         /* 폴리곤, 테두리 VAO 설정 */
         void setVAO();
     };
@@ -47,7 +46,6 @@ namespace graphics
     {
     public:
         Sphere();
-    private:
         /* vertices 와 indices 데이터를 생성한다 */
         void generateVertices(float radius, int sectorCount, int stackCount);
         void generateIndices(int sectorCount, int stackCount);
