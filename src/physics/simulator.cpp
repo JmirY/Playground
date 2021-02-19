@@ -1,47 +1,44 @@
 #include <physics/simulator.h>
-#include <typeinfo>
+#include <iterator>
 
 using namespace physics;
 
 Simulator::~Simulator()
 {
     /* 충돌 정보 해제 */
-    Contacts::iterator i = contacts.begin();
-    for (; i != contacts.end(); ++i)
-        delete *i;
+    for (Contact* contact : contacts)
+        delete contact;
     
     /* 충돌체 해제 */
-    Colliders::iterator j = colliders.begin();
-    for (; j != colliders.end(); ++j)
-        delete *j;
+    for (auto collider : colliders)
+        delete collider.second;
     
     /* 강체 해제 */
-    RigidBodies::iterator k = bodies.begin();
-    for (; k != bodies.end(); ++k)
-        delete *k;
+    for (auto body : bodies)
+        delete body.second;
 }
 
 void Simulator::simulate(float duration)
 {
     /* 물체들을 적분한다 */
-    for (RigidBodies::iterator i = bodies.begin(); i != bodies.end(); ++i)
+    for (auto body : bodies)
     {
-        (*i)->integrate(duration);
+        body.second->integrate(duration);
     }
 
     /* 물체 간 충돌을 검출한다 */
     detectCollision();
 
     /* 충돌들을 처리한다 */
-    for (Contacts::iterator i = contacts.begin(); i != contacts.end(); ++i)
+    for (Contact* contact : contacts)
     {
-        (*i)->resolve();
-        delete *i;
+        contact->resolve();
+        delete contact;
     }
     contacts.clear();
 }
 
-RigidBody* Simulator::addRigidBody(Geometry geometry)
+RigidBody* Simulator::addRigidBody(unsigned int id, Geometry geometry)
 {
     /* 강체를 생성한다 */
     RigidBody* newBody = new RigidBody;
@@ -61,11 +58,11 @@ RigidBody* Simulator::addRigidBody(Geometry geometry)
     }
     newBody->setInertiaTensor(inertiaTensor);
 
-    bodies.push_back(newBody);
+    bodies[id] = newBody;
     return newBody;
 }
 
-Collider* Simulator::addCollider(Geometry geometry, RigidBody* body)
+Collider* Simulator::addCollider(unsigned int id, Geometry geometry, RigidBody* body)
 {
     Collider* newCollider;
 
@@ -74,55 +71,69 @@ Collider* Simulator::addCollider(Geometry geometry, RigidBody* body)
     else if (geometry == BOX)
         newCollider = new BoxCollider(body, 0.5f, 0.5f, 0.5f);
     
-    colliders.push_back(newCollider);
+    colliders[id] = newCollider;
     return newCollider;
+}
+
+void Simulator::deletePhysicsObject(unsigned int id)
+{
+    RigidBodies::iterator bodyIter = bodies.find(id);
+    Colliders::iterator colliderIter = colliders.find(id);
+
+    /* 벡터에서 해당 주소값들을 제거한다 */
+    bodies.erase(bodyIter);
+    colliders.erase(colliderIter);
+    
+    /* 메모리를 해제한다 */
+    delete bodyIter->second;
+    delete colliderIter->second;
 }
 
 void Simulator::detectCollision()
 {
     for (Colliders::iterator i = colliders.begin(); i != colliders.end(); ++i)
     {
-        for (Colliders::iterator j = i + 1; j != colliders.end(); ++j)
+        for (Colliders::iterator j = std::next(i, 1); j != colliders.end(); ++j)
         {
-            if ((*i)->geometry == SPHERE)
+            if (i->second->geometry == SPHERE)
             {
-                SphereCollider* collider1 = static_cast<SphereCollider*>(*i);
-                if ((*j)->geometry == SPHERE) // 구 - 구 충돌
+                SphereCollider* collider1 = static_cast<SphereCollider*>(i->second);
+                if (j->second->geometry == SPHERE) // 구 - 구 충돌
                 {
-                    SphereCollider* collider2 = static_cast<SphereCollider*>(*j);
+                    SphereCollider* collider2 = static_cast<SphereCollider*>(j->second);
                     CollisionDetector::sphereAndSphere(contacts, *collider1, *collider2);
                 }
-                else if ((*j)->geometry == BOX) // 구 - 직육면체 충돌
+                else if (j->second->geometry == BOX) // 구 - 직육면체 충돌
                 {
-                    BoxCollider* collider2 = static_cast<BoxCollider*>(*j);
+                    BoxCollider* collider2 = static_cast<BoxCollider*>(j->second);
                     CollisionDetector::sphereAndBox(contacts, *collider1, *collider2);
                 }
             }
-            else if ((*i)->geometry == BOX)
+            else if (i->second->geometry == BOX)
             {
-                BoxCollider* collider1 = static_cast<BoxCollider*>(*i);
-                if ((*j)->geometry == SPHERE) // 구 - 직육면체 충돌
+                BoxCollider* collider1 = static_cast<BoxCollider*>(i->second);
+                if (j->second->geometry == SPHERE) // 구 - 직육면체 충돌
                 {
-                    SphereCollider* collider2 = static_cast<SphereCollider*>(*j);
+                    SphereCollider* collider2 = static_cast<SphereCollider*>(j->second);
                     CollisionDetector::sphereAndBox(contacts, *collider2, *collider1);
                 }
-                else if ((*j)->geometry == BOX) // 직육면체 - 직육면체 충돌
+                else if (j->second->geometry == BOX) // 직육면체 - 직육면체 충돌
                 {
-                    BoxCollider* collider2 = static_cast<BoxCollider*>(*j);
+                    BoxCollider* collider2 = static_cast<BoxCollider*>(j->second);
                     CollisionDetector::boxAndBox(contacts, *collider1, *collider2);
                 }
             }
         }
 
         /* 지면과의 충돌 검사 */
-        if ((*i)->geometry == SPHERE)
+        if (i->second->geometry == SPHERE)
         {
-            SphereCollider* sphereCollider = static_cast<SphereCollider*>(*i);
+            SphereCollider* sphereCollider = static_cast<SphereCollider*>(i->second);
             CollisionDetector::sphereAndPlane(contacts, *sphereCollider, groundCollider);
         }
-        else if ((*i)->geometry == BOX)
+        else if (i->second->geometry == BOX)
         {
-            BoxCollider* boxCollider = static_cast<BoxCollider*>(*i);
+            BoxCollider* boxCollider = static_cast<BoxCollider*>(i->second);
             CollisionDetector::boxAndPlane(contacts, *boxCollider, groundCollider);
         }
     }

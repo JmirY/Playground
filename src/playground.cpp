@@ -25,12 +25,11 @@ void Playground::run()
         renderer.renderBackground();
 
         /* 오브젝트 렌더 */
-        Objects::iterator i = objects.begin();
-        for (; i != objects.end(); ++i)
+        for (auto object : objects)
         {
             float modelMatrix[16];
-            (*i)->body->getTransformMatrix(modelMatrix);
-            renderer.renderObject((*i)->geometry, (*i)->color, modelMatrix);
+            object.second->body->getTransformMatrix(modelMatrix);
+            renderer.renderObject(object.second->geometry, object.second->color, modelMatrix);
         }
 
         glfwSwapBuffers(renderer.window);
@@ -40,18 +39,16 @@ void Playground::run()
 
 void Playground::addObject(Geometry geometry)
 {
-    Object* newObject;
+    Object* newObject = new Object;
 
+    /* id 를 부여한다 */
+    newObject->id = idCounter;
+    
+    /* 도형 정보를 저장한다 */
     if (geometry == SPHERE)
-    {
-        newObject = new SphereObject;
         newObject->geometry = SPHERE;
-    }
     else if (geometry == BOX)
-    {
-        newObject = new BoxObject;
         newObject->geometry = BOX;
-    }
 
     /* 색상은 무작위로 설정한다 */
     newObject->color = glm::vec3(
@@ -61,8 +58,20 @@ void Playground::addObject(Geometry geometry)
     );
 
     /* 강체와 충돌체를 추가한다 */
-    newObject->body = simulator.addRigidBody(geometry);
-    newObject->collider = simulator.addCollider(geometry, newObject->body);
+    newObject->body = simulator.addRigidBody(idCounter, geometry);
+    newObject->collider = simulator.addCollider(idCounter, geometry, newObject->body);
 
-    objects.push_back(newObject);
+    objects[idCounter] = newObject;
+    ++idCounter;
+}
+
+void Playground::removeObject(unsigned int id)
+{
+    /* 물리 오브젝트를 제거한다 */
+    simulator.deletePhysicsObject(id);
+
+    /* 오브젝트를 objects 에서 제거하고 메모리에서 해제한다 */
+    Objects::iterator objectIter = objects.find(id);
+    objects.erase(objectIter);
+    delete objectIter->second;
 }

@@ -8,6 +8,7 @@
 class Object
 {
 public:
+    unsigned int id;
     Geometry geometry;
     physics::RigidBody* body;
     physics::Collider* collider;
