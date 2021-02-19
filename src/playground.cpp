@@ -61,7 +61,8 @@ void Playground::addObject(Geometry geometry)
     );
 
     /* 강체와 충돌체를 추가한다 */
-    newObject->body = simulator.addPhysicsObject(geometry);
+    newObject->body = simulator.addRigidBody(geometry);
+    newObject->collider = simulator.addCollider(geometry, newObject->body);
 
     objects.push_back(newObject);
 }

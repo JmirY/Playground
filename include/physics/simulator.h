@@ -32,8 +32,11 @@ namespace physics
         /* 주어진 시간 동안의 물리 현상을 시뮬레이팅한다 */
         void simulate(float duration);
 
-        /* 새로운 물체를 시뮬레이션에 추가한다 */
-        RigidBody* addPhysicsObject(Geometry);
+        /* 새로운 강체를 시뮬레이션에 추가하고 추가된 강체의 주소를 반환한다 */
+        RigidBody* addRigidBody(Geometry);
+
+        /* 주어진 강체를 감싸는 충돌체를 시뮬레이션에 추가하고 추가된 충돌체의 주소를 반환한다 */
+        Collider* addCollider(Geometry, RigidBody*);
 
     private:
         /* 충돌을 검출하고 충돌 정보를 contacts 에 저장한다 */

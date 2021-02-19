@@ -41,7 +41,7 @@ void Simulator::simulate(float duration)
     contacts.clear();
 }
 
-RigidBody* Simulator::addPhysicsObject(Geometry geometry)
+RigidBody* Simulator::addRigidBody(Geometry geometry)
 {
     /* 강체를 생성한다 */
     RigidBody* newBody = new RigidBody;
@@ -49,25 +49,33 @@ RigidBody* Simulator::addPhysicsObject(Geometry geometry)
     newBody->setPosition(0.0f, 2.0f, 0.0f);
     newBody->setAcceleration(0.0f, -1.0f, 0.0f);
 
-    /* 강체의 관성 모멘트 텐서와 충돌체를 생성한다 */
+    /* 강체의 관성 모멘트 텐서를 도형에 따라 결정한다 */
     Matrix3 inertiaTensor;
-    Collider* newCollider;
     if (geometry == SPHERE)
     {
         inertiaTensor.setDiagonal(2.0f);
-        newCollider = new SphereCollider(newBody, 1.0f);
     }
     else if (geometry == BOX)
     {
-        inertiaTensor.setDiagonal(2.0f);
-        newCollider = new BoxCollider(newBody, 0.5f, 0.5f, 0.5f);
+        inertiaTensor.setDiagonal(0.208333f);
     }
     newBody->setInertiaTensor(inertiaTensor);
 
     bodies.push_back(newBody);
-    colliders.push_back(newCollider);
-
     return newBody;
+}
+
+Collider* Simulator::addCollider(Geometry geometry, RigidBody* body)
+{
+    Collider* newCollider;
+
+    if (geometry == SPHERE)
+        newCollider = new SphereCollider(body, 1.0f);
+    else if (geometry == BOX)
+        newCollider = new BoxCollider(body, 0.5f, 0.5f, 0.5f);
+    
+    colliders.push_back(newCollider);
+    return newCollider;
 }
 
 void Simulator::detectCollision()
