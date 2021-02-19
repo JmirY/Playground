@@ -9,7 +9,8 @@ class Object
 {
 public:
     Geometry geometry;
-    physics::RigidBody *body;
+    physics::RigidBody* body;
+    physics::Collider* collider;
     glm::vec3 color;
 };
 
