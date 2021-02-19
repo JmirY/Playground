@@ -38,7 +38,7 @@ int main()
         /* 오브젝트 렌더 */
         glm::vec3 objectColor(1.0f, 0.5f, 0.3f);
         body.getTransformMatrix(modelMatrix);
-        renderer.renderObject("Cube", objectColor, modelMatrix);
+        renderer.renderObject("Box", objectColor, modelMatrix);
 
         /* 시간 계산 */
         curTime = glfwGetTime();

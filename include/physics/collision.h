@@ -37,6 +37,8 @@ namespace physics
     public:
         /* 생성자 */
         SphereCollider(RigidBody* body, float radius);
+
+        void setRadius(float value) { radius = value; }
     };
 
     class BoxCollider : public Collider
@@ -53,6 +55,8 @@ namespace physics
     public:
         /* 생성자 */
         BoxCollider(RigidBody* body, float halfX, float halfY, float halfZ);
+
+        void setHalfSize(float x, float y, float z) { halfX = x; halfY = y; halfZ = z; }
     };
 
     /* 바닥, 벽을 표현하기 위한 반무한체.

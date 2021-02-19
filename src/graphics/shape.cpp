@@ -1,6 +1,5 @@
 #include <graphics/opengl/glad/glad.h>
 #include <graphics/shape.h>
-#include <graphics/vertices_data.h>
 #include <cmath>
 
 using namespace graphics;
@@ -66,22 +65,49 @@ void Shape::setVAO()
     glBindVertexArray(0);
 }
 
-Cube::Cube()
+Box::Box()
 {
-    vertices = CUBE_VERTICES;
-    polygonIndices = CUBE_POLYGON_INDICES;
-    frameIndices = CUBE_FRAME_INDICES;
+    /* 직육면체를 처음 만들었을 땐 half size 가 0.5 다 */
+    generateVertices(0.5f, 0.5f, 0.5f);
+    polygonIndices = {
+        0, 1, 2,  0, 2, 3,  // 앞
+        4, 5, 6,  4, 6, 7,  // 뒤
+        3, 2, 6,  3, 6, 7,  // 위
+        0, 1, 5,  0, 5, 4,  // 아래
+        1, 5, 6,  1, 2, 6,  // 오른
+        0, 4, 7,  0, 3, 7,  // 왼
+    };
+    frameIndices = {
+        0, 1, 2, 3, 0,      // 앞
+        4, 5, 6, 7, 4,      // 뒤
+        5, 6, 2, 1, 5,      // 오른
+        4, 0, 3, 7, 4,      // 왼
+        7, 3, 2, 6, 7,      // 위
+        4, 5, 1, 0, 4       // 아래
+    };
     setVAO();
+}
+
+void Box::generateVertices(float halfX, float halfY, float halfZ)
+{
+    vertices.clear();
+    vertices = {
+        -halfX, -halfY, halfZ,  // bottom left
+        halfX, -halfY, halfZ,   // bottom right
+        halfX, halfY, halfZ,    // top right
+        -halfX, halfY, halfZ,   // top left
+
+        -halfX, -halfY, -halfZ, // bottom left
+        halfX, -halfY, -halfZ,  // bottom right
+        halfX, halfY, -halfZ,   // top right
+        -halfX, halfY, -halfZ   // top left
+    };
 }
 
 Sphere::Sphere()
 {
-    const float RADIUS = 1.0f;
-    const int SECTOR_CNT = 36;
-    const int STACK_CNT = 18;
-
-    generateVertices(RADIUS, SECTOR_CNT, STACK_CNT);
-    generateIndices(SECTOR_CNT, STACK_CNT);
+    generateVertices();
+    generateIndices();
     setVAO();
 }
 

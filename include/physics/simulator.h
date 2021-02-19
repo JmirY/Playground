@@ -40,7 +40,7 @@ namespace physics
         Collider* addCollider(unsigned int id, Geometry, RigidBody*);
 
         /* 충돌체와 강체를 제거한다 */
-        void deletePhysicsObject(unsigned int id);
+        void removePhysicsObject(unsigned int id);
 
     private:
         /* 충돌을 검출하고 충돌 정보를 contacts 에 저장한다 */

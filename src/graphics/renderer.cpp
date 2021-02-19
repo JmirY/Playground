@@ -50,12 +50,6 @@ Renderer::Renderer()
     glViewport(0, 0, windowWidth, windowHeight);
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 
-    /* Shape 등록 */
-    Shape *cube = new Cube();
-    Shape *sphere = new Sphere();
-    shapes[BOX] = cube;
-    shapes[SPHERE] = sphere;
-
     /* 배경 VAO 설정 */
     glGenVertexArrays(1, &backgroundVAO);
     glBindVertexArray(backgroundVAO);
@@ -100,7 +94,28 @@ Renderer::~Renderer()
     glfwTerminate();
 }
 
-void Renderer::renderObject(Geometry shapeType, glm::vec3 color, float modelMatrix[])
+Shape* Renderer::addShape(unsigned int id, Geometry geometry)
+{
+    Shape* newShape;
+
+    if (geometry == SPHERE)
+        newShape = new Sphere;
+    else if (geometry == BOX)
+        newShape = new Box;
+
+    shapes[id] = newShape;
+    return newShape;
+}
+
+void Renderer::removeShape(unsigned int id)
+{
+    Shapes::iterator shapeIter = shapes.find(id);
+
+    delete shapeIter->second;
+    shapes.erase(shapeIter);
+}
+
+void Renderer::renderObject(unsigned int id, glm::vec3 color, float modelMatrix[])
 {
     /* 변환 행렬 설정 */
     glm::mat4 model = glm::make_mat4(modelMatrix);
@@ -121,40 +136,7 @@ void Renderer::renderObject(Geometry shapeType, glm::vec3 color, float modelMatr
     objectShader->setVec3("viewPos", camera->getPosition());
 
     /* 오브젝트 표면 렌더 */
-    Shape *objectShape = shapes.find(shapeType)->second;
-    // std::cout << "DEBUG::Renderer::size of object's vertices = " << object->vertices.size() << std::endl; // debug
-    glBindVertexArray(objectShape->polygonVAO);
-    glDrawElements(GL_TRIANGLES, objectShape->polygonIndices.size(), GL_UNSIGNED_INT, (void*)0);
-
-    /* 오브젝트 테두리 렌더 */
-    objectShader->setVec3("objectColor", glm::vec3(0.0f, 0.0f, 0.0f));
-    glBindVertexArray(objectShape->frameVAO);
-    glDrawElements(GL_LINE_STRIP, objectShape->frameIndices.size(), GL_UNSIGNED_INT, (void*)0);
-
-    glBindVertexArray(0);
-}
-
-void Renderer::renderObject(Geometry shapeType, glm::vec3 color, glm::mat4 modelMatrix)
-{
-    /* 변환 행렬 설정 */
-    glm::mat4 view = camera->getViewMatrix();
-    glm::mat4 projection = glm::perspective(
-        glm::radians(camera->getFov()),
-        ((float) windowWidth) / windowHeight,
-        PERSPECTIVE_NEAR,
-        PERSPECTIVE_FAR
-    );
-
-    /* 셰이더 설정 */
-    objectShader->use();
-    objectShader->setMat4("model", modelMatrix);
-    objectShader->setMat4("view", view);
-    objectShader->setMat4("projection", projection);
-    objectShader->setVec3("objectColor", color);
-    objectShader->setVec3("viewPos", camera->getPosition());
-
-    /* 오브젝트 표면 렌더 */
-    Shape *objectShape = shapes.find(shapeType)->second;
+    Shape *objectShape = shapes.find(id)->second;
     // std::cout << "DEBUG::Renderer::size of object's vertices = " << object->vertices.size() << std::endl; // debug
     glBindVertexArray(objectShape->polygonVAO);
     glDrawElements(GL_TRIANGLES, objectShape->polygonIndices.size(), GL_UNSIGNED_INT, (void*)0);

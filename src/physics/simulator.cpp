@@ -75,7 +75,7 @@ Collider* Simulator::addCollider(unsigned int id, Geometry geometry, RigidBody* 
     return newCollider;
 }
 
-void Simulator::deletePhysicsObject(unsigned int id)
+void Simulator::removePhysicsObject(unsigned int id)
 {
     RigidBodies::iterator bodyIter = bodies.find(id);
     Colliders::iterator colliderIter = colliders.find(id);

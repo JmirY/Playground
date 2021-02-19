@@ -35,10 +35,12 @@ namespace graphics
     };
 
     /* 정육면체 */
-    class Cube : public Shape
+    class Box : public Shape
     {
     public:
-        Cube();
+        Box();
+        /* 주어진 데이터에 따라 정점을 생성한다 */
+        void generateVertices(float halfX, float halfY, float halfZ);
     };
 
     /* 구 (UV sphere) */
@@ -46,9 +48,8 @@ namespace graphics
     {
     public:
         Sphere();
-        /* vertices 와 indices 데이터를 생성한다 */
-        void generateVertices(float radius, int sectorCount, int stackCount);
-        void generateIndices(int sectorCount, int stackCount);
+        void generateVertices(float radius = 1.0f, int sectorCount = 36, int stackCount = 18);
+        void generateIndices(int sectorCount = 36, int stackCount = 18);
     };
 } // namespace graphics
 

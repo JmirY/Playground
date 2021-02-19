@@ -43,7 +43,7 @@ namespace graphics
     class Renderer
     {
     public:
-        typedef std::map<Geometry, Shape*> Shapes;
+        typedef std::map<unsigned int, Shape*> Shapes;
 
         /* static 멤버 함수 convertScreenToWorld 에서 사용되므로 static 선언 */
         static int windowWidth, windowHeight;
@@ -64,9 +64,14 @@ namespace graphics
         Renderer();
         ~Renderer();
 
+        /* Shape 추가 */
+        Shape* addShape(unsigned int id, Geometry);
+
+        /* Shape 제거 */
+        void removeShape(unsigned int id);
+
         /* 오브젝트 렌더 */
-        void renderObject(Geometry, glm::vec3 color, float modelMatrix[]);
-        void renderObject(Geometry, glm::vec3 color, glm::mat4 modelMatrix);
+        void renderObject(unsigned int id, glm::vec3 color, float modelMatrix[]);
 
         /* 배경 렌더 */
         void renderBackground();
