@@ -1,6 +1,6 @@
 #include <object.h>
 
-void SphereObject::updateData()
+void SphereObject::updateDerivedData()
 {
     /* 강체의 데이터를 갱신한다 */
     physics::Matrix3 inertiaTensor;
@@ -17,7 +17,7 @@ void SphereObject::updateData()
     sphereShape->setVAO();
 }
 
-void BoxObject::updateData()
+void BoxObject::updateDerivedData()
 {
     /* 강체의 데이터를 갱신한다 */
     physics::Matrix3 inertiaTensor;

@@ -39,17 +39,23 @@ void Playground::run()
 
 void Playground::addObject(Geometry geometry)
 {
-    Object* newObject = new Object;
+    Object* newObject;
+
+    /* 주어진 도형에 따라 인스턴스를 생성한다 */
+    if (geometry == SPHERE)
+    {
+        newObject = new SphereObject;
+        newObject->geometry = SPHERE;
+    }
+    else if (geometry == BOX)
+    {
+        newObject = new BoxObject;
+        newObject->geometry = BOX;
+    }
 
     /* id 를 부여한다 */
     newObject->id = idCounter;
     
-    /* 도형 정보를 저장한다 */
-    if (geometry == SPHERE)
-        newObject->geometry = SPHERE;
-    else if (geometry == BOX)
-        newObject->geometry = BOX;
-
     /* 강체와 충돌체를 추가한다 */
     newObject->body = simulator.addRigidBody(idCounter, geometry);
     newObject->collider = simulator.addCollider(idCounter, geometry, newObject->body);

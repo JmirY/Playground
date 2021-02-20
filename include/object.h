@@ -22,6 +22,17 @@ protected:
     physics::Collider* collider;
     glm::vec3 color;
     graphics::Shape* shape;
+
+public:
+    /* 소멸자 */
+    virtual ~Object() {};
+
+    /* 구의 반지름 또는 직육면체의 half-size 를 설정한다 */
+    virtual void setData(float) = 0;
+    virtual void setData(float, float, float) = 0;
+
+    /* 오브젝트의 설정값에 따라 강체, 충돌체, Shape 의 데이터를 갱신한다 */
+    virtual void updateDerivedData() = 0;
 };
 
 class SphereObject : public Object
@@ -31,10 +42,11 @@ protected:
 
 public:
     SphereObject() : radius(1.0f) {}
+    ~SphereObject() {}
 
-    void setRadius(float value) { radius = value; }
-    /* 오브젝트의 설정값에 따라 강체, 충돌체, Shape 의 데이터를 갱신한다 */
-    void updateData();
+    void setData(float value) { radius = value; }
+    void setData(float, float, float) {}
+    void updateDerivedData();
 };
 
 class BoxObject : public Object
@@ -46,11 +58,11 @@ protected:
 
 public:
     BoxObject() : halfX(0.5f), halfY(0.5f), halfZ(0.5f) {}
+    ~BoxObject() {}
 
-    void setHalfX(float x) { halfX = x; }
-    void setHalfY(float y) { halfY = y; }
-    void setHalfZ(float z) { halfZ = z; }
-    void updateData();
+    void setData(float halfSize) { halfX = halfY = halfZ = halfSize; }
+    void setData(float x, float y, float z) { halfX = x; halfY = y; halfZ = z;}
+    void updateDerivedData();
 };
 
 #endif // OBJECT_H
