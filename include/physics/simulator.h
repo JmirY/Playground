@@ -16,7 +16,7 @@ namespace physics
         typedef std::map<unsigned int, Collider*> Colliders;
         typedef std::vector<Contact*> Contacts;
 
-    public: // TODO: private 으로 변경
+    private:
         RigidBodies bodies;
         Colliders colliders;
         Contacts contacts;
@@ -24,10 +24,7 @@ namespace physics
         PlaneCollider groundCollider;
 
     public:
-        /* 생성자 */
         Simulator() : groundCollider(Vector3(0.0f, 1.0f, 0.0f), 0.0f) {}
-
-        /* 소멸자 */
         ~Simulator();
 
         /* 주어진 시간 동안의 물리 현상을 시뮬레이팅한다 */
