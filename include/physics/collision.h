@@ -23,6 +23,10 @@ namespace physics
     protected:
         Geometry geometry;
         RigidBody* body;
+
+    public:
+        virtual ~Collider() {}
+        virtual void setGeometricData(double, ...) = 0;
     };
 
     class SphereCollider : public Collider
@@ -31,14 +35,12 @@ namespace physics
         friend class Simulator;
 
     protected:
-        /* 구의 반지름 */
         float radius;
 
     public:
-        /* 생성자 */
         SphereCollider(RigidBody* body, float radius);
 
-        void setRadius(float value) { radius = value; }
+        void setGeometricData(double, ...);
     };
 
     class BoxCollider : public Collider
@@ -47,16 +49,14 @@ namespace physics
         friend class Simulator;
 
     protected:
-        /* x, y, z 축과 평행한 변의 절반 */
         float halfX;
         float halfY;
         float halfZ;
 
     public:
-        /* 생성자 */
         BoxCollider(RigidBody* body, float halfX, float halfY, float halfZ);
 
-        void setHalfSize(float x, float y, float z) { halfX = x; halfY = y; halfZ = z; }
+        void setGeometricData(double, ...);
     };
 
     /* 바닥, 벽을 표현하기 위한 반무한체.
@@ -74,7 +74,6 @@ namespace physics
         float offset;
 
     public:
-        /* 생성자 */
         PlaneCollider(Vector3 normal, float offset);
     };
 

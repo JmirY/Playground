@@ -14,8 +14,7 @@ void SphereObject::updateDerivedData()
     body->setInertiaTensor(inertiaTensor);
 
     /* 충돌체의 데이터를 갱신한다 */
-    physics::SphereCollider* sphereCollider = static_cast<physics::SphereCollider*>(collider);
-    sphereCollider->setRadius(radius);
+    collider->setGeometricData(radius);
 
     /* Shape 의 데이터를 갱신한다 */
     graphics::Sphere* sphereShape = static_cast<graphics::Sphere*>(shape);
@@ -47,8 +46,7 @@ void BoxObject::updateDerivedData()
     body->setInertiaTensor(inertiaTensor);
 
     /* 충돌체의 데이터를 갱신한다 */
-    physics::BoxCollider* boxCollider = static_cast<physics::BoxCollider*>(collider);
-    boxCollider->setHalfSize(halfX, halfY, halfZ);
+    collider->setGeometricData(halfX, halfY, halfZ);
 
     /* Shape 의 데이터를 갱신한다 */
     graphics::Box* boxShape = static_cast<graphics::Box*>(shape);

@@ -2,6 +2,7 @@
 #include <cmath>
 #include <iostream>
 #include <limits>
+#include <cstdarg>
 
 using namespace physics;
 
@@ -12,6 +13,11 @@ SphereCollider::SphereCollider(RigidBody* _body, float _radius)
     radius = _radius;
 }
 
+void SphereCollider::setGeometricData(double value, ...)
+{
+    radius = value;
+}
+
 BoxCollider::BoxCollider(RigidBody* _body, float _halfX, float _halfY, float _halfZ)
 {
     geometry = BOX;
@@ -19,6 +25,19 @@ BoxCollider::BoxCollider(RigidBody* _body, float _halfX, float _halfY, float _ha
     halfX = _halfX;
     halfY = _halfY;
     halfZ = _halfZ;
+}
+
+void BoxCollider::setGeometricData(double value, ...)
+{
+    halfX = value;
+
+    va_list args;
+    va_start(args, value);
+    
+    halfY = va_arg(args, double);
+    halfZ = va_arg(args, double);
+
+    va_end(args);
 }
 
 PlaneCollider::PlaneCollider(Vector3 _normal, float _offset)
