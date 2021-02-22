@@ -1,6 +1,7 @@
 #include <graphics/opengl/glad/glad.h>
 #include <graphics/shape.h>
 #include <cmath>
+#include <cstdarg>
 
 using namespace graphics;
 
@@ -67,7 +68,6 @@ void Shape::generateVAOs()
 
 Box::Box()
 {
-    /* 직육면체를 처음 만들었을 땐 half size 가 0.5 다 */
     generateVertices(0.5f, 0.5f, 0.5f);
     polygonIndices = {
         0, 1, 2,  0, 2, 3,  // 앞
@@ -88,8 +88,16 @@ Box::Box()
     generateVAOs();
 }
 
-void Box::generateVertices(float halfX, float halfY, float halfZ)
+void Box::generateVertices(double value, ...)
 {
+    float halfX = (float)value;
+
+    va_list args;
+    va_start(args, value);
+
+    float halfY = (float) va_arg(args, double);
+    float halfZ = (float) va_arg(args, double);
+    
     vertices.clear();
     vertices = {
         -halfX, -halfY, halfZ,  // bottom left
@@ -106,20 +114,20 @@ void Box::generateVertices(float halfX, float halfY, float halfZ)
 
 Sphere::Sphere()
 {
-    generateVertices();
+    generateVertices(1.0f);
     generateIndices();
     generateVAOs();
 }
 
-void Sphere::generateVertices(float radius, int sectorCount, int stackCount)
+void Sphere::generateVertices(double radius, ...)
 {
     float x, y, z, xy;
-    float sectorStep = 2 * PI / sectorCount;
-    float stackStep = PI / stackCount;
+    float sectorStep = 2 * PI / SECTOR_CNT;
+    float stackStep = PI / STACK_CNT;
     float sectorAngle, stackAngle;
 
     vertices.clear();
-    for(int i = 0; i <= stackCount; ++i)
+    for(int i = 0; i <= STACK_CNT; ++i)
     {
         stackAngle = PI / 2 - i * stackStep;        // starting from pi/2 to -pi/2
         xy = radius * cosf(stackAngle);             // r * cos(u)
@@ -127,7 +135,7 @@ void Sphere::generateVertices(float radius, int sectorCount, int stackCount)
 
         // add (sectorCount+1) vertices per stack
         // the first and last vertices have same position and normal, but different tex coords
-        for(int j = 0; j <= sectorCount; ++j)
+        for(int j = 0; j <= SECTOR_CNT; ++j)
         {
             sectorAngle = j * sectorStep;           // starting from 0 to 2pi
 
@@ -141,15 +149,15 @@ void Sphere::generateVertices(float radius, int sectorCount, int stackCount)
     }
 }
 
-void Sphere::generateIndices(int sectorCount, int stackCount)
+void Sphere::generateIndices()
 {
     int k1, k2;
-    for(int i = 0; i < stackCount; ++i)
+    for(int i = 0; i < STACK_CNT; ++i)
     {
-        k1 = i * (sectorCount + 1);     // beginning of current stack
-        k2 = k1 + sectorCount + 1;      // beginning of next stack
+        k1 = i * (SECTOR_CNT + 1);     // beginning of current stack
+        k2 = k1 + SECTOR_CNT + 1;      // beginning of next stack
 
-        for(int j = 0; j < sectorCount; ++j, ++k1, ++k2)
+        for(int j = 0; j < SECTOR_CNT; ++j, ++k1, ++k2)
         {
             // 2 triangles per sector excluding first and last stacks
             // k1 => k2 => k1+1
@@ -161,7 +169,7 @@ void Sphere::generateIndices(int sectorCount, int stackCount)
             }
 
             // k1+1 => k2 => k2+1
-            if(i != (stackCount-1))
+            if(i != (STACK_CNT-1))
             {
                 polygonIndices.push_back(k1 + 1);
                 polygonIndices.push_back(k2);

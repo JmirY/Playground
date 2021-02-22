@@ -14,13 +14,13 @@ namespace graphics
         /* 도형의 정점들 */
         std::vector<float> vertices;
 
-        /* 폴리곤을 구성하는 정점들의 인덱스 저장 */
+        /* 표면을 구성하는 정점들의 인덱스 저장 */
         std::vector<unsigned int> polygonIndices;
 
-        /* 프레임(테두리)을 구성하는 정점들의 인덱스 저장 */
+        /* 테두리를 구성하는 정점들의 인덱스 저장 */
         std::vector<unsigned int> frameIndices;
 
-        /* 폴리곤을 렌더할 때 사용하는 VAO */
+        /* 표면을 렌더할 때 사용하는 VAO */
         unsigned int polygonVAO;
 
         /* 테두리를 렌더할 때 사용하는 VAO */
@@ -28,27 +28,34 @@ namespace graphics
 
     public:
         Shape() {}
+        virtual ~Shape() {}
 
         /* 폴리곤, 테두리 VAO 설정 */
         void generateVAOs();
+
+        /* 주어진 도형 데이터에 맞춰 정점 데이터를 생성한다.
+            가변 인자를 활용하기 위해 인자를 double 로 선언한다 */
+        virtual void generateVertices(double, ...) = 0;
     };
 
-    /* 정육면체 */
     class Box : public Shape
     {
     public:
         Box();
-        /* 주어진 데이터에 따라 정점을 생성한다 */
-        void generateVertices(float halfX, float halfY, float halfZ);
+        void generateVertices(double, ...);
     };
 
-    /* 구 (UV sphere) */
+    /* UV sphere */
     class Sphere : public Shape
     {
     public:
+        static const int SECTOR_CNT = 36;
+        static const int STACK_CNT = 18;
+
+    public:
         Sphere();
-        void generateVertices(float radius = 1.0f, int sectorCount = 36, int stackCount = 18);
-        void generateIndices(int sectorCount = 36, int stackCount = 18);
+        void generateVertices(double, ...);
+        void generateIndices();
     };
 } // namespace graphics
 

@@ -24,6 +24,7 @@ protected:
     graphics::Shape* shape;
 
 public:
+    Object() {}
     virtual ~Object() {};
 
     /* 구의 반지름 또는 직육면체의 half-size 를 설정한다 */

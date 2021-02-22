@@ -17,9 +17,8 @@ void SphereObject::updateDerivedData()
     collider->setGeometricData(radius);
 
     /* Shape 의 데이터를 갱신한다 */
-    graphics::Sphere* sphereShape = static_cast<graphics::Sphere*>(shape);
-    sphereShape->generateVertices(radius);
-    sphereShape->generateVAOs();
+    shape->generateVertices(radius);
+    shape->generateVAOs();
 }
 
 void BoxObject::setGeometricData(double value, ...)
@@ -49,7 +48,6 @@ void BoxObject::updateDerivedData()
     collider->setGeometricData(halfX, halfY, halfZ);
 
     /* Shape 의 데이터를 갱신한다 */
-    graphics::Box* boxShape = static_cast<graphics::Box*>(shape);
-    boxShape->generateVertices(halfX, halfY, halfZ);
-    boxShape->generateVAOs();
+    shape->generateVertices(halfX, halfY, halfZ);
+    shape->generateVAOs();
 }
