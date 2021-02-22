@@ -32,7 +32,8 @@ void Simulator::simulate(float duration)
     /* 충돌들을 처리한다 */
     for (Contact* contact : contacts)
     {
-        contact->resolve();
+        contact->resolveVelocity();
+        contact->resolvePenetration();
         delete contact;
     }
     contacts.clear();

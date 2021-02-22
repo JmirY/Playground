@@ -2,12 +2,6 @@
 
 using namespace physics;
 
-void Contact::resolve()
-{
-    resolveVelocity();
-    resolvePenetration();
-}
-
 void Contact::resolveVelocity()
 {
     Vector3 contactPointFromCenter1 = contactPoint - bodies[0]->getPosition();
