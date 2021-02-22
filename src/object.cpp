@@ -14,7 +14,7 @@ void SphereObject::updateDerivedData()
     /* Shape 의 데이터를 갱신한다 */
     graphics::Sphere* sphereShape = static_cast<graphics::Sphere*>(shape);
     sphereShape->generateVertices(radius);
-    sphereShape->setVAO();
+    sphereShape->generateVAOs();
 }
 
 void BoxObject::updateDerivedData()
@@ -34,5 +34,5 @@ void BoxObject::updateDerivedData()
     /* Shape 의 데이터를 갱신한다 */
     graphics::Box* boxShape = static_cast<graphics::Box*>(shape);
     boxShape->generateVertices(halfX, halfY, halfZ);
-    boxShape->setVAO();
+    boxShape->generateVAOs();
 }

@@ -27,11 +27,10 @@ namespace graphics
         unsigned int frameVAO;
 
     public:
-        /* 생성자 */
         Shape() {}
 
         /* 폴리곤, 테두리 VAO 설정 */
-        void setVAO();
+        void generateVAOs();
     };
 
     /* 정육면체 */

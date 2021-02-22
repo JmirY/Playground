@@ -6,7 +6,7 @@ using namespace graphics;
 
 const float PI = 3.141592f;
 
-void Shape::setVAO()
+void Shape::generateVAOs()
 {
     /* 폴리곤 VAO 설정 */
     glGenVertexArrays(1, &polygonVAO);
@@ -85,7 +85,7 @@ Box::Box()
         7, 3, 2, 6, 7,      // 위
         4, 5, 1, 0, 4       // 아래
     };
-    setVAO();
+    generateVAOs();
 }
 
 void Box::generateVertices(float halfX, float halfY, float halfZ)
@@ -108,7 +108,7 @@ Sphere::Sphere()
 {
     generateVertices();
     generateIndices();
-    setVAO();
+    generateVAOs();
 }
 
 void Sphere::generateVertices(float radius, int sectorCount, int stackCount)
