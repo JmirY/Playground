@@ -81,13 +81,11 @@ void Simulator::removePhysicsObject(unsigned int id)
     RigidBodies::iterator bodyIter = bodies.find(id);
     Colliders::iterator colliderIter = colliders.find(id);
 
-    /* 벡터에서 해당 주소값들을 제거한다 */
-    bodies.erase(bodyIter);
-    colliders.erase(colliderIter);
-    
-    /* 메모리를 해제한다 */
     delete bodyIter->second;
     delete colliderIter->second;
+
+    bodies.erase(bodyIter);
+    colliders.erase(colliderIter);
 }
 
 void Simulator::detectCollision()
