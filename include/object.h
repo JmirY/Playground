@@ -27,8 +27,7 @@ public:
     virtual ~Object() {};
 
     /* 구의 반지름 또는 직육면체의 half-size 를 설정한다 */
-    virtual void setGeometricData(float) = 0;
-    virtual void setGeometricData(float, float, float) = 0;
+    virtual void setGeometricData(double, ...) = 0;
 
     /* 도형의 속성값에 따라 강체, 충돌체, Shape 의 데이터를 갱신한다 */
     virtual void updateDerivedData() = 0;
@@ -42,8 +41,7 @@ protected:
 public:
     SphereObject() : radius(1.0f) {}
 
-    void setGeometricData(float value) { radius = value; }
-    void setGeometricData(float, float, float) {}
+    void setGeometricData(double, ...);
     void updateDerivedData();
 };
 
@@ -57,8 +55,7 @@ protected:
 public:
     BoxObject() : halfX(0.5f), halfY(0.5f), halfZ(0.5f) {}
 
-    void setGeometricData(float halfSize) { halfX = halfY = halfZ = halfSize; }
-    void setGeometricData(float x, float y, float z) { halfX = x; halfY = y; halfZ = z;}
+    void setGeometricData(double, ...);
     void updateDerivedData();
 };
 

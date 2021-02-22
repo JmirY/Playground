@@ -1,4 +1,10 @@
 #include <object.h>
+#include <cstdarg>
+
+void SphereObject::setGeometricData(double value, ...)
+{
+    radius = value;
+}
 
 void SphereObject::updateDerivedData()
 {
@@ -15,6 +21,19 @@ void SphereObject::updateDerivedData()
     graphics::Sphere* sphereShape = static_cast<graphics::Sphere*>(shape);
     sphereShape->generateVertices(radius);
     sphereShape->generateVAOs();
+}
+
+void BoxObject::setGeometricData(double value, ...)
+{
+    halfX = value;
+
+    va_list args;
+    va_start(args, value);
+    
+    halfY = va_arg(args, double);
+    halfZ = va_arg(args, double);
+
+    va_end(args);
 }
 
 void BoxObject::updateDerivedData()
