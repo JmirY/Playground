@@ -83,7 +83,7 @@ Renderer::Renderer()
 Renderer::~Renderer()
 {
     /* shapes 원소들 해제 */
-    for (auto shape : shapes)
+    for (auto& shape : shapes)
     {
         delete shape.second;
     }
@@ -92,6 +92,11 @@ Renderer::~Renderer()
     delete objectShader;
 
     glfwTerminate();
+}
+
+GLFWwindow* Renderer::getWindow()
+{
+    return window;
 }
 
 Shape* Renderer::addShape(unsigned int id, Geometry geometry)

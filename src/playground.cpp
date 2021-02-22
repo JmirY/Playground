@@ -6,7 +6,7 @@ void Playground::run()
     double prevTime = glfwGetTime();
     double curTime, deltaTime;
 
-    while (!glfwWindowShouldClose(renderer.window))
+    while (!glfwWindowShouldClose(renderer.getWindow()))
     {
         /* 시간 계산 */
         curTime = glfwGetTime();
@@ -32,7 +32,7 @@ void Playground::run()
             renderer.renderObject(object.second->id, object.second->color, modelMatrix);
         }
 
-        glfwSwapBuffers(renderer.window);
+        glfwSwapBuffers(renderer.getWindow());
         glfwPollEvents();
     }
 }

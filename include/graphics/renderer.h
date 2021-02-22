@@ -45,14 +45,15 @@ namespace graphics
     public:
         typedef std::map<unsigned int, Shape*> Shapes;
 
+    private:
         /* static 멤버 함수 convertScreenToWorld 에서 사용되므로 static 선언 */
         static int windowWidth, windowHeight;
 
-    public: // TODO: Controller 클래스 작성 후 protected 으로 바꾸기
         GLFWwindow *window;
 
-        static Camera *camera;
-        Shader *objectShader;
+        /* static 멤버 함수 convertScreenToWorld 에서 사용되므로 static 선언 */
+        static Camera* camera;
+        Shader* objectShader;
 
         /* Shape 포인터 저장 */
         Shapes shapes;
@@ -63,6 +64,8 @@ namespace graphics
     public:
         Renderer();
         ~Renderer();
+
+        GLFWwindow* getWindow();
 
         /* Shape 추가 */
         Shape* addShape(unsigned int id, Geometry);
