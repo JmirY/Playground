@@ -21,10 +21,10 @@ namespace physics
         friend class Simulator;
 
     protected:
-        Geometry geometry;
         RigidBody* body;
 
     public:
+        Collider() {}
         virtual ~Collider() {}
         virtual void setGeometricData(double, ...) = 0;
     };
@@ -38,8 +38,7 @@ namespace physics
         float radius;
 
     public:
-        SphereCollider(RigidBody* body, float radius);
-
+        SphereCollider(RigidBody* _body, float _radius);
         void setGeometricData(double, ...);
     };
 
@@ -55,7 +54,6 @@ namespace physics
 
     public:
         BoxCollider(RigidBody* body, float halfX, float halfY, float halfZ);
-
         void setGeometricData(double, ...);
     };
 
