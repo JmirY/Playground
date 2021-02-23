@@ -25,7 +25,7 @@ namespace graphics
     const float GRID_GAP = 1.0f;
 
     /******************************
-     * Renderer 클래스 프로퍼티 초기값 *
+     * Renderer 클래스 속성 초기값 *
      ******************************/
 
     /* 초기 윈도우 너비 & 높이 */
@@ -53,7 +53,7 @@ namespace graphics
 
         /* static 멤버 함수 convertScreenToWorld 에서 사용되므로 static 선언 */
         static Camera* camera;
-        Shader* objectShader;
+        Shader objectShader;
 
         /* Shape 포인터 저장 */
         Shapes shapes;

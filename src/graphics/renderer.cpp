@@ -70,7 +70,7 @@ Renderer::Renderer()
     glBindVertexArray(0);
 
     /* Shader 인스턴스 생성 */
-    objectShader = new Shader(
+    objectShader = Shader(
         "./shaders/object_vertex.glsl",
         "./shaders/object_fragment.glsl"
     );
@@ -89,7 +89,6 @@ Renderer::~Renderer()
     }
     /* Camera & Shader 인스턴스 해제 */
     delete camera;
-    delete objectShader;
 
     glfwTerminate();
 }
@@ -133,12 +132,12 @@ void Renderer::renderObject(unsigned int id, glm::vec3 color, float modelMatrix[
     );
 
     /* 셰이더 설정 */
-    objectShader->use();
-    objectShader->setMat4("model", model);
-    objectShader->setMat4("view", view);
-    objectShader->setMat4("projection", projection);
-    objectShader->setVec3("objectColor", color);
-    objectShader->setVec3("viewPos", camera->getPosition());
+    objectShader.use();
+    objectShader.setMat4("model", model);
+    objectShader.setMat4("view", view);
+    objectShader.setMat4("projection", projection);
+    objectShader.setVec3("objectColor", color);
+    objectShader.setVec3("viewPos", camera->getPosition());
 
     /* 오브젝트 표면 렌더 */
     Shape *objectShape = shapes.find(id)->second;
@@ -147,7 +146,7 @@ void Renderer::renderObject(unsigned int id, glm::vec3 color, float modelMatrix[
     glDrawElements(GL_TRIANGLES, objectShape->polygonIndices.size(), GL_UNSIGNED_INT, (void*)0);
 
     /* 오브젝트 테두리 렌더 */
-    objectShader->setVec3("objectColor", glm::vec3(0.0f, 0.0f, 0.0f));
+    objectShader.setVec3("objectColor", glm::vec3(0.0f, 0.0f, 0.0f));
     glBindVertexArray(objectShape->frameVAO);
     glDrawElements(GL_LINE_STRIP, objectShape->frameIndices.size(), GL_UNSIGNED_INT, (void*)0);
 
@@ -166,11 +165,11 @@ void Renderer::renderBackground()
     );
 
     /* 셰이더 설정 */
-    objectShader->use();
-    objectShader->setMat4("view", view);
-    objectShader->setMat4("projection", projection);
-    objectShader->setVec3("objectColor", glm::vec3(0.0f, 0.0f, 0.0f));
-    objectShader->setVec3("viewPos", camera->getPosition());
+    objectShader.use();
+    objectShader.setMat4("view", view);
+    objectShader.setMat4("projection", projection);
+    objectShader.setVec3("objectColor", glm::vec3(0.0f, 0.0f, 0.0f));
+    objectShader.setVec3("viewPos", camera->getPosition());
 
     /* 직선을 translate 하며 grid 렌더 */
     glBindVertexArray(backgroundVAO);
@@ -178,29 +177,29 @@ void Renderer::renderBackground()
     {
         /* 원점을 지나는 선만 진하게 표시 */
         if (gap == GRID_GAP)
-            objectShader->setVec3("objectColor", glm::vec3(0.35f, 0.35f, 0.35f));
+            objectShader.setVec3("objectColor", glm::vec3(0.35f, 0.35f, 0.35f));
 
         /* +X축 방향 */
         glm::mat4 model(1.0f);
         model = glm::translate(model, glm::vec3(gap, 0.0f, 0.0f));
-        objectShader->setMat4("model", model);
+        objectShader.setMat4("model", model);
         glDrawArrays(GL_LINES, 0, 2);
         /* -X축 방향 */
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(-gap, 0.0f, 0.0f));
-        objectShader->setMat4("model", model);
+        objectShader.setMat4("model", model);
         glDrawArrays(GL_LINES, 0, 2);
         /* +Z축 방향 */
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, 0.0f, gap));
         model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        objectShader->setMat4("model", model);
+        objectShader.setMat4("model", model);
         glDrawArrays(GL_LINES, 0, 2);
         /* -Z축 방향 */
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, 0.0f, -gap));
         model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        objectShader->setMat4("model", model);
+        objectShader.setMat4("model", model);
         glDrawArrays(GL_LINES, 0, 2);
     }
     glBindVertexArray(0);

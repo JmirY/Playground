@@ -10,11 +10,12 @@ namespace graphics
     {
     public:
         /* 셰이더 프로그램 ID */
-        unsigned int ID;
+        unsigned int id;
 
     public:
-        /* 생성자 */
-        /* 셰이더 소스들의 경로를 인자로 받아 빌드한다 */
+        Shader() {}
+        /* 셰이더 소스들의 경로를 인자로 받아 빌드한다.
+            GLFW 윈도우가 활성화 되어 있어야한다 */
         Shader(const char* vertexPath, const char* fragmentPath);
 
         /* 셰이더를 활성화 한다 */
