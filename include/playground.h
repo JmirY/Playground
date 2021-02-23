@@ -15,15 +15,14 @@ private:
     physics::Simulator simulator;
     graphics::Renderer renderer;
 
-    /* 새로운 오브젝트에 부여될 식별자를 기억한다 */
-    unsigned int idCounter;
+    /* 새로운 오브젝트에 부여될 ID 값 */
+    unsigned int newObjectID;
 
     /* 시뮬레이션 중인 오브젝트들을 저장한다 */
     Objects objects;
 
 public:
-    /* 생성자 */
-    Playground() : idCounter(0) {};
+    Playground() : newObjectID(0) {};
     
     /* 메인 루프를 실행한다 */
     void run();

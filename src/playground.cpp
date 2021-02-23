@@ -54,11 +54,11 @@ void Playground::addObject(Geometry geometry)
     }
 
     /* id 를 부여한다 */
-    newObject->id = idCounter;
+    newObject->id = newObjectID;
     
     /* 강체와 충돌체를 추가한다 */
-    newObject->body = simulator.addRigidBody(idCounter, geometry);
-    newObject->collider = simulator.addCollider(idCounter, geometry, newObject->body);
+    newObject->body = simulator.addRigidBody(newObjectID, geometry);
+    newObject->collider = simulator.addCollider(newObjectID, geometry, newObject->body);
 
     /* 색상은 무작위로 설정한다 */
     newObject->color = glm::vec3(
@@ -68,10 +68,10 @@ void Playground::addObject(Geometry geometry)
     );
 
     /* Shape 을 추가한다 */
-    newObject->shape = renderer.addShape(idCounter, geometry);
+    newObject->shape = renderer.addShape(newObjectID, geometry);
 
-    objects[idCounter] = newObject;
-    ++idCounter;
+    objects[newObjectID] = newObject;
+    ++newObjectID;
 }
 
 void Playground::removeObject(unsigned int id)
