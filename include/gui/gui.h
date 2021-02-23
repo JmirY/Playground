@@ -8,10 +8,19 @@ namespace gui
 {
     class GUI
     {
+    private:
+        unsigned int textureBufferID;
+
     public:
         GUI() {}
-        GUI(GLFWwindow* window);
+        GUI(GLFWwindow* window, unsigned int textureBufferID);
 
+        void renderAll();
+
+    private:
+        void renderScene();
+        void renderObjectPalette();
+        void renderInspector();
     };
 } // namespace gui
 

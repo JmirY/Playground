@@ -25,7 +25,7 @@ Renderer::Renderer()
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
     /* window 생성 */
-    window = glfwCreateWindow(windowWidth, windowHeight, "Playground", NULL, NULL);
+    window = glfwCreateWindow(1280, 720, "Playground", NULL, NULL);
     if (!window)
     {
         std::cout << "ERROR::Renderer::Failed to create GLFW window" << std::endl;
@@ -50,6 +50,16 @@ Renderer::Renderer()
     glViewport(0, 0, windowWidth, windowHeight);
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 
+    /* Shader 인스턴스 생성 */
+    objectShader = Shader(
+        "./shaders/object_vertex.glsl",
+        "./shaders/object_fragment.glsl"
+    );
+
+    /* 콜백 함수 등록 */
+    glfwSetCursorPosCallback(window, cursorPosCallback);
+    glfwSetScrollCallback(window, mouseScrollCallback);
+
     /* 배경 VAO 설정 */
     glGenVertexArrays(1, &backgroundVAO);
     glBindVertexArray(backgroundVAO);
@@ -69,15 +79,24 @@ Renderer::Renderer()
 
     glBindVertexArray(0);
 
-    /* Shader 인스턴스 생성 */
-    objectShader = Shader(
-        "./shaders/object_vertex.glsl",
-        "./shaders/object_fragment.glsl"
-    );
+    /* 프레임 버퍼 생성 */
+    glGenFramebuffers(1, &frameBufferID);
+    glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID);
 
-    /* 콜백 함수 등록 */
-    glfwSetCursorPosCallback(window, cursorPosCallback);
-    glfwSetScrollCallback(window, mouseScrollCallback);
+    /* 텍스처 버퍼 생성 */
+    glGenTextures(1, &textureBufferID);
+    glBindTexture(GL_TEXTURE_2D, textureBufferID);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, windowWidth, windowHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, (void*)0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    /* 프레임 버퍼 오브젝트에 텍스처 버퍼 바인드 */
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureBufferID, 0);
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cout << "ERROR::Renderer::Framebuffer is not complete" << std::endl;
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 Renderer::~Renderer()
@@ -91,9 +110,14 @@ Renderer::~Renderer()
     glfwTerminate();
 }
 
-GLFWwindow* Renderer::getWindow()
+GLFWwindow* Renderer::getWindow() const
 {
     return window;
+}
+
+unsigned int Renderer::getTextureBufferID() const
+{
+    return textureBufferID;
 }
 
 Shape* Renderer::addShape(unsigned int id, Geometry geometry)
@@ -139,7 +163,6 @@ void Renderer::renderObject(unsigned int id, glm::vec3 color, float modelMatrix[
 
     /* 오브젝트 표면 렌더 */
     Shape *objectShape = shapes.find(id)->second;
-    // std::cout << "DEBUG::Renderer::size of object's vertices = " << object->vertices.size() << std::endl; // debug
     glBindVertexArray(objectShape->polygonVAO);
     glDrawElements(GL_TRIANGLES, objectShape->polygonIndices.size(), GL_UNSIGNED_INT, (void*)0);
 
@@ -207,6 +230,16 @@ void Renderer::updateWindowSize()
 {
     glfwGetFramebufferSize(window, &windowWidth, &windowHeight);
     glViewport(0, 0, windowWidth, windowHeight);
+}
+
+void Renderer::bindFrameBuffer()
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID);
+}
+
+void Renderer::unbindFrameBuffer()
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void Renderer::cursorPosCallback(GLFWwindow *window, double xPos, double yPos)

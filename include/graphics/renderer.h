@@ -2,11 +2,11 @@
 #define RENDERER_H
 
 #include "opengl/glad/glad.h"
-#include "GLFW/glfw3.h"
 #include "shader.h"
 #include "camera.h"
 #include "shape.h"
 #include "../geometry.h"
+#include <GLFW/glfw3.h>
 #include <map>
 
 namespace graphics
@@ -29,8 +29,8 @@ namespace graphics
      ******************************/
 
     /* 초기 윈도우 너비 & 높이 */
-    const int WINDOW_WIDTH = 1280;
-    const int WINDOW_HEIGHT = 720;
+    const int WINDOW_WIDTH = 1024;
+    const int WINDOW_HEIGHT = 576;
 
     /* Perspective frustum 에서의 near & far 값 */
     const float PERSPECTIVE_NEAR = 0.1f;
@@ -58,14 +58,21 @@ namespace graphics
         /* Shape 포인터 저장 */
         Shapes shapes;
 
-        /* 배경 VAO */
+        /* 배경 VAO 의 ID */
         unsigned int backgroundVAO;
+
+        /* 프레임 버퍼의 ID */
+        unsigned int frameBufferID;
+
+        /* 텍스처 버퍼의 ID */
+        unsigned int textureBufferID;
         
     public:
         Renderer();
         ~Renderer();
 
-        GLFWwindow* getWindow();
+        GLFWwindow* getWindow() const;
+        unsigned int getTextureBufferID() const;
 
         /* Shape 추가 */
         Shape* addShape(unsigned int id, Geometry);
@@ -81,6 +88,9 @@ namespace graphics
     
         /* 프레임 버퍼를 쿼리해 windowWidth & windowHeight 을 업데이트 */
         void updateWindowSize();
+
+        void bindFrameBuffer();
+        void unbindFrameBuffer();
 
         /****************
          * glfw 콜백 함수 *
