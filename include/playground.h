@@ -3,6 +3,7 @@
 
 #include "physics/simulator.h"
 #include "graphics/renderer.h"
+#include "gui/gui.h"
 #include "object.h"
 #include <map>
 
@@ -11,9 +12,10 @@ class Playground
 public:
     typedef std::map<unsigned int, Object*> Objects;
 
-private:
+public:
     physics::Simulator simulator;
     graphics::Renderer renderer;
+    gui::GUI userInterface;
 
     /* 새로운 오브젝트에 부여될 ID 값 */
     unsigned int newObjectID;
@@ -22,7 +24,7 @@ private:
     Objects objects;
 
 public:
-    Playground() : newObjectID(0) {};
+    Playground();
     
     /* 메인 루프를 실행한다 */
     void run();

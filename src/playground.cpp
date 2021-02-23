@@ -1,5 +1,11 @@
 #include <playground.h>
 
+Playground::Playground()
+{
+    newObjectID = 0;
+    userInterface = gui::GUI(renderer.getWindow());
+}
+
 void Playground::run()
 {
     /* 프레임 간 시간 측정 */
