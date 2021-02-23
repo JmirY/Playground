@@ -9,7 +9,7 @@ using namespace graphics;
 
 int Renderer::windowWidth = WINDOW_WIDTH;
 int Renderer::windowHeight = WINDOW_HEIGHT;
-Camera* Renderer::camera = new Camera;
+Camera Renderer::camera = Camera();
 
 /***************
  * 멤버 함수 정의 *
@@ -87,8 +87,6 @@ Renderer::~Renderer()
     {
         delete shape.second;
     }
-    /* Camera & Shader 인스턴스 해제 */
-    delete camera;
 
     glfwTerminate();
 }
@@ -123,9 +121,9 @@ void Renderer::renderObject(unsigned int id, glm::vec3 color, float modelMatrix[
 {
     /* 변환 행렬 설정 */
     glm::mat4 model = glm::make_mat4(modelMatrix);
-    glm::mat4 view = camera->getViewMatrix();
+    glm::mat4 view = camera.getViewMatrix();
     glm::mat4 projection = glm::perspective(
-        glm::radians(camera->getFov()),
+        glm::radians(camera.getFov()),
         ((float) windowWidth) / windowHeight,
         PERSPECTIVE_NEAR,
         PERSPECTIVE_FAR
@@ -137,7 +135,7 @@ void Renderer::renderObject(unsigned int id, glm::vec3 color, float modelMatrix[
     objectShader.setMat4("view", view);
     objectShader.setMat4("projection", projection);
     objectShader.setVec3("objectColor", color);
-    objectShader.setVec3("viewPos", camera->getPosition());
+    objectShader.setVec3("viewPos", camera.getPosition());
 
     /* 오브젝트 표면 렌더 */
     Shape *objectShape = shapes.find(id)->second;
@@ -156,9 +154,9 @@ void Renderer::renderObject(unsigned int id, glm::vec3 color, float modelMatrix[
 void Renderer::renderBackground()
 {
     /* 변환 행렬 설정 */
-    glm::mat4 view = camera->getViewMatrix();
+    glm::mat4 view = camera.getViewMatrix();
     glm::mat4 projection = glm::perspective(
-        glm::radians(camera->getFov()),
+        glm::radians(camera.getFov()),
         ((float) windowWidth) / windowHeight,
         PERSPECTIVE_NEAR,
         PERSPECTIVE_FAR
@@ -169,7 +167,7 @@ void Renderer::renderBackground()
     objectShader.setMat4("view", view);
     objectShader.setMat4("projection", projection);
     objectShader.setVec3("objectColor", glm::vec3(0.0f, 0.0f, 0.0f));
-    objectShader.setVec3("viewPos", camera->getPosition());
+    objectShader.setVec3("viewPos", camera.getPosition());
 
     /* 직선을 translate 하며 grid 렌더 */
     glBindVertexArray(backgroundVAO);
@@ -230,14 +228,14 @@ void Renderer::cursorPosCallback(GLFWwindow *window, double xPos, double yPos)
     /* 왼클릭 -> 카메라 panning */
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
     {
-        camera->pan(xOffset, yOffset);
+        camera.pan(xOffset, yOffset);
     }
     /* 오른클릭 -> 카메라 회전 */
     else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
     {
         glm::vec3 end = convertScreenToWorld(glm::vec2(xPos, yPos));
         glm::vec3 start = convertScreenToWorld(glm::vec2(xPosPrev, yPosPrev));
-        camera->rotate(start, end);
+        camera.rotate(start, end);
     }
 
     xPosPrev = xPos;
@@ -246,7 +244,7 @@ void Renderer::cursorPosCallback(GLFWwindow *window, double xPos, double yPos)
 
 void Renderer::mouseScrollCallback(GLFWwindow *window, double xOffset, double yOffset)
 {
-    camera->zoom((float) yOffset);
+    camera.zoom((float) yOffset);
 }
 
 glm::vec3 Renderer::convertScreenToWorld(glm::vec2 screenPt)
@@ -270,7 +268,7 @@ glm::vec3 Renderer::convertScreenToWorld(glm::vec2 screenPt)
 
     /* 뷰 좌표계 -> 월드 좌표계 */
     glm::vec3 worldPt;
-    worldPt = glm::inverse(camera->getViewMatrix()) * glm::vec4(viewPt, 1.0f);
+    worldPt = glm::inverse(camera.getViewMatrix()) * glm::vec4(viewPt, 1.0f);
 
     return worldPt;
 }

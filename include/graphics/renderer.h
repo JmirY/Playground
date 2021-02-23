@@ -52,7 +52,7 @@ namespace graphics
         GLFWwindow *window;
 
         /* static 멤버 함수 convertScreenToWorld 에서 사용되므로 static 선언 */
-        static Camera* camera;
+        static Camera camera;
         Shader objectShader;
 
         /* Shape 포인터 저장 */
