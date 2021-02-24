@@ -29,8 +29,12 @@ namespace graphics
      ******************************/
 
     /* 초기 윈도우 너비 & 높이 */
-    const int WINDOW_WIDTH = 1024;
-    const int WINDOW_HEIGHT = 576;
+    const int WINDOW_WIDTH = 1280;
+    const int WINDOW_HEIGHT = 720;
+
+    /* Scene 너비 & 높이 */
+    const int SCENE_WIDTH = 1024;
+    const int SCENE_HEIGHT = 576;
 
     /* Perspective frustum 에서의 near & far 값 */
     const float PERSPECTIVE_NEAR = 0.1f;
@@ -46,8 +50,10 @@ namespace graphics
         typedef std::map<unsigned int, Shape*> Shapes;
 
     private:
+        int windowWidth, windowHeight;
+    
         /* static 멤버 함수 convertScreenToWorld 에서 사용되므로 static 선언 */
-        static int windowWidth, windowHeight;
+        static int sceneWidth, sceneHeight;
 
         GLFWwindow *window;
 
@@ -86,7 +92,7 @@ namespace graphics
         /* 배경 렌더 */
         void renderBackground();
     
-        /* 프레임 버퍼를 쿼리해 windowWidth & windowHeight 을 업데이트 */
+        /* 프레임 버퍼를 쿼리해 sceneWidth & sceneHeight 을 업데이트 */
         void updateWindowSize();
 
         void bindFrameBuffer();
