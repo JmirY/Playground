@@ -25,6 +25,7 @@ void Playground::run()
         renderer.updateWindowSize();
         
         renderer.bindFrameBuffer();
+        renderer.setSceneViewport();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         /* 배경 렌더 */
@@ -38,6 +39,7 @@ void Playground::run()
         }
 
         renderer.unbindFrameBuffer();
+        renderer.setWindowViewport();
 
         userInterface.renderAll();
 

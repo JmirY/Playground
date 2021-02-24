@@ -98,6 +98,9 @@ namespace graphics
         void bindFrameBuffer();
         void unbindFrameBuffer();
 
+        void setSceneViewport();
+        void setWindowViewport();
+
         /****************
          * glfw 콜백 함수 *
          ****************/

@@ -244,12 +244,20 @@ void Renderer::updateWindowSize()
 void Renderer::bindFrameBuffer()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID);
-    glViewport(0, 0, sceneWidth, sceneHeight);
 }
 
 void Renderer::unbindFrameBuffer()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void Renderer::setSceneViewport()
+{
+    glViewport(0, 0, sceneWidth, sceneHeight);
+}
+
+void Renderer::setWindowViewport()
+{
     glViewport(0, 0, windowWidth, windowHeight);
 }
 
