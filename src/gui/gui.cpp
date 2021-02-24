@@ -34,6 +34,7 @@ void GUI::renderScene()
     windowFlags |= ImGuiWindowFlags_NoMove;
     windowFlags |= ImGuiWindowFlags_NoCollapse;
     windowFlags |= ImGuiWindowFlags_NoResize;
+    windowFlags |= ImGuiWindowFlags_NoTitleBar;
     
     ImGui::Begin("Scene", NULL, windowFlags);
     {
@@ -55,6 +56,7 @@ void GUI::renderObjectPalette()
     windowFlags |= ImGuiWindowFlags_NoMove;
     windowFlags |= ImGuiWindowFlags_NoCollapse;
     windowFlags |= ImGuiWindowFlags_NoResize;
+    windowFlags |= ImGuiWindowFlags_NoTitleBar;
     
     ImGui::Begin("ObjectPalette", NULL, windowFlags);
     {
@@ -70,6 +72,7 @@ void GUI::renderInspector()
     windowFlags |= ImGuiWindowFlags_NoMove;
     windowFlags |= ImGuiWindowFlags_NoCollapse;
     windowFlags |= ImGuiWindowFlags_NoResize;
+    windowFlags |= ImGuiWindowFlags_NoTitleBar;
     
     ImGui::Begin("Inspector", NULL, windowFlags);
     {
