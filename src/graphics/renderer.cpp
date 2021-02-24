@@ -42,11 +42,6 @@ Renderer::Renderer()
         exit(1);
     }
 
-    /* Depth test 활성화 */
-    glEnable(GL_DEPTH_TEST);
-    /* Anti-aliasing 활성화 */
-    glEnable(GL_LINE_SMOOTH);
-
     glViewport(0, 0, windowWidth, windowHeight);
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 
@@ -79,11 +74,11 @@ Renderer::Renderer()
 
     glBindVertexArray(0);
 
-    /* 프레임 버퍼 생성 */
+    /* 프레임 버퍼 오브젝트 생성 */
     glGenFramebuffers(1, &frameBufferID);
     glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID);
 
-    /* 텍스처 버퍼 생성 */
+    /* 텍스처 버퍼 오브젝트 생성 */
     glGenTextures(1, &textureBufferID);
     glBindTexture(GL_TEXTURE_2D, textureBufferID);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, windowWidth, windowHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, (void*)0);
@@ -91,8 +86,19 @@ Renderer::Renderer()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    /* 프레임 버퍼 오브젝트에 텍스처 버퍼 바인드 */
+    /* 프레임 버퍼 오브젝트에 텍스처 버퍼 오브젝트 바인드 */
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureBufferID, 0);
+
+    /* 렌더 버퍼 오브젝트 생성 */
+    unsigned int renderBufferID;
+    glGenRenderbuffers(1, &renderBufferID);
+    glBindRenderbuffer(GL_RENDERBUFFER, renderBufferID);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, windowWidth, windowHeight);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+    /* 프레임 버퍼 오브젝트에 렌더 버퍼 오브젝트 바인드 */
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, renderBufferID);
+    
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         std::cout << "ERROR::Renderer::Framebuffer is not complete" << std::endl;
 
@@ -243,9 +249,24 @@ void Renderer::unbindFrameBuffer()
 }
 
 void Renderer::cursorPosCallback(GLFWwindow *window, double xPos, double yPos)
-{
-    /* 커서가 윈도우 상에 있지 않으면 종료 */
-    if (!glfwGetWindowAttrib(window, GLFW_HOVERED))
+{    
+    static bool isLeftButtonClickedOutside = false;
+    static bool isRightButtonClickedOutside = false;
+
+    /* Scene 외부를 클릭하여 드래그하였는지 검사 */
+    if ((xPos > (double) windowWidth || yPos > (double) windowHeight)
+            && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+        isLeftButtonClickedOutside = true;
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
+        isLeftButtonClickedOutside = false;
+    
+    if ((xPos > (double) windowWidth || yPos > (double) windowHeight)
+            && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+        isRightButtonClickedOutside = true;
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE)
+        isRightButtonClickedOutside = false;
+
+    if (isLeftButtonClickedOutside || isRightButtonClickedOutside)
         return;
 
     /* 직전 호출에서의 커서 위치 저장 */
@@ -260,7 +281,7 @@ void Renderer::cursorPosCallback(GLFWwindow *window, double xPos, double yPos)
 
     /* 왼클릭 -> 카메라 panning */
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-    {
+    {        
         camera.pan(xOffset, yOffset);
     }
     /* 오른클릭 -> 카메라 회전 */
@@ -277,6 +298,11 @@ void Renderer::cursorPosCallback(GLFWwindow *window, double xPos, double yPos)
 
 void Renderer::mouseScrollCallback(GLFWwindow *window, double xOffset, double yOffset)
 {
+    double xPos, yPos;
+    glfwGetCursorPos(window, &xPos, &yPos);
+    if (xPos > windowWidth || yPos > windowHeight)
+        return;
+
     camera.zoom((float) yOffset);
 }
 
