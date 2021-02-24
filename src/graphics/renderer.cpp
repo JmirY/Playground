@@ -103,6 +103,9 @@ Renderer::Renderer()
         std::cout << "ERROR::Renderer::Framebuffer is not complete" << std::endl;
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_LINE_SMOOTH);
 }
 
 Renderer::~Renderer()

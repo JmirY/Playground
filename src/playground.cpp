@@ -22,11 +22,9 @@ void Playground::run()
         /* 물리 시뮬레이션 */
         simulator.simulate(deltaTime);
 
-        /* Framebuffer 크기 퀴리 후 윈도우 크기를 갱신한다 */
-        // renderer.updateWindowSize();
-
         renderer.bindFrameBuffer();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         /* 배경 렌더 */
         renderer.renderBackground();
         /* 오브젝트 렌더 */
@@ -36,6 +34,7 @@ void Playground::run()
             object.second->body->getTransformMatrix(modelMatrix);
             renderer.renderObject(object.second->id, object.second->color, modelMatrix);
         }
+
         renderer.unbindFrameBuffer();
 
         userInterface.renderAll();
