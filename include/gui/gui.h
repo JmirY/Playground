@@ -18,9 +18,9 @@ namespace gui
         void renderAll();
 
     private:
-        void renderScene();
-        void renderObjectPalette();
-        void renderInspector();
+        void renderScene(ImGuiWindowFlags);
+        void renderObjectPalette(ImGuiWindowFlags);
+        void renderInspector(ImGuiWindowFlags);
     };
 } // namespace gui
 

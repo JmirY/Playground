@@ -19,28 +19,29 @@ void GUI::renderAll()
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    renderScene();
-    renderObjectPalette();
-    renderInspector();
+    ImGuiWindowFlags windowFlags = 0;
+    windowFlags |= ImGuiWindowFlags_NoMove;
+    windowFlags |= ImGuiWindowFlags_NoCollapse;
+    windowFlags |= ImGuiWindowFlags_NoResize;
+    windowFlags |= ImGuiWindowFlags_NoTitleBar;
+
+    renderScene(windowFlags);
+    renderObjectPalette(windowFlags);
+    renderInspector(windowFlags);
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     ImGui::EndFrame();
 }
 
-void GUI::renderScene()
+void GUI::renderScene(ImGuiWindowFlags windowFlags)
 {
-    ImGuiWindowFlags windowFlags = 0;
-    windowFlags |= ImGuiWindowFlags_NoMove;
-    windowFlags |= ImGuiWindowFlags_NoCollapse;
-    windowFlags |= ImGuiWindowFlags_NoResize;
-    windowFlags |= ImGuiWindowFlags_NoTitleBar;
     
     ImGui::Begin("Scene", NULL, windowFlags);
     {
         ImGui::BeginChild("SceneRender");
         ImGui::Image(
-            (ImTextureID) textureBufferID,
+            (ImTextureID)(intptr_t) textureBufferID,
             ImGui::GetWindowSize(),
             ImVec2(0, 1),
             ImVec2(1, 0)
@@ -50,14 +51,8 @@ void GUI::renderScene()
     ImGui::End();
 }
 
-void GUI::renderObjectPalette()
-{
-    ImGuiWindowFlags windowFlags = 0;
-    windowFlags |= ImGuiWindowFlags_NoMove;
-    windowFlags |= ImGuiWindowFlags_NoCollapse;
-    windowFlags |= ImGuiWindowFlags_NoResize;
-    windowFlags |= ImGuiWindowFlags_NoTitleBar;
-    
+void GUI::renderObjectPalette(ImGuiWindowFlags windowFlags)
+{    
     ImGui::Begin("ObjectPalette", NULL, windowFlags);
     {
         ImGui::BeginChild("ObjectPaletteRender");
@@ -66,14 +61,8 @@ void GUI::renderObjectPalette()
     ImGui::End();
 }
 
-void GUI::renderInspector()
-{
-    ImGuiWindowFlags windowFlags = 0;
-    windowFlags |= ImGuiWindowFlags_NoMove;
-    windowFlags |= ImGuiWindowFlags_NoCollapse;
-    windowFlags |= ImGuiWindowFlags_NoResize;
-    windowFlags |= ImGuiWindowFlags_NoTitleBar;
-    
+void GUI::renderInspector(ImGuiWindowFlags windowFlags)
+{    
     ImGui::Begin("Inspector", NULL, windowFlags);
     {
         ImGui::BeginChild("InspectorRender");
