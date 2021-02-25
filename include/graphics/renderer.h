@@ -5,7 +5,7 @@
 #include "shader.h"
 #include "camera.h"
 #include "shape.h"
-#include "../geometry.h"
+#include "../playground/geometry.h"
 #include <GLFW/glfw3.h>
 #include <map>
 
