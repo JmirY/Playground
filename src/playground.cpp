@@ -24,7 +24,7 @@ void Playground::run()
 
         renderer.updateWindowSize();
         
-        renderer.bindFrameBuffer();
+        renderer.bindSceneFrameBuffer();
         renderer.setSceneViewport();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -38,7 +38,7 @@ void Playground::run()
             renderer.renderObject(object.second->id, object.second->color, modelMatrix);
         }
 
-        renderer.unbindFrameBuffer();
+        renderer.bindDefaultFrameBuffer();
         renderer.setWindowViewport();
 
         userInterface.renderAll();

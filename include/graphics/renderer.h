@@ -39,10 +39,6 @@ namespace graphics
     /* Perspective frustum 에서의 near & far 값 */
     const float PERSPECTIVE_NEAR = 0.1f;
     const float PERSPECTIVE_FAR = 100.0f;
-
-    /******************
-     * Renderer 클래스 *
-     ******************/
     
     class Renderer
     {
@@ -68,7 +64,7 @@ namespace graphics
         unsigned int backgroundVAO;
 
         /* 프레임 버퍼의 ID */
-        unsigned int frameBufferID;
+        unsigned int sceneFrameBufferID;
 
         /* 텍스처 버퍼의 ID */
         unsigned int textureBufferID;
@@ -80,32 +76,22 @@ namespace graphics
         GLFWwindow* getWindow() const;
         unsigned int getTextureBufferID() const;
 
-        /* Shape 추가 */
         Shape* addShape(unsigned int id, Geometry);
-
-        /* Shape 제거 */
         void removeShape(unsigned int id);
 
-        /* 오브젝트 렌더 */
         void renderObject(unsigned int id, glm::vec3 color, float modelMatrix[]);
-
-        /* 배경 렌더 */
         void renderBackground();
-    
-        /* 프레임 버퍼를 쿼리해 sceneWidth & sceneHeight 을 업데이트 */
+
+        /* 프레임 버퍼를 쿼리해 windowWidth & windowHeight 을 업데이트 */
         void updateWindowSize();
 
-        void bindFrameBuffer();
-        void unbindFrameBuffer();
+        void bindSceneFrameBuffer();
+        void bindDefaultFrameBuffer();
 
         void setSceneViewport();
         void setWindowViewport();
 
-        /****************
-         * glfw 콜백 함수 *
-         ****************/
-        // 마우스 입력에 따라 카메라 조정
-
+        /* 마우스 입력에 따라 카메라를 조정한다 */
         static void cursorPosCallback(GLFWwindow *window, double xPos, double yPos);
         static void mouseScrollCallback(GLFWwindow *window, double xOffset, double yOffset);
 

@@ -72,8 +72,8 @@ Renderer::Renderer()
     glBindVertexArray(0);
 
     /* 프레임 버퍼 오브젝트 생성 */
-    glGenFramebuffers(1, &frameBufferID);
-    glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID);
+    glGenFramebuffers(1, &sceneFrameBufferID);
+    glBindFramebuffer(GL_FRAMEBUFFER, sceneFrameBufferID);
 
     /* 텍스처 버퍼 오브젝트 생성 */
     glGenTextures(1, &textureBufferID);
@@ -241,12 +241,12 @@ void Renderer::updateWindowSize()
     glViewport(0, 0, windowWidth, windowHeight);
 }
 
-void Renderer::bindFrameBuffer()
+void Renderer::bindSceneFrameBuffer()
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID);
+    glBindFramebuffer(GL_FRAMEBUFFER, sceneFrameBufferID);
 }
 
-void Renderer::unbindFrameBuffer()
+void Renderer::bindDefaultFrameBuffer()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
