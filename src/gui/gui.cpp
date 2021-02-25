@@ -11,6 +11,10 @@ GUI::GUI(GLFWwindow* window, unsigned int _textureBufferID)
     ImGui_ImplOpenGL3_Init("#version 330 core");
 
     textureBufferID = _textureBufferID;
+
+    /* imgui 전역 스타일 설정 */
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.WindowRounding = 0.0f;
 }
 
 void GUI::renderAll()
@@ -28,6 +32,8 @@ void GUI::renderAll()
     renderScene(windowFlags);
     renderObjectPalette(windowFlags);
     renderInspector(windowFlags);
+
+    ImGui::ShowDemoWindow(); // test
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -56,6 +62,11 @@ void GUI::renderObjectPalette(ImGuiWindowFlags windowFlags)
     ImGui::Begin("ObjectPalette", NULL, windowFlags);
     {
         ImGui::BeginChild("ObjectPaletteRender");
+
+        ImVec2 buttonSize(100, 100);
+        ImGui::Button("Sphere", buttonSize);
+        ImGui::SameLine(); ImGui::Button("Box", buttonSize);
+        
         ImGui::EndChild();
     }
     ImGui::End();
