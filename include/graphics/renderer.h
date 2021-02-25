@@ -6,6 +6,7 @@
 #include "shader.h"
 #include "camera.h"
 #include "shape.h"
+#include "../geometry.h"
 #include <map>
 
 namespace graphics
@@ -24,7 +25,7 @@ namespace graphics
     const float GRID_GAP = 1.0f;
 
     /******************************
-     * Renderer 클래스 프로퍼티 초기값 *
+     * Renderer 클래스 속성 초기값 *
      ******************************/
 
     /* 초기 윈도우 너비 & 높이 */
@@ -42,16 +43,17 @@ namespace graphics
     class Renderer
     {
     public:
-        typedef std::map<std::string, Shape*> Shapes;
+        typedef std::map<unsigned int, Shape*> Shapes;
 
+    private:
         /* static 멤버 함수 convertScreenToWorld 에서 사용되므로 static 선언 */
         static int windowWidth, windowHeight;
 
-    public: // TODO: Controller 클래스 작성 후 protected 으로 바꾸기
         GLFWwindow *window;
 
-        static Camera *camera;
-        Shader *objectShader;
+        /* static 멤버 함수 convertScreenToWorld 에서 사용되므로 static 선언 */
+        static Camera camera;
+        Shader objectShader;
 
         /* Shape 포인터 저장 */
         Shapes shapes;
@@ -63,9 +65,16 @@ namespace graphics
         Renderer();
         ~Renderer();
 
+        GLFWwindow* getWindow();
+
+        /* Shape 추가 */
+        Shape* addShape(unsigned int id, Geometry);
+
+        /* Shape 제거 */
+        void removeShape(unsigned int id);
+
         /* 오브젝트 렌더 */
-        void renderObject(std::string shape, glm::vec3 color, float modelMatrix[]);
-        void renderObject(std::string shape, glm::vec3 color, glm::mat4 modelMatrix);
+        void renderObject(unsigned int id, glm::vec3 color, float modelMatrix[]);
 
         /* 배경 렌더 */
         void renderBackground();

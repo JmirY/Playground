@@ -1,6 +1,8 @@
 #ifndef MATRIX4_H
 #define MATRIX4_H
 
+#include "vector3.h"
+
 namespace physics
 {
     class Matrix4
@@ -39,6 +41,13 @@ namespace physics
         /* 행렬끼리 곱하기 */
         Matrix4 operator*(const Matrix4& other) const;
         void operator*=(const Matrix4& other);
+
+        /* 벡터와 곱하기 */
+        Vector3 operator*(const Vector3& vec) const;
+
+        /* 실수와 곱하기 */
+        Matrix4 operator*(const float value) const;
+        void operator*=(const float value);
     };    
 } // namespace physics
 

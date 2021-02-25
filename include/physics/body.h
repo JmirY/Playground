@@ -10,7 +10,7 @@ namespace physics
 {
     class RigidBody
     {
-    protected:
+    protected:        
         /* 질량의 역수.
             적분식에 활용하기 좋고,
             무한대의 질량(ex. 배경)을 표현하기 편하다 */
@@ -64,6 +64,10 @@ namespace physics
             인자는 모두 월드 좌표계 기준이다 */
         void addForceAt(const Vector3& force, const Vector3& point);
 
+        /* 로컬 좌표계의 x, y, z 축 중 하나를 월드 좌표계로 변환하고
+            단위 벡터화하여 반환한다. */
+        Vector3 getAxis(int index) const;
+
     private:
         /* 강체에 가해진 힘과 토크를 0 으로 설정한다 */
         void clearForceAndTorque();
@@ -71,7 +75,7 @@ namespace physics
         /* 현재 상태를 참고하여 변환 행렬을 업데이트한다 */
         void updateTransformMatrix();
 
-        /* 관성 텐서를 로컬 -> 월드 좌표계 기준으로 변환한다 */
+        /* 관성 모멘트 텐서를 로컬 -> 월드 좌표계 기준으로 변환한다 */
         void transformInertiaTensor();
 
     public:
@@ -87,6 +91,9 @@ namespace physics
         void setVelocity(const Vector3& vec);
         void setVelocity(float x, float y, float z);
 
+        void setRotation(const Vector3& vec);
+        void setRotation(float x, float y, float z);
+
         void setAcceleration(const Vector3& vec);
         void setAcceleration(float x, float y, float z);
 
@@ -95,8 +102,11 @@ namespace physics
         /* getter */
         float getMass() const;
         float getInverseMass() const;
+        Matrix3 getInverseInertiaTensor() const;
+        Matrix3 getInverseInertiaTensorWorld() const;
         Vector3 getPosition() const;
         Vector3 getVelocity() const;
+        Vector3 getRotation() const;
         Vector3 getAcceleration() const;
         float getLinearDamping() const;
 

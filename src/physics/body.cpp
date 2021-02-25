@@ -1,5 +1,6 @@
-#include <physics/rigid_body.h>
+#include <physics/body.h>
 #include <cmath>
+#include <iostream>
 
 using namespace physics;
 
@@ -9,7 +10,7 @@ void RigidBody::integrate(float duration)
     if (inverseMass == 0.0f)
         return;
 
-    /* 가속도를 업데이트한다 */
+    /* 가속도를 계산한다 */
     prevAcceleration = acceleration;
     prevAcceleration += force * inverseMass;
 
@@ -44,10 +45,30 @@ void RigidBody::integrate(float duration)
 
 void RigidBody::addForceAt(const Vector3& _force, const Vector3& point)
 {
+    /* 힘을 업데이트한다 */
     force += _force;
-
+    /* 토크를 업데이트한다 */
     Vector3 pointFromCenter = point - position;
     torque += pointFromCenter.cross(_force);
+}
+
+Vector3 RigidBody::getAxis(int index) const
+{
+    /* 입력값 검사 */
+    if (index < 0 || index > 3)
+    {
+        std::cout << "RigidBody::getAxis::Out of index" << std::endl;
+        return Vector3();
+    }
+
+    Vector3 result(
+        transformMatrix.entries[index],
+        transformMatrix.entries[index + 4],
+        transformMatrix.entries[index + 8]
+    );
+    result.normalize();
+
+    return result;
 }
 
 void RigidBody::clearForceAndTorque()
@@ -133,6 +154,18 @@ void RigidBody::setVelocity(float x, float y, float z)
     velocity.z = z;
 }
 
+void RigidBody::setRotation(const Vector3& vec)
+{
+    rotation = vec;
+}
+
+void RigidBody::setRotation(float x, float y, float z)
+{
+    rotation.x = x;
+    rotation.y = y;
+    rotation.z = z;
+}
+
 void RigidBody::setAcceleration(const Vector3& vec)
 {
     acceleration = vec;
@@ -160,6 +193,16 @@ float RigidBody::getInverseMass() const
     return inverseMass;
 }
 
+Matrix3 RigidBody::getInverseInertiaTensor() const
+{
+    return inverseInertiaTensor;
+}
+
+Matrix3 RigidBody::getInverseInertiaTensorWorld() const
+{
+    return inverseInertiaTensorWorld;
+}
+
 Vector3 RigidBody::getPosition() const
 {
     return position;
@@ -168,6 +211,11 @@ Vector3 RigidBody::getPosition() const
 Vector3 RigidBody::getVelocity() const
 {
     return velocity;
+}
+
+Vector3 RigidBody::getRotation() const
+{
+    return rotation;
 }
 
 Vector3 RigidBody::getAcceleration() const

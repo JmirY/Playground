@@ -9,7 +9,7 @@ using namespace graphics;
 
 int Renderer::windowWidth = WINDOW_WIDTH;
 int Renderer::windowHeight = WINDOW_HEIGHT;
-Camera* Renderer::camera = new Camera;
+Camera Renderer::camera = Camera();
 
 /***************
  * 멤버 함수 정의 *
@@ -50,12 +50,6 @@ Renderer::Renderer()
     glViewport(0, 0, windowWidth, windowHeight);
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 
-    /* Shape 등록 */
-    Shape *cube = new Cube();
-    Shape *sphere = new Sphere();
-    shapes["Cube"] = cube;
-    shapes["Sphere"] = sphere;
-
     /* 배경 VAO 설정 */
     glGenVertexArrays(1, &backgroundVAO);
     glBindVertexArray(backgroundVAO);
@@ -76,7 +70,7 @@ Renderer::Renderer()
     glBindVertexArray(0);
 
     /* Shader 인스턴스 생성 */
-    objectShader = new Shader(
+    objectShader = Shader(
         "./shaders/object_vertex.glsl",
         "./shaders/object_fragment.glsl"
     );
@@ -89,78 +83,68 @@ Renderer::Renderer()
 Renderer::~Renderer()
 {
     /* shapes 원소들 해제 */
-    for (auto shape : shapes)
+    for (auto& shape : shapes)
     {
         delete shape.second;
     }
-    /* Camera & Shader 인스턴스 해제 */
-    delete camera;
-    delete objectShader;
 
     glfwTerminate();
 }
 
-void Renderer::renderObject(std::string shapeType, glm::vec3 color, float modelMatrix[])
+GLFWwindow* Renderer::getWindow()
+{
+    return window;
+}
+
+Shape* Renderer::addShape(unsigned int id, Geometry geometry)
+{
+    Shape* newShape;
+
+    if (geometry == SPHERE)
+        newShape = new Sphere;
+    else if (geometry == BOX)
+        newShape = new Box;
+
+    shapes[id] = newShape;
+    return newShape;
+}
+
+void Renderer::removeShape(unsigned int id)
+{
+    Shapes::iterator shapeIter = shapes.find(id);
+
+    delete shapeIter->second;
+    shapes.erase(shapeIter);
+}
+
+void Renderer::renderObject(unsigned int id, glm::vec3 color, float modelMatrix[])
 {
     /* 변환 행렬 설정 */
     glm::mat4 model = glm::make_mat4(modelMatrix);
-    glm::mat4 view = camera->getViewMatrix();
+    glm::mat4 view = camera.getViewMatrix();
     glm::mat4 projection = glm::perspective(
-        glm::radians(camera->getFov()),
+        glm::radians(camera.getFov()),
         ((float) windowWidth) / windowHeight,
         PERSPECTIVE_NEAR,
         PERSPECTIVE_FAR
     );
 
     /* 셰이더 설정 */
-    objectShader->use();
-    objectShader->setMat4("model", model);
-    objectShader->setMat4("view", view);
-    objectShader->setMat4("projection", projection);
-    objectShader->setVec3("objectColor", color);
-    objectShader->setVec3("viewPos", camera->getPosition());
+    objectShader.use();
+    objectShader.setMat4("model", model);
+    objectShader.setMat4("view", view);
+    objectShader.setMat4("projection", projection);
+    objectShader.setVec3("objectColor", color);
+    objectShader.setVec3("viewPos", camera.getPosition());
 
     /* 오브젝트 표면 렌더 */
-    Shape *objectShape = shapes.find(shapeType)->second;
+    Shape *objectShape = shapes.find(id)->second;
     // std::cout << "DEBUG::Renderer::size of object's vertices = " << object->vertices.size() << std::endl; // debug
     glBindVertexArray(objectShape->polygonVAO);
     glDrawElements(GL_TRIANGLES, objectShape->polygonIndices.size(), GL_UNSIGNED_INT, (void*)0);
 
     /* 오브젝트 테두리 렌더 */
-    objectShader->setVec3("objectColor", glm::vec3(0.0f, 0.0f, 0.0f));
-    glBindVertexArray(objectShape->frameVAO);
-    glDrawElements(GL_LINE_STRIP, objectShape->frameIndices.size(), GL_UNSIGNED_INT, (void*)0);
-
-    glBindVertexArray(0);
-}
-
-void Renderer::renderObject(std::string shapeType, glm::vec3 color, glm::mat4 modelMatrix)
-{
-    /* 변환 행렬 설정 */
-    glm::mat4 view = camera->getViewMatrix();
-    glm::mat4 projection = glm::perspective(
-        glm::radians(camera->getFov()),
-        ((float) windowWidth) / windowHeight,
-        PERSPECTIVE_NEAR,
-        PERSPECTIVE_FAR
-    );
-
-    /* 셰이더 설정 */
-    objectShader->use();
-    objectShader->setMat4("model", modelMatrix);
-    objectShader->setMat4("view", view);
-    objectShader->setMat4("projection", projection);
-    objectShader->setVec3("objectColor", color);
-    objectShader->setVec3("viewPos", camera->getPosition());
-
-    /* 오브젝트 표면 렌더 */
-    Shape *objectShape = shapes.find(shapeType)->second;
-    // std::cout << "DEBUG::Renderer::size of object's vertices = " << object->vertices.size() << std::endl; // debug
-    glBindVertexArray(objectShape->polygonVAO);
-    glDrawElements(GL_TRIANGLES, objectShape->polygonIndices.size(), GL_UNSIGNED_INT, (void*)0);
-
-    /* 오브젝트 테두리 렌더 */
-    objectShader->setVec3("objectColor", glm::vec3(0.0f, 0.0f, 0.0f));
+    objectShader.setVec3("objectColor", glm::vec3(0.0f, 0.0f, 0.0f));
     glBindVertexArray(objectShape->frameVAO);
     glDrawElements(GL_LINE_STRIP, objectShape->frameIndices.size(), GL_UNSIGNED_INT, (void*)0);
 
@@ -170,20 +154,20 @@ void Renderer::renderObject(std::string shapeType, glm::vec3 color, glm::mat4 mo
 void Renderer::renderBackground()
 {
     /* 변환 행렬 설정 */
-    glm::mat4 view = camera->getViewMatrix();
+    glm::mat4 view = camera.getViewMatrix();
     glm::mat4 projection = glm::perspective(
-        glm::radians(camera->getFov()),
+        glm::radians(camera.getFov()),
         ((float) windowWidth) / windowHeight,
         PERSPECTIVE_NEAR,
         PERSPECTIVE_FAR
     );
 
     /* 셰이더 설정 */
-    objectShader->use();
-    objectShader->setMat4("view", view);
-    objectShader->setMat4("projection", projection);
-    objectShader->setVec3("objectColor", glm::vec3(0.0f, 0.0f, 0.0f));
-    objectShader->setVec3("viewPos", camera->getPosition());
+    objectShader.use();
+    objectShader.setMat4("view", view);
+    objectShader.setMat4("projection", projection);
+    objectShader.setVec3("objectColor", glm::vec3(0.0f, 0.0f, 0.0f));
+    objectShader.setVec3("viewPos", camera.getPosition());
 
     /* 직선을 translate 하며 grid 렌더 */
     glBindVertexArray(backgroundVAO);
@@ -191,29 +175,29 @@ void Renderer::renderBackground()
     {
         /* 원점을 지나는 선만 진하게 표시 */
         if (gap == GRID_GAP)
-            objectShader->setVec3("objectColor", glm::vec3(0.2f, 0.2f, 0.2f));
+            objectShader.setVec3("objectColor", glm::vec3(0.35f, 0.35f, 0.35f));
 
         /* +X축 방향 */
         glm::mat4 model(1.0f);
         model = glm::translate(model, glm::vec3(gap, 0.0f, 0.0f));
-        objectShader->setMat4("model", model);
+        objectShader.setMat4("model", model);
         glDrawArrays(GL_LINES, 0, 2);
         /* -X축 방향 */
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(-gap, 0.0f, 0.0f));
-        objectShader->setMat4("model", model);
+        objectShader.setMat4("model", model);
         glDrawArrays(GL_LINES, 0, 2);
         /* +Z축 방향 */
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, 0.0f, gap));
         model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        objectShader->setMat4("model", model);
+        objectShader.setMat4("model", model);
         glDrawArrays(GL_LINES, 0, 2);
         /* -Z축 방향 */
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, 0.0f, -gap));
         model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        objectShader->setMat4("model", model);
+        objectShader.setMat4("model", model);
         glDrawArrays(GL_LINES, 0, 2);
     }
     glBindVertexArray(0);
@@ -244,14 +228,14 @@ void Renderer::cursorPosCallback(GLFWwindow *window, double xPos, double yPos)
     /* 왼클릭 -> 카메라 panning */
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
     {
-        camera->pan(xOffset, yOffset);
+        camera.pan(xOffset, yOffset);
     }
     /* 오른클릭 -> 카메라 회전 */
     else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
     {
         glm::vec3 end = convertScreenToWorld(glm::vec2(xPos, yPos));
         glm::vec3 start = convertScreenToWorld(glm::vec2(xPosPrev, yPosPrev));
-        camera->rotate(start, end);
+        camera.rotate(start, end);
     }
 
     xPosPrev = xPos;
@@ -260,7 +244,7 @@ void Renderer::cursorPosCallback(GLFWwindow *window, double xPos, double yPos)
 
 void Renderer::mouseScrollCallback(GLFWwindow *window, double xOffset, double yOffset)
 {
-    camera->zoom((float) yOffset);
+    camera.zoom((float) yOffset);
 }
 
 glm::vec3 Renderer::convertScreenToWorld(glm::vec2 screenPt)
@@ -284,7 +268,7 @@ glm::vec3 Renderer::convertScreenToWorld(glm::vec2 screenPt)
 
     /* 뷰 좌표계 -> 월드 좌표계 */
     glm::vec3 worldPt;
-    worldPt = glm::inverse(camera->getViewMatrix()) * glm::vec4(viewPt, 1.0f);
+    worldPt = glm::inverse(camera.getViewMatrix()) * glm::vec4(viewPt, 1.0f);
 
     return worldPt;
 }
