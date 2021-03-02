@@ -68,12 +68,12 @@ void GUI::renderObjectPalette(ImGuiWindowFlags windowFlags, EventQueue& eventQue
         ImVec2 buttonSize(100, 100);
         if (ImGui::Button("Sphere", buttonSize))
         {
-            eventQueue.push(new ObjectAdditionEvent(SPHERE));
+            eventQueue.push(new ObjectAddedEvent(SPHERE));
         }
         ImGui::SameLine();
         if (ImGui::Button("Box", buttonSize))
         {
-            eventQueue.push(new ObjectAdditionEvent(BOX));
+            eventQueue.push(new ObjectAddedEvent(BOX));
         }
         
         ImGui::EndChild();

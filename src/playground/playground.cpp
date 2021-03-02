@@ -109,9 +109,9 @@ void Playground::removeObject(unsigned int id)
 
 void Playground::handleEvent(Event* event)
 {
-    if (typeid(*event) == typeid(ObjectAdditionEvent))
+    if (typeid(*event) == typeid(ObjectAddedEvent))
     {
-        ObjectAdditionEvent* targetEvent = static_cast<ObjectAdditionEvent*>(event);
+        ObjectAddedEvent* targetEvent = static_cast<ObjectAddedEvent*>(event);
         addObject(targetEvent->geometry);
     }
 

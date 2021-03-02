@@ -10,15 +10,15 @@ public:
     virtual ~Event() {}
 };
 
-class ObjectAdditionEvent : public Event
+class ObjectAddedEvent : public Event
 {
 public:
     Geometry geometry;
 public:
-    ObjectAdditionEvent() {}
-    ObjectAdditionEvent(Geometry _geometry)
+    ObjectAddedEvent() {}
+    ObjectAddedEvent(Geometry _geometry)
         : geometry(_geometry) {}
-    ~ObjectAdditionEvent() {}
+    ~ObjectAddedEvent() {}
 };
 
 #endif // EVENT_H
