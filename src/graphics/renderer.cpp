@@ -7,8 +7,8 @@ using namespace graphics;
  * static 멤버 변수 초기화 *
  ***********************/
 
-int Renderer::windowWidth = WINDOW_WIDTH;
-int Renderer::windowHeight = WINDOW_HEIGHT;
+int Renderer::sceneWidth = SCENE_WIDTH;
+int Renderer::sceneHeight = SCENE_HEIGHT;
 Camera Renderer::camera = Camera();
 
 /***************
@@ -25,7 +25,7 @@ Renderer::Renderer()
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
     /* window 생성 */
-    window = glfwCreateWindow(windowWidth, windowHeight, "Playground", NULL, NULL);
+    window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Playground", NULL, NULL);
     if (!window)
     {
         std::cout << "ERROR::Renderer::Failed to create GLFW window" << std::endl;
@@ -42,13 +42,15 @@ Renderer::Renderer()
         exit(1);
     }
 
-    /* Depth test 활성화 */
-    glEnable(GL_DEPTH_TEST);
-    /* Anti-aliasing 활성화 */
-    glEnable(GL_LINE_SMOOTH);
+    /* Shader 인스턴스 생성 */
+    objectShader = Shader(
+        "./shaders/object_vertex.glsl",
+        "./shaders/object_fragment.glsl"
+    );
 
-    glViewport(0, 0, windowWidth, windowHeight);
-    glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+    /* 콜백 함수 등록 */
+    glfwSetCursorPosCallback(window, cursorPosCallback);
+    glfwSetScrollCallback(window, mouseScrollCallback);
 
     /* 배경 VAO 설정 */
     glGenVertexArrays(1, &backgroundVAO);
@@ -69,15 +71,41 @@ Renderer::Renderer()
 
     glBindVertexArray(0);
 
-    /* Shader 인스턴스 생성 */
-    objectShader = Shader(
-        "./shaders/object_vertex.glsl",
-        "./shaders/object_fragment.glsl"
-    );
+    /* 프레임 버퍼 오브젝트 생성 */
+    glGenFramebuffers(1, &sceneFrameBufferID);
+    glBindFramebuffer(GL_FRAMEBUFFER, sceneFrameBufferID);
 
-    /* 콜백 함수 등록 */
-    glfwSetCursorPosCallback(window, cursorPosCallback);
-    glfwSetScrollCallback(window, mouseScrollCallback);
+    /* 텍스처 버퍼 오브젝트 생성 */
+    glGenTextures(1, &textureBufferID);
+    glBindTexture(GL_TEXTURE_2D, textureBufferID);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, sceneWidth, sceneHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, (void*)0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    /* 프레임 버퍼 오브젝트에 텍스처 버퍼 오브젝트 바인드 */
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureBufferID, 0);
+
+    /* 렌더 버퍼 오브젝트 생성 */
+    unsigned int renderBufferID;
+    glGenRenderbuffers(1, &renderBufferID);
+    glBindRenderbuffer(GL_RENDERBUFFER, renderBufferID);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, sceneWidth, sceneHeight);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+    /* 프레임 버퍼 오브젝트에 렌더 버퍼 오브젝트 바인드 */
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, renderBufferID);
+    
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cout << "ERROR::Renderer::Framebuffer is not complete" << std::endl;
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    glViewport(0, 0, windowWidth, windowHeight);
+    glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_LINE_SMOOTH);
 }
 
 Renderer::~Renderer()
@@ -91,9 +119,14 @@ Renderer::~Renderer()
     glfwTerminate();
 }
 
-GLFWwindow* Renderer::getWindow()
+GLFWwindow* Renderer::getWindow() const
 {
     return window;
+}
+
+unsigned int Renderer::getTextureBufferID() const
+{
+    return textureBufferID;
 }
 
 Shape* Renderer::addShape(unsigned int id, Geometry geometry)
@@ -124,7 +157,7 @@ void Renderer::renderObject(unsigned int id, glm::vec3 color, float modelMatrix[
     glm::mat4 view = camera.getViewMatrix();
     glm::mat4 projection = glm::perspective(
         glm::radians(camera.getFov()),
-        ((float) windowWidth) / windowHeight,
+        ((float) sceneWidth) / sceneHeight,
         PERSPECTIVE_NEAR,
         PERSPECTIVE_FAR
     );
@@ -139,7 +172,6 @@ void Renderer::renderObject(unsigned int id, glm::vec3 color, float modelMatrix[
 
     /* 오브젝트 표면 렌더 */
     Shape *objectShape = shapes.find(id)->second;
-    // std::cout << "DEBUG::Renderer::size of object's vertices = " << object->vertices.size() << std::endl; // debug
     glBindVertexArray(objectShape->polygonVAO);
     glDrawElements(GL_TRIANGLES, objectShape->polygonIndices.size(), GL_UNSIGNED_INT, (void*)0);
 
@@ -157,7 +189,7 @@ void Renderer::renderBackground()
     glm::mat4 view = camera.getViewMatrix();
     glm::mat4 projection = glm::perspective(
         glm::radians(camera.getFov()),
-        ((float) windowWidth) / windowHeight,
+        ((float) sceneWidth) / sceneHeight,
         PERSPECTIVE_NEAR,
         PERSPECTIVE_FAR
     );
@@ -209,15 +241,50 @@ void Renderer::updateWindowSize()
     glViewport(0, 0, windowWidth, windowHeight);
 }
 
-void Renderer::cursorPosCallback(GLFWwindow *window, double xPos, double yPos)
+void Renderer::bindSceneFrameBuffer()
 {
-    /* 커서가 윈도우 상에 있지 않으면 종료 */
-    if (!glfwGetWindowAttrib(window, GLFW_HOVERED))
+    glBindFramebuffer(GL_FRAMEBUFFER, sceneFrameBufferID);
+}
+
+void Renderer::bindDefaultFrameBuffer()
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void Renderer::setSceneViewport()
+{
+    glViewport(0, 0, sceneWidth, sceneHeight);
+}
+
+void Renderer::setWindowViewport()
+{
+    glViewport(0, 0, windowWidth, windowHeight);
+}
+
+void Renderer::cursorPosCallback(GLFWwindow *window, double xPos, double yPos)
+{    
+    static bool isLeftButtonClickedOutside = false;
+    static bool isRightButtonClickedOutside = false;
+
+    /* Scene 외부를 클릭하여 드래그하였는지 검사 */
+    if ((xPos > (double) sceneWidth || yPos > (double) sceneHeight || xPos < 0.0f || yPos < 0.0f)
+            && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+        isLeftButtonClickedOutside = true;
+    else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
+        isLeftButtonClickedOutside = false;
+    
+    if ((xPos > (double) sceneWidth || yPos > (double) sceneHeight || xPos < 0.0f || yPos < 0.0f)
+            && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+        isRightButtonClickedOutside = true;
+    else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE)
+        isRightButtonClickedOutside = false;
+
+    if (isLeftButtonClickedOutside || isRightButtonClickedOutside)
         return;
 
     /* 직전 호출에서의 커서 위치 저장 */
-    static double xPosPrev = WINDOW_WIDTH / 2.0f;
-    static double yPosPrev = WINDOW_HEIGHT / 2.0f;
+    static double xPosPrev = SCENE_WIDTH / 2.0f;
+    static double yPosPrev = SCENE_HEIGHT / 2.0f;
     /* 커서의 이동 거리 */
     double xOffset = xPos - xPosPrev;
     double yOffset = yPosPrev - yPos;
@@ -227,7 +294,7 @@ void Renderer::cursorPosCallback(GLFWwindow *window, double xPos, double yPos)
 
     /* 왼클릭 -> 카메라 panning */
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-    {
+    {        
         camera.pan(xOffset, yOffset);
     }
     /* 오른클릭 -> 카메라 회전 */
@@ -244,6 +311,11 @@ void Renderer::cursorPosCallback(GLFWwindow *window, double xPos, double yPos)
 
 void Renderer::mouseScrollCallback(GLFWwindow *window, double xOffset, double yOffset)
 {
+    double xPos, yPos;
+    glfwGetCursorPos(window, &xPos, &yPos);
+    if (xPos > sceneWidth || yPos > sceneHeight)
+        return;
+
     camera.zoom((float) yOffset);
 }
 
@@ -251,8 +323,8 @@ glm::vec3 Renderer::convertScreenToWorld(glm::vec2 screenPt)
 {
     /* 스크린 좌표계 -> 뷰 좌표계 */
     glm::vec3 viewPt = glm::vec3(
-        (float) screenPt.x / windowWidth * 2 - 1.0f,
-		(float) screenPt.y / windowHeight * 2 - 1.0f,
+        (float) screenPt.x / sceneWidth * 2 - 1.0f,
+		(float) screenPt.y / sceneHeight * 2 - 1.0f,
 		0.0f
     );
     viewPt.y = -viewPt.y;
