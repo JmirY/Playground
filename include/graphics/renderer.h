@@ -2,11 +2,11 @@
 #define RENDERER_H
 
 #include "opengl/glad/glad.h"
-#include "GLFW/glfw3.h"
 #include "shader.h"
 #include "camera.h"
 #include "shape.h"
-#include "../geometry.h"
+#include "../playground/geometry.h"
+#include <GLFW/glfw3.h>
 #include <map>
 
 namespace graphics
@@ -32,13 +32,13 @@ namespace graphics
     const int WINDOW_WIDTH = 1280;
     const int WINDOW_HEIGHT = 720;
 
+    /* Scene 너비 & 높이 */
+    const int SCENE_WIDTH = 1024;
+    const int SCENE_HEIGHT = 576;
+
     /* Perspective frustum 에서의 near & far 값 */
     const float PERSPECTIVE_NEAR = 0.1f;
     const float PERSPECTIVE_FAR = 100.0f;
-
-    /******************
-     * Renderer 클래스 *
-     ******************/
     
     class Renderer
     {
@@ -46,8 +46,10 @@ namespace graphics
         typedef std::map<unsigned int, Shape*> Shapes;
 
     private:
+        int windowWidth, windowHeight;
+    
         /* static 멤버 함수 convertScreenToWorld 에서 사용되므로 static 선언 */
-        static int windowWidth, windowHeight;
+        static int sceneWidth, sceneHeight;
 
         GLFWwindow *window;
 
@@ -58,35 +60,38 @@ namespace graphics
         /* Shape 포인터 저장 */
         Shapes shapes;
 
-        /* 배경 VAO */
+        /* 배경 VAO 의 ID */
         unsigned int backgroundVAO;
+
+        /* 프레임 버퍼의 ID */
+        unsigned int sceneFrameBufferID;
+
+        /* 텍스처 버퍼의 ID */
+        unsigned int textureBufferID;
         
     public:
         Renderer();
         ~Renderer();
 
-        GLFWwindow* getWindow();
+        GLFWwindow* getWindow() const;
+        unsigned int getTextureBufferID() const;
 
-        /* Shape 추가 */
         Shape* addShape(unsigned int id, Geometry);
-
-        /* Shape 제거 */
         void removeShape(unsigned int id);
 
-        /* 오브젝트 렌더 */
         void renderObject(unsigned int id, glm::vec3 color, float modelMatrix[]);
-
-        /* 배경 렌더 */
         void renderBackground();
-    
+
         /* 프레임 버퍼를 쿼리해 windowWidth & windowHeight 을 업데이트 */
         void updateWindowSize();
 
-        /****************
-         * glfw 콜백 함수 *
-         ****************/
-        // 마우스 입력에 따라 카메라 조정
+        void bindSceneFrameBuffer();
+        void bindDefaultFrameBuffer();
 
+        void setSceneViewport();
+        void setWindowViewport();
+
+        /* 마우스 입력에 따라 카메라를 조정한다 */
         static void cursorPosCallback(GLFWwindow *window, double xPos, double yPos);
         static void mouseScrollCallback(GLFWwindow *window, double xOffset, double yOffset);
 

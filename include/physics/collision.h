@@ -3,7 +3,7 @@
 
 #include "body.h"
 #include "contact.h"
-#include "../geometry.h"
+#include "../playground/geometry.h"
 #include <vector>
 
 namespace physics

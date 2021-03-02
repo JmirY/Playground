@@ -1,4 +1,12 @@
-#include <playground.h>
+#include <playground/playground.h>
+#include <typeinfo>
+
+Playground::Playground()
+    : eventQueue(50), userInterface(renderer.getWindow(), renderer.getTextureBufferID())
+{
+    newObjectID = 0;
+    // userInterface = gui::GUI(renderer.getWindow(), renderer.getTextureBufferID());
+}
 
 void Playground::run()
 {
@@ -13,24 +21,35 @@ void Playground::run()
         deltaTime = curTime - prevTime;
         prevTime = curTime;
 
+        /* GUI 이벤트 처리 */
+        while (!eventQueue.isEmpty())
+        {
+            handleEvent(eventQueue.pop());
+        }
+
         /* 물리 시뮬레이션 */
         simulator.simulate(deltaTime);
 
-        /* Framebuffer 크기 퀴리 후 윈도우 크기를 갱신한다 */
         renderer.updateWindowSize();
-
+        
+        renderer.bindSceneFrameBuffer();
+        renderer.setSceneViewport();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         /* 배경 렌더 */
         renderer.renderBackground();
-
         /* 오브젝트 렌더 */
-        for (auto object : objects)
+        for (auto& object : objects)
         {
             float modelMatrix[16];
             object.second->body->getTransformMatrix(modelMatrix);
             renderer.renderObject(object.second->id, object.second->color, modelMatrix);
         }
+
+        renderer.bindDefaultFrameBuffer();
+        renderer.setWindowViewport();
+
+        userInterface.renderAll(eventQueue);
 
         glfwSwapBuffers(renderer.getWindow());
         glfwPollEvents();
@@ -86,4 +105,15 @@ void Playground::removeObject(unsigned int id)
     Objects::iterator objectIter = objects.find(id);
     delete objectIter->second;
     objects.erase(objectIter);
+}
+
+void Playground::handleEvent(Event* event)
+{
+    if (typeid(*event) == typeid(ObjectAdditionEvent))
+    {
+        ObjectAdditionEvent* targetEvent = static_cast<ObjectAdditionEvent*>(event);
+        addObject(targetEvent->geometry);
+    }
+
+    delete event;
 }
