@@ -90,9 +90,24 @@ void GUI::renderInspector(
 )
 {    
     ImGui::Begin("Inspector", NULL, windowFlags);
-    {
-        ImGui::BeginChild("InspectorObjectList", ImVec2(0, 216));
 
+    ImGui::BeginChild("InspectorSimulationControl", ImVec2(0, 70));
+    {
+        /* 시뮬레이션 멈춤/재개 버튼 */
+        std::string label("Pause Simulation");
+        if (!isSimulating)
+            label = "Resume Simulation";
+        if (ImGui::Button(label.c_str()))
+            eventQueue.push(new SimulationStatusChangedEvent);
+
+        /* 오브젝트 삭제 버튼 */
+        if (ImGui::Button("Remove Selected Objects"))
+            eventQueue.push(new ObjectRemovedEvent);
+    }
+    ImGui::EndChild(); ImGui::Separator();
+
+    ImGui::BeginChild("InspectorObjectList", ImVec2(0, 216));
+    {
         /* 생성된 오브젝트들을 나열한다 */
         int i = 1;
         for (const auto& object : objects)
@@ -107,23 +122,14 @@ void GUI::renderInspector(
             ++i;
             ImGui::PopID();
         }
-        
-        ImGui::EndChild(); ImGui::Separator();
-
-        ImGui::BeginChild("InspectorObjectAttribute");
-
-        /* 시뮬레이션 멈춤/재개 버튼 */
-        std::string label("Pause Simulation");
-        if (!isSimulating)
-            label = "Resume Simulation";
-        if (ImGui::Button(label.c_str()))
-            eventQueue.push(new SimulationStatusChangedEvent);
-
-        /* 오브젝트 삭제 버튼 */
-        if (ImGui::Button("Remove Selected Objects"))
-            eventQueue.push(new ObjectRemovedEvent);
-        
-        ImGui::EndChild();
     }
+    ImGui::EndChild(); ImGui::Separator();
+
+    ImGui::BeginChild("InspectorObjectAttribute");
+    {
+
+    }
+    ImGui::EndChild();
+
     ImGui::End();
 }
