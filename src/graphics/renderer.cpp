@@ -267,13 +267,13 @@ void Renderer::cursorPosCallback(GLFWwindow *window, double xPos, double yPos)
     static bool isRightButtonClickedOutside = false;
 
     /* Scene 외부를 클릭하여 드래그하였는지 검사 */
-    if ((xPos > (double) sceneWidth || yPos > (double) sceneHeight)
+    if ((xPos > (double) sceneWidth || yPos > (double) sceneHeight || xPos < 0.0f || yPos < 0.0f)
             && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
         isLeftButtonClickedOutside = true;
     else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
         isLeftButtonClickedOutside = false;
     
-    if ((xPos > (double) sceneWidth || yPos > (double) sceneHeight)
+    if ((xPos > (double) sceneWidth || yPos > (double) sceneHeight || xPos < 0.0f || yPos < 0.0f)
             && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
         isRightButtonClickedOutside = true;
     else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE)

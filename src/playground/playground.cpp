@@ -1,9 +1,11 @@
-#include <playground.h>
+#include <playground/playground.h>
+#include <typeinfo>
 
 Playground::Playground()
+    : eventQueue(50), userInterface(renderer.getWindow(), renderer.getTextureBufferID())
 {
     newObjectID = 0;
-    userInterface = gui::GUI(renderer.getWindow(), renderer.getTextureBufferID());
+    // userInterface = gui::GUI(renderer.getWindow(), renderer.getTextureBufferID());
 }
 
 void Playground::run()
@@ -18,6 +20,12 @@ void Playground::run()
         curTime = glfwGetTime();
         deltaTime = curTime - prevTime;
         prevTime = curTime;
+
+        /* GUI 이벤트 처리 */
+        while (!eventQueue.isEmpty())
+        {
+            handleEvent(eventQueue.pop());
+        }
 
         /* 물리 시뮬레이션 */
         simulator.simulate(deltaTime);
@@ -41,7 +49,7 @@ void Playground::run()
         renderer.bindDefaultFrameBuffer();
         renderer.setWindowViewport();
 
-        userInterface.renderAll();
+        userInterface.renderAll(eventQueue);
 
         glfwSwapBuffers(renderer.getWindow());
         glfwPollEvents();
@@ -97,4 +105,15 @@ void Playground::removeObject(unsigned int id)
     Objects::iterator objectIter = objects.find(id);
     delete objectIter->second;
     objects.erase(objectIter);
+}
+
+void Playground::handleEvent(Event* event)
+{
+    if (typeid(*event) == typeid(ObjectAdditionEvent))
+    {
+        ObjectAdditionEvent* targetEvent = static_cast<ObjectAdditionEvent*>(event);
+        addObject(targetEvent->geometry);
+    }
+
+    delete event;
 }

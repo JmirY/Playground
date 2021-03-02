@@ -5,6 +5,7 @@
 #include "graphics/renderer.h"
 #include "gui/gui.h"
 #include "object.h"
+#include "event_queue.h"
 #include <map>
 
 class Playground
@@ -23,17 +24,18 @@ public:
     /* 시뮬레이션 중인 오브젝트들을 저장한다 */
     Objects objects;
 
+    EventQueue eventQueue;
+
 public:
     Playground();
     
     /* 메인 루프를 실행한다 */
     void run();
 
-    /* 오브젝트를 추가한다 */
     void addObject(Geometry);
-
-    /* 오브젝트를 제거한다 */
     void removeObject(unsigned int id);
+
+    void handleEvent(Event*);
 };
 
 #endif // PLAYGROUND_H
