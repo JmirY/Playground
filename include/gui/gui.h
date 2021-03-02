@@ -3,6 +3,7 @@
 
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
+#include "../playground/event_queue.h"
 
 namespace gui
 {
@@ -15,12 +16,12 @@ namespace gui
         GUI() {}
         GUI(GLFWwindow* window, unsigned int textureBufferID);
 
-        void renderAll();
+        void renderAll(EventQueue&);
 
     private:
-        void renderScene(ImGuiWindowFlags);
-        void renderObjectPalette(ImGuiWindowFlags);
-        void renderInspector(ImGuiWindowFlags);
+        void renderScene(ImGuiWindowFlags, EventQueue&);
+        void renderObjectPalette(ImGuiWindowFlags, EventQueue&);
+        void renderInspector(ImGuiWindowFlags, EventQueue&);
     };
 } // namespace gui
 

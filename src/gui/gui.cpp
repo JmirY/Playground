@@ -1,5 +1,6 @@
 #include <gui/gui.h>
 #include <GLFW/glfw3.h>
+#include <playground/geometry.h>
 
 using namespace gui;
 
@@ -17,7 +18,7 @@ GUI::GUI(GLFWwindow* window, unsigned int _textureBufferID)
     style.WindowRounding = 0.0f;
 }
 
-void GUI::renderAll()
+void GUI::renderAll(EventQueue& eventQueue)
 {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -29,9 +30,9 @@ void GUI::renderAll()
     windowFlags |= ImGuiWindowFlags_NoResize;
     windowFlags |= ImGuiWindowFlags_NoTitleBar;
 
-    renderScene(windowFlags);
-    renderObjectPalette(windowFlags);
-    renderInspector(windowFlags);
+    renderScene(windowFlags, eventQueue);
+    renderObjectPalette(windowFlags, eventQueue);
+    renderInspector(windowFlags, eventQueue);
 
     ImGui::ShowDemoWindow(); // test
 
@@ -40,7 +41,7 @@ void GUI::renderAll()
     ImGui::EndFrame();
 }
 
-void GUI::renderScene(ImGuiWindowFlags windowFlags)
+void GUI::renderScene(ImGuiWindowFlags windowFlags, EventQueue& eventQueue)
 {
     
     ImGui::Begin("Scene", NULL, windowFlags);
@@ -57,22 +58,29 @@ void GUI::renderScene(ImGuiWindowFlags windowFlags)
     ImGui::End();
 }
 
-void GUI::renderObjectPalette(ImGuiWindowFlags windowFlags)
+void GUI::renderObjectPalette(ImGuiWindowFlags windowFlags, EventQueue& eventQueue)
 {    
     ImGui::Begin("ObjectPalette", NULL, windowFlags);
     {
         ImGui::BeginChild("ObjectPaletteRender");
 
         ImVec2 buttonSize(100, 100);
-        ImGui::Button("Sphere", buttonSize);
-        ImGui::SameLine(); ImGui::Button("Box", buttonSize);
+        if (ImGui::Button("Sphere", buttonSize))
+        {
+            eventQueue.push(new ObjectAdditionEvent(SPHERE));
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Box", buttonSize))
+        {
+            eventQueue.push(new ObjectAdditionEvent(BOX));
+        }
         
         ImGui::EndChild();
     }
     ImGui::End();
 }
 
-void GUI::renderInspector(ImGuiWindowFlags windowFlags)
+void GUI::renderInspector(ImGuiWindowFlags windowFlags, EventQueue& eventQueue)
 {    
     ImGui::Begin("Inspector", NULL, windowFlags);
     {
