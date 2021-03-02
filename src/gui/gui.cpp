@@ -18,7 +18,7 @@ GUI::GUI(GLFWwindow* window, unsigned int _textureBufferID)
     style.WindowRounding = 0.0f;
 }
 
-void GUI::renderAll(EventQueue& eventQueue)
+void GUI::renderAll(EventQueue& eventQueue, const Objects& objects)
 {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -32,7 +32,7 @@ void GUI::renderAll(EventQueue& eventQueue)
 
     renderScene(windowFlags, eventQueue);
     renderObjectPalette(windowFlags, eventQueue);
-    renderInspector(windowFlags, eventQueue);
+    renderInspector(windowFlags, eventQueue, objects);
 
     ImGui::ShowDemoWindow(); // test
 
@@ -64,6 +64,7 @@ void GUI::renderObjectPalette(ImGuiWindowFlags windowFlags, EventQueue& eventQue
     {
         ImGui::BeginChild("ObjectPaletteRender");
 
+        /* 오브젝트 추가 버튼을 렌더한다 */
         ImVec2 buttonSize(100, 100);
         if (ImGui::Button("Sphere", buttonSize))
         {
@@ -80,11 +81,29 @@ void GUI::renderObjectPalette(ImGuiWindowFlags windowFlags, EventQueue& eventQue
     ImGui::End();
 }
 
-void GUI::renderInspector(ImGuiWindowFlags windowFlags, EventQueue& eventQueue)
+void GUI::renderInspector(ImGuiWindowFlags windowFlags, EventQueue& eventQueue, const Objects& objects)
 {    
     ImGui::Begin("Inspector", NULL, windowFlags);
     {
-        ImGui::BeginChild("InspectorRender");
+        ImGui::BeginChild("InspectorObjectList", ImVec2(0, 216));
+
+        /* 생성된 오브젝트들을 나열한다 */
+        int i = 1;
+        for (const auto& object : objects)
+        {
+            ImGui::PushID(i);
+
+            ImGui::Selectable("Object", false, 0, ImVec2(50, 50));
+
+            if (i % 4 != 0)
+                ImGui::SameLine();
+            ++i;
+            ImGui::PopID();
+        }
+        
+        ImGui::EndChild(); ImGui::Separator();
+
+        ImGui::BeginChild("InspectorObjectAttribute");
         ImGui::EndChild();
     }
     ImGui::End();
