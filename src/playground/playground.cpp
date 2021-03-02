@@ -125,5 +125,6 @@ void Playground::handleObjectAddedEvent(ObjectAddedEvent* event)
 
 void Playground::handleObjectSelectedEvent(ObjectSelectedEvent* event)
 {
-    objects.find(event->id)->second->isSelected = true;
+    bool& isSelected = objects.find(event->id)->second->isSelected;
+    isSelected = !isSelected;
 }
