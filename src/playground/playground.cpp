@@ -110,16 +110,20 @@ void Playground::removeObject(unsigned int id)
 void Playground::handleEvent(Event* event)
 {
     if (typeid(*event) == typeid(ObjectAddedEvent))
-    {
-        ObjectAddedEvent* targetEvent = static_cast<ObjectAddedEvent*>(event);
-        addObject(targetEvent->geometry);
-    }
+        handleObjectAddedEvent(static_cast<ObjectAddedEvent*>(event));
 
-    if (typeid(*event) == typeid(ObjectSelectedEvent))
-    {
-        ObjectSelectedEvent* targetEvent = static_cast<ObjectSelectedEvent*>(event);
-        objects.find(targetEvent->id)->second->isSelected = true;
-    }
+    else if (typeid(*event) == typeid(ObjectSelectedEvent))
+        handleObjectSelectedEvent(static_cast<ObjectSelectedEvent*>(event));
 
     delete event;
+}
+
+void Playground::handleObjectAddedEvent(ObjectAddedEvent* event)
+{
+    addObject(event->geometry);
+}
+
+void Playground::handleObjectSelectedEvent(ObjectSelectedEvent* event)
+{
+    objects.find(event->id)->second->isSelected = true;
 }

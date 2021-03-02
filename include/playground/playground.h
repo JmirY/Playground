@@ -36,6 +36,10 @@ public:
     void removeObject(unsigned int id);
 
     void handleEvent(Event*);
+    
+private:
+    void handleObjectAddedEvent(ObjectAddedEvent*);
+    void handleObjectSelectedEvent(ObjectSelectedEvent*);
 };
 
 #endif // PLAYGROUND_H
