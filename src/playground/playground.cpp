@@ -93,7 +93,7 @@ void Playground::addObject(Geometry geometry)
     ++newObjectID;
 }
 
-void Playground::removeObject(unsigned int id)
+Playground::Objects::iterator Playground::removeObject(unsigned int id)
 {
     /* 물리 데이터를 제거한다 */
     simulator.removePhysicsObject(id);
@@ -104,16 +104,19 @@ void Playground::removeObject(unsigned int id)
     /* 오브젝트를 objects 에서 제거하고 메모리에서 해제한다 */
     Objects::iterator objectIter = objects.find(id);
     delete objectIter->second;
-    objects.erase(objectIter);
+    return objects.erase(objectIter);
 }
 
 void Playground::handleEvent(Event* event)
 {
-    if (typeid(*event) == typeid(ObjectAddedEvent))
+    if (typeid(*event) == typeid(ObjectSelectedEvent))
+        handleObjectSelectedEvent(static_cast<ObjectSelectedEvent*>(event));
+
+    else if (typeid(*event) == typeid(ObjectAddedEvent))
         handleObjectAddedEvent(static_cast<ObjectAddedEvent*>(event));
 
-    else if (typeid(*event) == typeid(ObjectSelectedEvent))
-        handleObjectSelectedEvent(static_cast<ObjectSelectedEvent*>(event));
+    else if (typeid(*event) == typeid(ObjectRemovedEvent))
+        handleObjectRemovedEvent(static_cast<ObjectRemovedEvent*>(event));
 
     delete event;
 }
@@ -127,4 +130,16 @@ void Playground::handleObjectSelectedEvent(ObjectSelectedEvent* event)
 {
     bool& isSelected = objects.find(event->id)->second->isSelected;
     isSelected = !isSelected;
+}
+
+void Playground::handleObjectRemovedEvent(ObjectRemovedEvent* event)
+{
+    Objects::iterator iter = objects.begin();
+    for (; iter != objects.end();)
+    {
+        if (iter->second->isSelected)
+            iter = removeObject(iter->second->id);
+        else
+            ++iter;
+    }
 }

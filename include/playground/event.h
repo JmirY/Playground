@@ -32,4 +32,11 @@ public:
     ~ObjectSelectedEvent() {}
 };
 
+class ObjectRemovedEvent : public Event
+{
+public:
+    ObjectRemovedEvent() {}
+    ~ObjectRemovedEvent() {}
+};
+
 #endif // EVENT_H

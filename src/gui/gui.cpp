@@ -105,6 +105,11 @@ void GUI::renderInspector(ImGuiWindowFlags windowFlags, EventQueue& eventQueue, 
         ImGui::EndChild(); ImGui::Separator();
 
         ImGui::BeginChild("InspectorObjectAttribute");
+
+        /* 오브젝트 삭제 버튼 */
+        if (ImGui::Button("Remove Selected Objects"))
+            eventQueue.push(new ObjectRemovedEvent);
+        
         ImGui::EndChild();
     }
     ImGui::End();

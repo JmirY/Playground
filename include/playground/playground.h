@@ -33,13 +33,14 @@ public:
     void run();
 
     void addObject(Geometry);
-    void removeObject(unsigned int id);
+    Objects::iterator removeObject(unsigned int id);
 
     void handleEvent(Event*);
-    
+
 private:
     void handleObjectAddedEvent(ObjectAddedEvent*);
     void handleObjectSelectedEvent(ObjectSelectedEvent*);
+    void handleObjectRemovedEvent(ObjectRemovedEvent*);
 };
 
 #endif // PLAYGROUND_H
