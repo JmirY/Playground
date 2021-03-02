@@ -13,7 +13,7 @@ class Playground
 public:
     typedef std::map<unsigned int, Object*> Objects;
 
-public:
+private:
     physics::Simulator simulator;
     graphics::Renderer renderer;
     gui::GUI userInterface;
@@ -25,6 +25,7 @@ public:
     Objects objects;
 
     EventQueue eventQueue;
+    bool isSimulating;
 
 public:
     Playground();
@@ -41,6 +42,7 @@ private:
     void handleObjectAddedEvent(ObjectAddedEvent*);
     void handleObjectSelectedEvent(ObjectSelectedEvent*);
     void handleObjectRemovedEvent(ObjectRemovedEvent*);
+    void handleSimulationStatusChangedEvent(SimulationStatusChangedEvent*);
 };
 
 #endif // PLAYGROUND_H

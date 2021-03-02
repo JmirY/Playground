@@ -1,6 +1,7 @@
 #include <gui/gui.h>
 #include <GLFW/glfw3.h>
 #include <playground/geometry.h>
+#include <string>
 
 using namespace gui;
 
@@ -18,7 +19,7 @@ GUI::GUI(GLFWwindow* window, unsigned int _textureBufferID)
     style.WindowRounding = 0.0f;
 }
 
-void GUI::renderAll(EventQueue& eventQueue, const Objects& objects)
+void GUI::renderAll(EventQueue& eventQueue, const Objects& objects, const bool& isSimulating)
 {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -32,7 +33,7 @@ void GUI::renderAll(EventQueue& eventQueue, const Objects& objects)
 
     renderScene(windowFlags, eventQueue);
     renderObjectPalette(windowFlags, eventQueue);
-    renderInspector(windowFlags, eventQueue, objects);
+    renderInspector(windowFlags, eventQueue, objects, isSimulating);
 
     ImGui::ShowDemoWindow(); // test
 
@@ -81,7 +82,12 @@ void GUI::renderObjectPalette(ImGuiWindowFlags windowFlags, EventQueue& eventQue
     ImGui::End();
 }
 
-void GUI::renderInspector(ImGuiWindowFlags windowFlags, EventQueue& eventQueue, const Objects& objects)
+void GUI::renderInspector(
+    ImGuiWindowFlags windowFlags,
+    EventQueue& eventQueue,
+    const Objects& objects,
+    const bool& isSimulating
+)
 {    
     ImGui::Begin("Inspector", NULL, windowFlags);
     {
@@ -105,6 +111,13 @@ void GUI::renderInspector(ImGuiWindowFlags windowFlags, EventQueue& eventQueue, 
         ImGui::EndChild(); ImGui::Separator();
 
         ImGui::BeginChild("InspectorObjectAttribute");
+
+        /* 시뮬레이션 멈춤/재개 버튼 */
+        std::string label("Pause Simulation");
+        if (!isSimulating)
+            label = "Resume Simulation";
+        if (ImGui::Button(label.c_str()))
+            eventQueue.push(new SimulationStatusChangedEvent);
 
         /* 오브젝트 삭제 버튼 */
         if (ImGui::Button("Remove Selected Objects"))

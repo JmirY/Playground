@@ -5,7 +5,7 @@ Playground::Playground()
     : eventQueue(50), userInterface(renderer.getWindow(), renderer.getTextureBufferID())
 {
     newObjectID = 0;
-    // userInterface = gui::GUI(renderer.getWindow(), renderer.getTextureBufferID());
+    isSimulating = true;
 }
 
 void Playground::run()
@@ -28,7 +28,8 @@ void Playground::run()
         }
 
         /* 물리 시뮬레이션 */
-        simulator.simulate(deltaTime);
+        if (isSimulating)
+            simulator.simulate(deltaTime);
 
         renderer.updateWindowSize();
         
@@ -49,7 +50,7 @@ void Playground::run()
         renderer.bindDefaultFrameBuffer();
         renderer.setWindowViewport();
 
-        userInterface.renderAll(eventQueue, objects);
+        userInterface.renderAll(eventQueue, objects, isSimulating);
 
         glfwSwapBuffers(renderer.getWindow());
         glfwPollEvents();
@@ -118,6 +119,9 @@ void Playground::handleEvent(Event* event)
     else if (typeid(*event) == typeid(ObjectRemovedEvent))
         handleObjectRemovedEvent(static_cast<ObjectRemovedEvent*>(event));
 
+    else if (typeid(*event) == typeid(SimulationStatusChangedEvent))
+        handleSimulationStatusChangedEvent(static_cast<SimulationStatusChangedEvent*>(event));
+
     delete event;
 }
 
@@ -142,4 +146,12 @@ void Playground::handleObjectRemovedEvent(ObjectRemovedEvent* event)
         else
             ++iter;
     }
+}
+
+void Playground::handleSimulationStatusChangedEvent(SimulationStatusChangedEvent* event)
+{
+    if (isSimulating)
+        isSimulating = false;
+    else
+        isSimulating = true;
 }

@@ -20,12 +20,17 @@ namespace gui
         GUI() {}
         GUI(GLFWwindow* window, unsigned int textureBufferID);
 
-        void renderAll(EventQueue&, const Objects&);
+        void renderAll(EventQueue&, const Objects&, const bool& isSimulating);
 
     private:
         void renderScene(ImGuiWindowFlags, EventQueue&);
         void renderObjectPalette(ImGuiWindowFlags, EventQueue&);
-        void renderInspector(ImGuiWindowFlags, EventQueue&, const Objects&);
+        void renderInspector(
+            ImGuiWindowFlags,
+            EventQueue&,
+            const Objects&,
+            const bool& isSimulating
+        );
     };
 } // namespace gui
 

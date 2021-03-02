@@ -39,4 +39,11 @@ public:
     ~ObjectRemovedEvent() {}
 };
 
+class SimulationStatusChangedEvent : public Event
+{
+public:
+    SimulationStatusChangedEvent() {};
+    ~SimulationStatusChangedEvent() {}
+};
+
 #endif // EVENT_H
