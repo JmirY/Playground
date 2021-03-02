@@ -79,7 +79,12 @@ namespace graphics
         Shape* addShape(unsigned int id, Geometry);
         void removeShape(unsigned int id);
 
-        void renderObject(unsigned int id, glm::vec3 color, float modelMatrix[]);
+        void renderObject(
+            unsigned int id,
+            glm::vec3 color,
+            float modelMatrix[],
+            bool isSelected
+        );
         void renderBackground();
 
         /* 프레임 버퍼를 쿼리해 windowWidth & windowHeight 을 업데이트 */

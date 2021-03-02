@@ -43,7 +43,7 @@ void Playground::run()
         {
             float modelMatrix[16];
             object.second->body->getTransformMatrix(modelMatrix);
-            renderer.renderObject(object.second->id, object.second->color, modelMatrix);
+            renderer.renderObject(object.second->id, object.second->color, modelMatrix, object.second->isSelected);
         }
 
         renderer.bindDefaultFrameBuffer();
@@ -113,6 +113,12 @@ void Playground::handleEvent(Event* event)
     {
         ObjectAddedEvent* targetEvent = static_cast<ObjectAddedEvent*>(event);
         addObject(targetEvent->geometry);
+    }
+
+    if (typeid(*event) == typeid(ObjectSelectedEvent))
+    {
+        ObjectSelectedEvent* targetEvent = static_cast<ObjectSelectedEvent*>(event);
+        objects.find(targetEvent->id)->second->isSelected = true;
     }
 
     delete event;

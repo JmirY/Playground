@@ -21,4 +21,15 @@ public:
     ~ObjectAddedEvent() {}
 };
 
+class ObjectSelectedEvent : public Event
+{
+public:
+    unsigned int id;
+public:
+    ObjectSelectedEvent() {}
+    ObjectSelectedEvent(unsigned int _id)
+        : id(_id) {}
+    ~ObjectSelectedEvent() {}
+};
+
 #endif // EVENT_H

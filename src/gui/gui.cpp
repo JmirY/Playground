@@ -93,7 +93,8 @@ void GUI::renderInspector(ImGuiWindowFlags windowFlags, EventQueue& eventQueue, 
         {
             ImGui::PushID(i);
 
-            ImGui::Selectable("Object", false, 0, ImVec2(50, 50));
+            if (ImGui::Selectable("Object", object.second->getIsSelected(), 0, ImVec2(50, 50)))
+                eventQueue.push(new ObjectSelectedEvent(object.second->getID()));
 
             if (i % 4 != 0)
                 ImGui::SameLine();
