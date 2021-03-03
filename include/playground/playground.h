@@ -46,6 +46,7 @@ private:
     void handleObjectSelectedEvent(ObjectSelectedEvent*);
     void handleObjectRemovedEvent(ObjectRemovedEvent*);
     void handleSimulationStatusChangedEvent(SimulationStatusChangedEvent*);
+    void handleObjectPositionChangedEvent(ObjectPositionChangedEvent*);
 };
 
 #endif // PLAYGROUND_H

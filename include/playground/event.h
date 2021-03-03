@@ -43,8 +43,25 @@ public:
 class SimulationStatusChangedEvent : public Event
 {
 public:
-    SimulationStatusChangedEvent() {};
+    SimulationStatusChangedEvent() {}
     ~SimulationStatusChangedEvent() {}
+};
+
+class ObjectPositionChangedEvent : public Event
+{
+public:
+    unsigned int id;
+    float position[3];
+public:
+    ObjectPositionChangedEvent() {}
+    ObjectPositionChangedEvent(unsigned int _id, float (&_position)[3])
+    {
+        id = _id;
+        position[0] = _position[0];
+        position[1] = _position[1];
+        position[2] = _position[2];
+    }
+    ~ObjectPositionChangedEvent() {}
 };
 
 #endif // EVENT_H

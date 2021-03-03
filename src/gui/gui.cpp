@@ -149,33 +149,36 @@ void GUI::renderInspector(
             ImGui::Separator();
 
             const Object* object = objects.find(selectedObjectIDs[0])->second;
-            float vector3[3];
+            float vecBuffer[3];
             /* 위치 */
-            object->getPositionInArray(vector3);
+            object->getPositionInArray(vecBuffer);
             ImGui::Text("Position"); ImGui::NextColumn();
-            ImGui::DragFloat("##PositionX", &vector3[0], 1.0f);
+            if (ImGui::DragFloat("##PositionX", &vecBuffer[0], 0.1f))
+                eventQueue.push(new ObjectPositionChangedEvent(selectedObjectIDs[0], vecBuffer));
             ImGui::NextColumn();
-            ImGui::DragFloat("##PositionY", &vector3[1], 1.0f);
+            if (ImGui::DragFloat("##PositionY", &vecBuffer[1], 0.1f))
+                eventQueue.push(new ObjectPositionChangedEvent(selectedObjectIDs[0], vecBuffer));
             ImGui::NextColumn();
-            ImGui::DragFloat("##PositionZ", &vector3[2], 1.0f);
+            if (ImGui::DragFloat("##PositionZ", &vecBuffer[2], 0.1f))
+                eventQueue.push(new ObjectPositionChangedEvent(selectedObjectIDs[0], vecBuffer));
             ImGui::NextColumn();
             /* 속도 */
-            object->getVelocityInArray(vector3);
+            object->getVelocityInArray(vecBuffer);
             ImGui::Text("Velocity"); ImGui::NextColumn();
-            ImGui::DragFloat("##VelocityX", &vector3[0], 1.0f);
+            ImGui::DragFloat("##VelocityX", &vecBuffer[0], 1.0f);
             ImGui::NextColumn();
-            ImGui::DragFloat("##VelocityY", &vector3[1], 1.0f);
+            ImGui::DragFloat("##VelocityY", &vecBuffer[1], 1.0f);
             ImGui::NextColumn();
-            ImGui::DragFloat("##VelocityZ", &vector3[2], 1.0f);
+            ImGui::DragFloat("##VelocityZ", &vecBuffer[2], 1.0f);
             ImGui::NextColumn();
             /* 가속도 */
-            object->getAccelerationInArray(vector3);
+            object->getAccelerationInArray(vecBuffer);
             ImGui::Text("Acceleration"); ImGui::NextColumn();
-            ImGui::DragFloat("##AccelerationX", &vector3[0], 1.0f);
+            ImGui::DragFloat("##AccelerationX", &vecBuffer[0], 1.0f);
             ImGui::NextColumn();
-            ImGui::DragFloat("##AccelerationY", &vector3[1], 1.0f);
+            ImGui::DragFloat("##AccelerationY", &vecBuffer[1], 1.0f);
             ImGui::NextColumn();
-            ImGui::DragFloat("##AccelerationZ", &vector3[2], 1.0f);
+            ImGui::DragFloat("##AccelerationZ", &vecBuffer[2], 1.0f);
             ImGui::NextColumn();
         }
     }
