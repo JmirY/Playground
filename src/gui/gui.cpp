@@ -150,14 +150,32 @@ void GUI::renderInspector(
 
             const Object* object = objects.find(selectedObjectIDs[0])->second;
             float vector3[3];
-            object->getPositionInArray(vector3);
             /* 위치 */
+            object->getPositionInArray(vector3);
             ImGui::Text("Position"); ImGui::NextColumn();
             ImGui::DragFloat("##PositionX", &vector3[0], 1.0f);
             ImGui::NextColumn();
             ImGui::DragFloat("##PositionY", &vector3[1], 1.0f);
             ImGui::NextColumn();
             ImGui::DragFloat("##PositionZ", &vector3[2], 1.0f);
+            ImGui::NextColumn();
+            /* 속도 */
+            object->getVelocityInArray(vector3);
+            ImGui::Text("Velocity"); ImGui::NextColumn();
+            ImGui::DragFloat("##VelocityX", &vector3[0], 1.0f);
+            ImGui::NextColumn();
+            ImGui::DragFloat("##VelocityY", &vector3[1], 1.0f);
+            ImGui::NextColumn();
+            ImGui::DragFloat("##VelocityZ", &vector3[2], 1.0f);
+            ImGui::NextColumn();
+            /* 가속도 */
+            object->getAccelerationInArray(vector3);
+            ImGui::Text("Acceleration"); ImGui::NextColumn();
+            ImGui::DragFloat("##AccelerationX", &vector3[0], 1.0f);
+            ImGui::NextColumn();
+            ImGui::DragFloat("##AccelerationY", &vector3[1], 1.0f);
+            ImGui::NextColumn();
+            ImGui::DragFloat("##AccelerationZ", &vector3[2], 1.0f);
             ImGui::NextColumn();
         }
     }
