@@ -50,7 +50,7 @@ void Playground::run()
         renderer.bindDefaultFrameBuffer();
         renderer.setWindowViewport();
 
-        userInterface.renderAll(eventQueue, objects, isSimulating);
+        userInterface.renderAll(eventQueue, objects, isSimulating, selectedObjectIDs);
 
         glfwSwapBuffers(renderer.getWindow());
         glfwPollEvents();

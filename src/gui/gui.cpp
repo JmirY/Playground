@@ -19,7 +19,12 @@ GUI::GUI(GLFWwindow* window, unsigned int _textureBufferID)
     style.WindowRounding = 0.0f;
 }
 
-void GUI::renderAll(EventQueue& eventQueue, const Objects& objects, const bool& isSimulating)
+void GUI::renderAll(
+    EventQueue& eventQueue,
+    const Objects& objects,
+    const bool& isSimulating,
+    const std::vector<unsigned int>& selectedObjectIDs
+)
 {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -33,7 +38,7 @@ void GUI::renderAll(EventQueue& eventQueue, const Objects& objects, const bool& 
 
     renderScene(windowFlags, eventQueue);
     renderObjectPalette(windowFlags, eventQueue);
-    renderInspector(windowFlags, eventQueue, objects, isSimulating);
+    renderInspector(windowFlags, eventQueue, objects, isSimulating, selectedObjectIDs);
 
     ImGui::ShowDemoWindow(); // test
 
@@ -86,7 +91,8 @@ void GUI::renderInspector(
     ImGuiWindowFlags windowFlags,
     EventQueue& eventQueue,
     const Objects& objects,
-    const bool& isSimulating
+    const bool& isSimulating,
+    const std::vector<unsigned int>& selectedObjectIDs
 )
 {    
     ImGui::Begin("Inspector", NULL, windowFlags);
@@ -133,7 +139,27 @@ void GUI::renderInspector(
 
     ImGui::BeginChild("InspectorObjectAttribute");
     {
+        if (selectedObjectIDs.size() == 1)
+        {
+            ImGui::Columns(4);
+            ImGui::NextColumn(); ImGui::AlignTextToFramePadding();
+            ImGui::Text("X"); ImGui::NextColumn(); ImGui::AlignTextToFramePadding();
+            ImGui::Text("Y"); ImGui::NextColumn(); ImGui::AlignTextToFramePadding();
+            ImGui::Text("Z"); ImGui::NextColumn();
+            ImGui::Separator();
 
+            const Object* object = objects.find(selectedObjectIDs[0])->second;
+            float vector3[3];
+            object->getPositionInArray(vector3);
+            /* 위치 */
+            ImGui::Text("Position"); ImGui::NextColumn();
+            ImGui::DragFloat("##PositionX", &vector3[0], 1.0f);
+            ImGui::NextColumn();
+            ImGui::DragFloat("##PositionY", &vector3[1], 1.0f);
+            ImGui::NextColumn();
+            ImGui::DragFloat("##PositionZ", &vector3[2], 1.0f);
+            ImGui::NextColumn();
+        }
     }
     ImGui::EndChild();
 

@@ -6,6 +6,7 @@
 #include "../playground/event_queue.h"
 #include "../playground/object.h"
 #include <map>
+#include <vector>
 
 namespace gui
 {
@@ -20,7 +21,12 @@ namespace gui
         GUI() {}
         GUI(GLFWwindow* window, unsigned int textureBufferID);
 
-        void renderAll(EventQueue&, const Objects&, const bool& isSimulating);
+        void renderAll(
+            EventQueue&,
+            const Objects&,
+            const bool& isSimulating,
+            const std::vector<unsigned int>& selectedObjectIDs
+        );
 
     private:
         void renderScene(ImGuiWindowFlags, EventQueue&);
@@ -29,7 +35,8 @@ namespace gui
             ImGuiWindowFlags,
             EventQueue&,
             const Objects&,
-            const bool& isSimulating
+            const bool& isSimulating,
+            const std::vector<unsigned int>& selectedObjectIDs
         );
     };
 } // namespace gui

@@ -1,6 +1,14 @@
 #include <playground/object.h>
 #include <cstdarg>
 
+void Object::getPositionInArray(float (&array)[3]) const
+{
+    physics::Vector3 position = body->getPosition();
+    array[0] = position.x;
+    array[1] = position.y;
+    array[2] = position.z;
+}
+
 void SphereObject::setGeometricData(double value, ...)
 {
     radius = value;

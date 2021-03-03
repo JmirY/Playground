@@ -31,6 +31,7 @@ public:
 
     unsigned int getID() const { return id; }
     bool getIsSelected() const { return isSelected; }
+    void getPositionInArray(float (&array)[3]) const;
 
     /* 구의 반지름 또는 직육면체의 half-size 를 설정한다 */
     virtual void setGeometricData(double, ...) = 0;
