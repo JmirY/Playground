@@ -38,7 +38,9 @@ void GUI::renderAll(
 
     renderScene(windowFlags, eventQueue);
     renderObjectPalette(windowFlags, eventQueue);
-    renderInspector(windowFlags, eventQueue, objects, isSimulating, selectedObjectIDs);
+    renderSimulationControl(windowFlags, eventQueue, isSimulating);
+    renderObjectList(windowFlags, eventQueue, objects);
+    renderObjectAttribute(windowFlags, eventQueue, objects, selectedObjectIDs);
 
     ImGui::ShowDemoWindow(); // test
 
@@ -49,7 +51,8 @@ void GUI::renderAll(
 
 void GUI::renderScene(ImGuiWindowFlags windowFlags, EventQueue& eventQueue)
 {
-    
+    ImGui::SetNextWindowPos(ImVec2(0, 0));
+    ImGui::SetNextWindowSize(ImVec2(1024, 576));
     ImGui::Begin("Scene", NULL, windowFlags);
     {
         ImGui::BeginChild("SceneRender");
@@ -66,6 +69,8 @@ void GUI::renderScene(ImGuiWindowFlags windowFlags, EventQueue& eventQueue)
 
 void GUI::renderObjectPalette(ImGuiWindowFlags windowFlags, EventQueue& eventQueue)
 {    
+    ImGui::SetNextWindowPos(ImVec2(0, 576));
+    ImGui::SetNextWindowSize(ImVec2(1024, 144));
     ImGui::Begin("ObjectPalette", NULL, windowFlags);
     {
         ImGui::BeginChild("ObjectPaletteRender");
@@ -87,18 +92,18 @@ void GUI::renderObjectPalette(ImGuiWindowFlags windowFlags, EventQueue& eventQue
     ImGui::End();
 }
 
-void GUI::renderInspector(
+void GUI::renderSimulationControl(
     ImGuiWindowFlags windowFlags,
     EventQueue& eventQueue,
-    const Objects& objects,
-    const bool& isSimulating,
-    const std::vector<unsigned int>& selectedObjectIDs
+    const bool& isSimulating
 )
-{    
-    ImGui::Begin("Inspector", NULL, windowFlags);
-
-    ImGui::BeginChild("InspectorSimulationControl", ImVec2(0, 70));
+{
+    ImGui::SetNextWindowPos(ImVec2(1024, 0));
+    ImGui::SetNextWindowSize(ImVec2(256, 70));
+    ImGui::Begin("SimulationControl", NULL, windowFlags);
     {
+        ImGui::BeginChild("SimulationControlRender");
+
         /* 시뮬레이션 멈춤/재개 버튼 */
         std::string label("Pause Simulation");
         if (!isSimulating)
@@ -109,11 +114,24 @@ void GUI::renderInspector(
         /* 오브젝트 삭제 버튼 */
         if (ImGui::Button("Remove Selected Objects"))
             eventQueue.push(new ObjectRemovedEvent);
-    }
-    ImGui::EndChild(); ImGui::Separator();
 
-    ImGui::BeginChild("InspectorObjectList", ImVec2(0, 216));
+        ImGui::EndChild();
+    }
+    ImGui::End();
+}
+
+void GUI::renderObjectList(
+    ImGuiWindowFlags windowFlags,
+    EventQueue& eventQueue,
+    const Objects& objects
+)
+{
+    ImGui::SetNextWindowPos(ImVec2(1024, 70));
+    ImGui::SetNextWindowSize(ImVec2(256, 216));
+    ImGui::Begin("ObjectList", NULL, windowFlags);
     {
+        ImGui::BeginChild("ObjectListRender");
+
         /* 생성된 오브젝트들을 나열한다 */
         int i = 1;
         for (const auto& object : objects)
@@ -134,11 +152,25 @@ void GUI::renderInspector(
             ++i;
             ImGui::PopID();
         }
-    }
-    ImGui::EndChild(); ImGui::Separator();
 
-    ImGui::BeginChild("InspectorObjectAttribute");
+        ImGui::EndChild();
+    }
+    ImGui::End();
+}
+
+void GUI::renderObjectAttribute(
+    ImGuiWindowFlags windowFlags,
+    EventQueue& eventQueue,
+    const Objects& objects,
+    const std::vector<unsigned int>& selectedObjectIDs
+)
+{
+    ImGui::SetNextWindowPos(ImVec2(1024, 286));
+    ImGui::SetNextWindowSize(ImVec2(256, 434));
+    ImGui::Begin("ObjectAttribute", NULL, windowFlags);
     {
+        ImGui::BeginChild("ObjectAttributeRender");
+
         if (selectedObjectIDs.size() == 1)
         {
             ImGui::Columns(4);
@@ -181,8 +213,8 @@ void GUI::renderInspector(
             ImGui::DragFloat("##AccelerationZ", &vecBuffer[2], 1.0f);
             ImGui::NextColumn();
         }
-    }
-    ImGui::EndChild();
 
+        ImGui::EndChild();
+    }
     ImGui::End();
 }

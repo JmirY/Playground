@@ -31,11 +31,20 @@ namespace gui
     private:
         void renderScene(ImGuiWindowFlags, EventQueue&);
         void renderObjectPalette(ImGuiWindowFlags, EventQueue&);
-        void renderInspector(
+        void renderSimulationControl(
+            ImGuiWindowFlags,
+            EventQueue&,
+            const bool& isSimulating
+        );
+        void renderObjectList(
+            ImGuiWindowFlags,
+            EventQueue&,
+            const Objects&
+        );
+        void renderObjectAttribute(
             ImGuiWindowFlags,
             EventQueue&,
             const Objects&,
-            const bool& isSimulating,
             const std::vector<unsigned int>& selectedObjectIDs
         );
     };
