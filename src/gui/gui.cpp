@@ -115,7 +115,13 @@ void GUI::renderInspector(
             ImGui::PushID(i);
 
             if (ImGui::Selectable("Object", object.second->getIsSelected(), 0, ImVec2(50, 50)))
-                eventQueue.push(new ObjectSelectedEvent(object.second->getID()));
+            {
+                /* ctrl 키를 누른 채로 클릭하면 다중 선택이 가능하다 */
+                if (ImGui::GetIO().KeyCtrl)
+                    eventQueue.push(new ObjectSelectedEvent(object.second->getID(), true));
+                else
+                    eventQueue.push(new ObjectSelectedEvent(object.second->getID(), false));
+            }
 
             if (i % 4 != 0)
                 ImGui::SameLine();

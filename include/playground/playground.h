@@ -7,6 +7,7 @@
 #include "object.h"
 #include "event_queue.h"
 #include <map>
+#include <vector>
 
 class Playground
 {
@@ -23,6 +24,8 @@ private:
 
     /* 시뮬레이션 중인 오브젝트들을 저장한다 */
     Objects objects;
+    /* 선택된 오브젝트들의 ID 를 저장한다 */
+    std::vector<unsigned int> selectedObjectIDs;
 
     EventQueue eventQueue;
     bool isSimulating;

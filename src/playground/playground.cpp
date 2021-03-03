@@ -132,20 +132,21 @@ void Playground::handleObjectAddedEvent(ObjectAddedEvent* event)
 
 void Playground::handleObjectSelectedEvent(ObjectSelectedEvent* event)
 {
-    bool& isSelected = objects.find(event->id)->second->isSelected;
-    isSelected = !isSelected;
+    if (!event->isCtrlPressed)
+    {
+        for (const auto& id : selectedObjectIDs)
+            objects.find(id)->second->isSelected = false;
+        selectedObjectIDs.clear();
+    }
+    selectedObjectIDs.push_back(event->id);
+    objects.find(event->id)->second->isSelected = true;
 }
 
 void Playground::handleObjectRemovedEvent(ObjectRemovedEvent* event)
 {
-    Objects::iterator iter = objects.begin();
-    for (; iter != objects.end();)
-    {
-        if (iter->second->isSelected)
-            iter = removeObject(iter->second->id);
-        else
-            ++iter;
-    }
+    for (const auto& id : selectedObjectIDs)
+        removeObject(id);
+    selectedObjectIDs.clear();
 }
 
 void Playground::handleSimulationStatusChangedEvent(SimulationStatusChangedEvent* event)

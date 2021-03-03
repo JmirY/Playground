@@ -25,10 +25,11 @@ class ObjectSelectedEvent : public Event
 {
 public:
     unsigned int id;
+    bool isCtrlPressed;
 public:
     ObjectSelectedEvent() {}
-    ObjectSelectedEvent(unsigned int _id)
-        : id(_id) {}
+    ObjectSelectedEvent(unsigned int _id, bool ctrl)
+        : id(_id), isCtrlPressed(ctrl) {}
     ~ObjectSelectedEvent() {}
 };
 
