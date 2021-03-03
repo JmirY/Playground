@@ -213,27 +213,26 @@ void GUI::renderObjectAttribute(
             ImGui::DragFloat("##AccelerationZ", &vecBuffer[2], 0.1f);
             ImGui::Columns(1); ImGui::Separator(); ImGui::Spacing();
             /* 도형 데이터 */
+            object->getGeometricDataInArray(vecBuffer);
             Geometry geometry = object->getGeometry();
             if (geometry == BOX)
             {
-                const BoxObject* box = static_cast<const BoxObject*>(object);
-                box->getHalfSizeInArray(vecBuffer);
-
                 ImGui::Text("Half-size");
                 ImGui::Text("X"); ImGui::SameLine();
-                ImGui::DragFloat("##Half-X", &vecBuffer[0], 0.1f);
+                if (ImGui::DragFloat("##Half-X", &vecBuffer[0], 0.01f))
+                    eventQueue.push(new ObjectAttributeChangedEvent(selectedObjectIDs[0], vecBuffer));
                 ImGui::Text("Y"); ImGui::SameLine();
-                ImGui::DragFloat("##Half-Y", &vecBuffer[1], 0.1f);
+                if (ImGui::DragFloat("##Half-Y", &vecBuffer[1], 0.01f))
+                    eventQueue.push(new ObjectAttributeChangedEvent(selectedObjectIDs[0], vecBuffer));
                 ImGui::Text("Z"); ImGui::SameLine();
-                ImGui::DragFloat("##Half-Z", &vecBuffer[2], 0.1f);
+                if (ImGui::DragFloat("##Half-Z", &vecBuffer[2], 0.01f))
+                    eventQueue.push(new ObjectAttributeChangedEvent(selectedObjectIDs[0], vecBuffer));
             }
             else if (geometry == SPHERE)
             {
-                const SphereObject* sphere = static_cast<const SphereObject*>(object);
-                float radius = sphere->getRadius();
-
                 ImGui::Text("Radius");
-                ImGui::DragFloat("##Radius", &radius, 0.1f);
+                if (ImGui::DragFloat("##Radius", &vecBuffer[0], 0.01f))
+                    eventQueue.push(new ObjectAttributeChangedEvent(selectedObjectIDs[0], vecBuffer));
             }
         }
 

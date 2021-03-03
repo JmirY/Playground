@@ -25,6 +25,11 @@ void Object::getAccelerationInArray(float (&array)[3]) const
     array[2] = acceleration.z;
 }
 
+void SphereObject::getGeometricDataInArray(float (&array)[3]) const
+{
+    array[0] = radius;
+}
+
 void SphereObject::setGeometricData(double value, ...)
 {
     radius = value;
@@ -45,7 +50,7 @@ void SphereObject::updateDerivedData()
     shape->generateVAOs();
 }
 
-void BoxObject::getHalfSizeInArray(float (&array)[3]) const
+void BoxObject::getGeometricDataInArray(float (&array)[3]) const
 {
     array[0] = halfX;
     array[1] = halfY;
