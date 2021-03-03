@@ -30,6 +30,7 @@ public:
     virtual ~Object() {};
 
     unsigned int getID() const { return id; }
+    Geometry getGeometry() const { return geometry; }
     bool getIsSelected() const { return isSelected; }
     void getPositionInArray(float (&array)[3]) const;
     void getVelocityInArray(float (&array)[3]) const;
@@ -50,6 +51,7 @@ protected:
 public:
     SphereObject() : radius(1.0f) {}
 
+    float getRadius() const { return radius; }
     void setGeometricData(double, ...);
     void updateDerivedData();
 };
@@ -64,6 +66,7 @@ protected:
 public:
     BoxObject() : halfX(0.5f), halfY(0.5f), halfZ(0.5f) {}
 
+    void getHalfSizeInArray(float (&array)[3]) const;
     void setGeometricData(double, ...);
     void updateDerivedData();
 };

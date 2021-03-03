@@ -45,6 +45,13 @@ void SphereObject::updateDerivedData()
     shape->generateVAOs();
 }
 
+void BoxObject::getHalfSizeInArray(float (&array)[3]) const
+{
+    array[0] = halfX;
+    array[1] = halfY;
+    array[2] = halfZ;
+}
+
 void BoxObject::setGeometricData(double value, ...)
 {
     halfX = value;

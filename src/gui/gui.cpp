@@ -197,21 +197,44 @@ void GUI::renderObjectAttribute(
             /* 속도 */
             object->getVelocityInArray(vecBuffer);
             ImGui::Text("Velocity"); ImGui::NextColumn();
-            ImGui::DragFloat("##VelocityX", &vecBuffer[0], 1.0f);
+            ImGui::DragFloat("##VelocityX", &vecBuffer[0], 0.1f);
             ImGui::NextColumn();
-            ImGui::DragFloat("##VelocityY", &vecBuffer[1], 1.0f);
+            ImGui::DragFloat("##VelocityY", &vecBuffer[1], 0.1f);
             ImGui::NextColumn();
-            ImGui::DragFloat("##VelocityZ", &vecBuffer[2], 1.0f);
+            ImGui::DragFloat("##VelocityZ", &vecBuffer[2], 0.1f);
             ImGui::NextColumn();
             /* 가속도 */
             object->getAccelerationInArray(vecBuffer);
             ImGui::Text("Acceleration"); ImGui::NextColumn();
-            ImGui::DragFloat("##AccelerationX", &vecBuffer[0], 1.0f);
+            ImGui::DragFloat("##AccelerationX", &vecBuffer[0], 0.1f);
             ImGui::NextColumn();
-            ImGui::DragFloat("##AccelerationY", &vecBuffer[1], 1.0f);
+            ImGui::DragFloat("##AccelerationY", &vecBuffer[1], 0.1f);
             ImGui::NextColumn();
-            ImGui::DragFloat("##AccelerationZ", &vecBuffer[2], 1.0f);
-            ImGui::NextColumn();
+            ImGui::DragFloat("##AccelerationZ", &vecBuffer[2], 0.1f);
+            ImGui::Columns(1); ImGui::Separator(); ImGui::Spacing();
+            /* 도형 데이터 */
+            Geometry geometry = object->getGeometry();
+            if (geometry == BOX)
+            {
+                const BoxObject* box = static_cast<const BoxObject*>(object);
+                box->getHalfSizeInArray(vecBuffer);
+
+                ImGui::Text("Half-size");
+                ImGui::Text("X"); ImGui::SameLine();
+                ImGui::DragFloat("##Half-X", &vecBuffer[0], 0.1f);
+                ImGui::Text("Y"); ImGui::SameLine();
+                ImGui::DragFloat("##Half-Y", &vecBuffer[1], 0.1f);
+                ImGui::Text("Z"); ImGui::SameLine();
+                ImGui::DragFloat("##Half-Z", &vecBuffer[2], 0.1f);
+            }
+            else if (geometry == SPHERE)
+            {
+                const SphereObject* sphere = static_cast<const SphereObject*>(object);
+                float radius = sphere->getRadius();
+
+                ImGui::Text("Radius");
+                ImGui::DragFloat("##Radius", &radius, 0.1f);
+            }
         }
 
         ImGui::EndChild();
