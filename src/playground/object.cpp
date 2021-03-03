@@ -1,6 +1,30 @@
 #include <playground/object.h>
 #include <cstdarg>
 
+void Object::getPositionInArray(float (&array)[3]) const
+{
+    physics::Vector3 position = body->getPosition();
+    array[0] = position.x;
+    array[1] = position.y;
+    array[2] = position.z;
+}
+
+void Object::getVelocityInArray(float (&array)[3]) const
+{
+    physics::Vector3 velocity = body->getVelocity();
+    array[0] = velocity.x;
+    array[1] = velocity.y;
+    array[2] = velocity.z;
+}
+
+void Object::getAccelerationInArray(float (&array)[3]) const
+{
+    physics::Vector3 acceleration = body->getAcceleration();
+    array[0] = acceleration.x;
+    array[1] = acceleration.y;
+    array[2] = acceleration.z;
+}
+
 void SphereObject::setGeometricData(double value, ...)
 {
     radius = value;

@@ -1,6 +1,7 @@
 #include <gui/gui.h>
 #include <GLFW/glfw3.h>
 #include <playground/geometry.h>
+#include <string>
 
 using namespace gui;
 
@@ -18,7 +19,12 @@ GUI::GUI(GLFWwindow* window, unsigned int _textureBufferID)
     style.WindowRounding = 0.0f;
 }
 
-void GUI::renderAll(EventQueue& eventQueue)
+void GUI::renderAll(
+    EventQueue& eventQueue,
+    const Objects& objects,
+    const bool& isSimulating,
+    const std::vector<unsigned int>& selectedObjectIDs
+)
 {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -32,7 +38,7 @@ void GUI::renderAll(EventQueue& eventQueue)
 
     renderScene(windowFlags, eventQueue);
     renderObjectPalette(windowFlags, eventQueue);
-    renderInspector(windowFlags, eventQueue);
+    renderInspector(windowFlags, eventQueue, objects, isSimulating, selectedObjectIDs);
 
     ImGui::ShowDemoWindow(); // test
 
@@ -64,15 +70,16 @@ void GUI::renderObjectPalette(ImGuiWindowFlags windowFlags, EventQueue& eventQue
     {
         ImGui::BeginChild("ObjectPaletteRender");
 
+        /* 오브젝트 추가 버튼을 렌더한다 */
         ImVec2 buttonSize(100, 100);
         if (ImGui::Button("Sphere", buttonSize))
         {
-            eventQueue.push(new ObjectAdditionEvent(SPHERE));
+            eventQueue.push(new ObjectAddedEvent(SPHERE));
         }
         ImGui::SameLine();
         if (ImGui::Button("Box", buttonSize))
         {
-            eventQueue.push(new ObjectAdditionEvent(BOX));
+            eventQueue.push(new ObjectAddedEvent(BOX));
         }
         
         ImGui::EndChild();
@@ -80,12 +87,102 @@ void GUI::renderObjectPalette(ImGuiWindowFlags windowFlags, EventQueue& eventQue
     ImGui::End();
 }
 
-void GUI::renderInspector(ImGuiWindowFlags windowFlags, EventQueue& eventQueue)
+void GUI::renderInspector(
+    ImGuiWindowFlags windowFlags,
+    EventQueue& eventQueue,
+    const Objects& objects,
+    const bool& isSimulating,
+    const std::vector<unsigned int>& selectedObjectIDs
+)
 {    
     ImGui::Begin("Inspector", NULL, windowFlags);
+
+    ImGui::BeginChild("InspectorSimulationControl", ImVec2(0, 70));
     {
-        ImGui::BeginChild("InspectorRender");
-        ImGui::EndChild();
+        /* 시뮬레이션 멈춤/재개 버튼 */
+        std::string label("Pause Simulation");
+        if (!isSimulating)
+            label = "Resume Simulation";
+        if (ImGui::Button(label.c_str()))
+            eventQueue.push(new SimulationStatusChangedEvent);
+
+        /* 오브젝트 삭제 버튼 */
+        if (ImGui::Button("Remove Selected Objects"))
+            eventQueue.push(new ObjectRemovedEvent);
     }
+    ImGui::EndChild(); ImGui::Separator();
+
+    ImGui::BeginChild("InspectorObjectList", ImVec2(0, 216));
+    {
+        /* 생성된 오브젝트들을 나열한다 */
+        int i = 1;
+        for (const auto& object : objects)
+        {
+            ImGui::PushID(i);
+
+            if (ImGui::Selectable("Object", object.second->getIsSelected(), 0, ImVec2(50, 50)))
+            {
+                /* ctrl 키를 누른 채로 클릭하면 다중 선택이 가능하다 */
+                if (ImGui::GetIO().KeyCtrl)
+                    eventQueue.push(new ObjectSelectedEvent(object.second->getID(), true));
+                else
+                    eventQueue.push(new ObjectSelectedEvent(object.second->getID(), false));
+            }
+
+            if (i % 4 != 0)
+                ImGui::SameLine();
+            ++i;
+            ImGui::PopID();
+        }
+    }
+    ImGui::EndChild(); ImGui::Separator();
+
+    ImGui::BeginChild("InspectorObjectAttribute");
+    {
+        if (selectedObjectIDs.size() == 1)
+        {
+            ImGui::Columns(4);
+            ImGui::NextColumn(); ImGui::AlignTextToFramePadding();
+            ImGui::Text("X"); ImGui::NextColumn(); ImGui::AlignTextToFramePadding();
+            ImGui::Text("Y"); ImGui::NextColumn(); ImGui::AlignTextToFramePadding();
+            ImGui::Text("Z"); ImGui::NextColumn();
+            ImGui::Separator();
+
+            const Object* object = objects.find(selectedObjectIDs[0])->second;
+            float vecBuffer[3];
+            /* 위치 */
+            object->getPositionInArray(vecBuffer);
+            ImGui::Text("Position"); ImGui::NextColumn();
+            if (ImGui::DragFloat("##PositionX", &vecBuffer[0], 0.1f))
+                eventQueue.push(new ObjectPositionChangedEvent(selectedObjectIDs[0], vecBuffer));
+            ImGui::NextColumn();
+            if (ImGui::DragFloat("##PositionY", &vecBuffer[1], 0.1f))
+                eventQueue.push(new ObjectPositionChangedEvent(selectedObjectIDs[0], vecBuffer));
+            ImGui::NextColumn();
+            if (ImGui::DragFloat("##PositionZ", &vecBuffer[2], 0.1f))
+                eventQueue.push(new ObjectPositionChangedEvent(selectedObjectIDs[0], vecBuffer));
+            ImGui::NextColumn();
+            /* 속도 */
+            object->getVelocityInArray(vecBuffer);
+            ImGui::Text("Velocity"); ImGui::NextColumn();
+            ImGui::DragFloat("##VelocityX", &vecBuffer[0], 1.0f);
+            ImGui::NextColumn();
+            ImGui::DragFloat("##VelocityY", &vecBuffer[1], 1.0f);
+            ImGui::NextColumn();
+            ImGui::DragFloat("##VelocityZ", &vecBuffer[2], 1.0f);
+            ImGui::NextColumn();
+            /* 가속도 */
+            object->getAccelerationInArray(vecBuffer);
+            ImGui::Text("Acceleration"); ImGui::NextColumn();
+            ImGui::DragFloat("##AccelerationX", &vecBuffer[0], 1.0f);
+            ImGui::NextColumn();
+            ImGui::DragFloat("##AccelerationY", &vecBuffer[1], 1.0f);
+            ImGui::NextColumn();
+            ImGui::DragFloat("##AccelerationZ", &vecBuffer[2], 1.0f);
+            ImGui::NextColumn();
+        }
+    }
+    ImGui::EndChild();
+
     ImGui::End();
 }
