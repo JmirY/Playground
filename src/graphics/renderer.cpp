@@ -150,7 +150,12 @@ void Renderer::removeShape(unsigned int id)
     shapes.erase(shapeIter);
 }
 
-void Renderer::renderObject(unsigned int id, glm::vec3 color, float modelMatrix[])
+void Renderer::renderObject(
+    unsigned int id,
+    glm::vec3 color,
+    float modelMatrix[],
+    bool isSelected
+)
 {
     /* 변환 행렬 설정 */
     glm::mat4 model = glm::make_mat4(modelMatrix);
@@ -176,7 +181,10 @@ void Renderer::renderObject(unsigned int id, glm::vec3 color, float modelMatrix[
     glDrawElements(GL_TRIANGLES, objectShape->polygonIndices.size(), GL_UNSIGNED_INT, (void*)0);
 
     /* 오브젝트 테두리 렌더 */
-    objectShader.setVec3("objectColor", glm::vec3(0.0f, 0.0f, 0.0f));
+    glm::vec3 frameColor(0.0f, 0.0f, 0.0f);
+    if (isSelected)
+        frameColor = glm::vec3(0.0f, 0.8f, 0.7f);
+    objectShader.setVec3("objectColor", frameColor);
     glBindVertexArray(objectShape->frameVAO);
     glDrawElements(GL_LINE_STRIP, objectShape->frameIndices.size(), GL_UNSIGNED_INT, (void*)0);
 

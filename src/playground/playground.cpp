@@ -5,7 +5,7 @@ Playground::Playground()
     : eventQueue(50), userInterface(renderer.getWindow(), renderer.getTextureBufferID())
 {
     newObjectID = 0;
-    // userInterface = gui::GUI(renderer.getWindow(), renderer.getTextureBufferID());
+    isSimulating = true;
 }
 
 void Playground::run()
@@ -28,7 +28,8 @@ void Playground::run()
         }
 
         /* 물리 시뮬레이션 */
-        simulator.simulate(deltaTime);
+        if (isSimulating)
+            simulator.simulate(deltaTime);
 
         renderer.updateWindowSize();
         
@@ -43,13 +44,13 @@ void Playground::run()
         {
             float modelMatrix[16];
             object.second->body->getTransformMatrix(modelMatrix);
-            renderer.renderObject(object.second->id, object.second->color, modelMatrix);
+            renderer.renderObject(object.second->id, object.second->color, modelMatrix, object.second->isSelected);
         }
 
         renderer.bindDefaultFrameBuffer();
         renderer.setWindowViewport();
 
-        userInterface.renderAll(eventQueue);
+        userInterface.renderAll(eventQueue, objects, isSimulating, selectedObjectIDs);
 
         glfwSwapBuffers(renderer.getWindow());
         glfwPollEvents();
@@ -93,7 +94,7 @@ void Playground::addObject(Geometry geometry)
     ++newObjectID;
 }
 
-void Playground::removeObject(unsigned int id)
+Playground::Objects::iterator Playground::removeObject(unsigned int id)
 {
     /* 물리 데이터를 제거한다 */
     simulator.removePhysicsObject(id);
@@ -104,16 +105,63 @@ void Playground::removeObject(unsigned int id)
     /* 오브젝트를 objects 에서 제거하고 메모리에서 해제한다 */
     Objects::iterator objectIter = objects.find(id);
     delete objectIter->second;
-    objects.erase(objectIter);
+    return objects.erase(objectIter);
 }
 
 void Playground::handleEvent(Event* event)
 {
-    if (typeid(*event) == typeid(ObjectAdditionEvent))
-    {
-        ObjectAdditionEvent* targetEvent = static_cast<ObjectAdditionEvent*>(event);
-        addObject(targetEvent->geometry);
-    }
+    if (typeid(*event) == typeid(ObjectSelectedEvent))
+        handleObjectSelectedEvent(static_cast<ObjectSelectedEvent*>(event));
+
+    else if (typeid(*event) == typeid(ObjectAddedEvent))
+        handleObjectAddedEvent(static_cast<ObjectAddedEvent*>(event));
+
+    else if (typeid(*event) == typeid(ObjectPositionChangedEvent))
+        handleObjectPositionChangedEvent(static_cast<ObjectPositionChangedEvent*>(event));
+
+    else if (typeid(*event) == typeid(ObjectRemovedEvent))
+        handleObjectRemovedEvent(static_cast<ObjectRemovedEvent*>(event));
+
+    else if (typeid(*event) == typeid(SimulationStatusChangedEvent))
+        handleSimulationStatusChangedEvent(static_cast<SimulationStatusChangedEvent*>(event));
 
     delete event;
+}
+
+void Playground::handleObjectAddedEvent(ObjectAddedEvent* event)
+{
+    addObject(event->geometry);
+}
+
+void Playground::handleObjectSelectedEvent(ObjectSelectedEvent* event)
+{
+    if (!event->isCtrlPressed)
+    {
+        for (const auto& id : selectedObjectIDs)
+            objects.find(id)->second->isSelected = false;
+        selectedObjectIDs.clear();
+    }
+    selectedObjectIDs.push_back(event->id);
+    objects.find(event->id)->second->isSelected = true;
+}
+
+void Playground::handleObjectRemovedEvent(ObjectRemovedEvent* event)
+{
+    for (const auto& id : selectedObjectIDs)
+        removeObject(id);
+    selectedObjectIDs.clear();
+}
+
+void Playground::handleSimulationStatusChangedEvent(SimulationStatusChangedEvent* event)
+{
+    if (isSimulating)
+        isSimulating = false;
+    else
+        isSimulating = true;
+}
+
+void Playground::handleObjectPositionChangedEvent(ObjectPositionChangedEvent* event)
+{
+    float (&position)[3] = event->position;
+    objects.find(event->id)->second->body->setPosition(position[0], position[1], position[2]);
 }

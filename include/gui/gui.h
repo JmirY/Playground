@@ -4,11 +4,16 @@
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 #include "../playground/event_queue.h"
+#include "../playground/object.h"
+#include <map>
+#include <vector>
 
 namespace gui
 {
     class GUI
     {
+        typedef std::map<unsigned int, Object*> Objects;
+
     private:
         unsigned int textureBufferID;
 
@@ -16,12 +21,23 @@ namespace gui
         GUI() {}
         GUI(GLFWwindow* window, unsigned int textureBufferID);
 
-        void renderAll(EventQueue&);
+        void renderAll(
+            EventQueue&,
+            const Objects&,
+            const bool& isSimulating,
+            const std::vector<unsigned int>& selectedObjectIDs
+        );
 
     private:
         void renderScene(ImGuiWindowFlags, EventQueue&);
         void renderObjectPalette(ImGuiWindowFlags, EventQueue&);
-        void renderInspector(ImGuiWindowFlags, EventQueue&);
+        void renderInspector(
+            ImGuiWindowFlags,
+            EventQueue&,
+            const Objects&,
+            const bool& isSimulating,
+            const std::vector<unsigned int>& selectedObjectIDs
+        );
     };
 } // namespace gui
 
