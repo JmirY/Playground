@@ -82,50 +82,52 @@ void Contact::resolveVelocity()
     /* 마찰을 계산한다 */
 
     /* 접선 벡터를 계산한다 */
-    Vector3 tangentVector = relativeVelocity - contactNormal * (relativeVelocity.dot(contactNormal));
-    if (tangentVector.magnitudeSquared() == 0.0f)
-        return;
-    tangentVector.normalize();
+    // Vector3 tangentVector = relativeVelocity - contactNormal * (relativeVelocity.dot(contactNormal));
+    // if (tangentVector.magnitudeSquared() == 0.0f)
+    //     return;
+    // tangentVector.normalize();
 
-    /* 마찰 임펄스를 계산한다 */
-    float totalMass = bodies[0]->getMass();
-    if (bodies[1] != nullptr)
-        totalMass += bodies[1]->getMass();
+    // /* 마찰 임펄스를 계산한다 */
+    // float totalMass = bodies[0]->getMass();
+    // if (bodies[1] != nullptr)
+    //     totalMass += bodies[1]->getMass();
     
-    float term = (relativeVelocity * totalMass).dot(tangentVector);
-    Vector3 frictionalImpulse;
-    if (term <= impulse * staticFriction)
-        frictionalImpulse = tangentVector * term * -1.0f;
-    else
-        frictionalImpulse = tangentVector * (dynamicFriction * impulse) * -1.0f;
+    // float term = (relativeVelocity * totalMass).dot(tangentVector);
+    // Vector3 frictionalImpulse;
+    // if (relativeVelocity.dot(tangentVector) == 0.0f && term <= impulse * staticFriction)
+    //     frictionalImpulse = tangentVector * term * -1.0f;
+    // else
+    // {
+    //     frictionalImpulse = tangentVector * (dynamicFriction * impulse) * -1.0f;
+    // }
 
-    /* 두 물체의 선속도를 갱신한다 */
-    bodies[0]->setVelocity(
-        bodies[0]->getVelocity() - frictionalImpulse * bodies[0]->getInverseMass()
-    );
+    // /* 두 물체의 선속도를 갱신한다 */
+    // bodies[0]->setVelocity(
+    //     bodies[0]->getVelocity() - frictionalImpulse * bodies[0]->getInverseMass()
+    // );
 
-    if (bodies[1] != nullptr)
-    {
-        bodies[1]->setVelocity(
-            bodies[1]->getVelocity() + frictionalImpulse * bodies[1]->getInverseMass()
-        );
-    }
+    // if (bodies[1] != nullptr)
+    // {
+    //     bodies[1]->setVelocity(
+    //         bodies[1]->getVelocity() + frictionalImpulse * bodies[1]->getInverseMass()
+    //     );
+    // }
 
-    /* 두 물체의 각속도를 갱신한다 */
-    contactPointFromCenter = contactPoint - bodies[0]->getPosition();
-    bodies[0]->setRotation(
-        bodies[0]->getRotation() - bodies[0]->getInverseInertiaTensorWorld() * frictionalImpulse.magnitude()
-            * (contactPointFromCenter.cross(contactNormal))
-    );
+    // /* 두 물체의 각속도를 갱신한다 */
+    // contactPointFromCenter = contactPoint - bodies[0]->getPosition();
+    // bodies[0]->setRotation(
+    //     bodies[0]->getRotation() - bodies[0]->getInverseInertiaTensorWorld() * frictionalImpulse.magnitude()
+    //         * (contactPointFromCenter.cross(tangentVector))
+    // );
 
-    if (bodies[1] != nullptr)
-    {
-        contactPointFromCenter = contactPoint - bodies[1]->getPosition();
-        bodies[1]->setRotation(
-            bodies[1]->getRotation() + bodies[1]->getInverseInertiaTensorWorld() * frictionalImpulse.magnitude()
-                * (contactPointFromCenter.cross(contactNormal))
-        );
-    }
+    // if (bodies[1] != nullptr)
+    // {
+    //     contactPointFromCenter = contactPoint - bodies[1]->getPosition();
+    //     bodies[1]->setRotation(
+    //         bodies[1]->getRotation() + bodies[1]->getInverseInertiaTensorWorld() * frictionalImpulse.magnitude()
+    //             * (contactPointFromCenter.cross(tangentVector))
+    //     );
+    // }
 }
 
 /* linear projection */
