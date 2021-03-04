@@ -81,4 +81,16 @@ public:
     ~ObjectGeometricDataChangedEvent() {}
 };
 
+class ObjectMassChangedEvent : public Event
+{
+public:
+    unsigned int id;
+    float value;
+public:
+    ObjectMassChangedEvent() {}
+    ObjectMassChangedEvent(unsigned int _id, float _value)
+        : id(_id), value(_value) {}
+    ~ObjectMassChangedEvent() {}
+};
+
 #endif // EVENT_H

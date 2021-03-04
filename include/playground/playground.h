@@ -48,6 +48,7 @@ private:
     void handleSimulationStatusChangedEvent(SimulationStatusChangedEvent*);
     void handleObjectPositionChangedEvent(ObjectPositionChangedEvent*);
     void handleObjectGeometricDataChangedEvent(ObjectGeometricDataChangedEvent*);
+    void handleObjectMassChangedEvent(ObjectMassChangedEvent*);
 };
 
 #endif // PLAYGROUND_H

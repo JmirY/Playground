@@ -216,7 +216,8 @@ void GUI::renderObjectAttribute(
             /* 질량 */
             object->getMassInArray(vecBuffer);
             ImGui::Text("Mass");
-            ImGui::DragFloat("##Mass", &vecBuffer[0], 0.1f);
+            if (ImGui::DragFloat("##Mass", &vecBuffer[0], 0.1f, 0.1f, FLT_MAX))
+                eventQueue.push(new ObjectMassChangedEvent(selectedObjectIDs[0], vecBuffer[0]));
             /* 도형 데이터 */
             object->getGeometricDataInArray(vecBuffer);
             Geometry geometry = object->getGeometry();

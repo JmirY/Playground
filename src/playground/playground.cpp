@@ -119,14 +119,17 @@ void Playground::handleEvent(Event* event)
     else if (typeid(*event) == typeid(ObjectPositionChangedEvent))
         handleObjectPositionChangedEvent(static_cast<ObjectPositionChangedEvent*>(event));
 
+    else if (typeid(*event) == typeid(SimulationStatusChangedEvent))
+        handleSimulationStatusChangedEvent(static_cast<SimulationStatusChangedEvent*>(event));
+
     else if (typeid(*event) == typeid(ObjectGeometricDataChangedEvent))
         handleObjectGeometricDataChangedEvent(static_cast<ObjectGeometricDataChangedEvent*>(event));
 
     else if (typeid(*event) == typeid(ObjectRemovedEvent))
         handleObjectRemovedEvent(static_cast<ObjectRemovedEvent*>(event));
 
-    else if (typeid(*event) == typeid(SimulationStatusChangedEvent))
-        handleSimulationStatusChangedEvent(static_cast<SimulationStatusChangedEvent*>(event));
+    else if (typeid(*event) == typeid(ObjectMassChangedEvent))
+        handleObjectMassChangedEvent(static_cast<ObjectMassChangedEvent*>(event));
 
     delete event;
 }
@@ -176,4 +179,10 @@ void Playground::handleObjectGeometricDataChangedEvent(ObjectGeometricDataChange
 
     object->setGeometricData(data[0], data[1], data[2]);
     object->updateDerivedData();
+}
+
+void Playground::handleObjectMassChangedEvent(ObjectMassChangedEvent* event)
+{
+    Object* object = objects.find(event->id)->second;
+    object->body->setMass(event->value);
 }
