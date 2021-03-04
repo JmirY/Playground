@@ -64,6 +64,23 @@ public:
     ~ObjectPositionChangedEvent() {}
 };
 
+class ObjectVelocityChangedEvent : public Event
+{
+public:
+    unsigned int id;
+    float velocity[3];
+public:
+    ObjectVelocityChangedEvent() {}
+    ObjectVelocityChangedEvent(unsigned int _id, float (&_velocity)[3])
+    {
+        id = _id;
+        velocity[0] = _velocity[0];
+        velocity[1] = _velocity[1];
+        velocity[2] = _velocity[2];
+    }
+    ~ObjectVelocityChangedEvent() {}
+};
+
 class ObjectGeometricDataChangedEvent : public Event
 {
 public:

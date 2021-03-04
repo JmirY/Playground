@@ -119,6 +119,9 @@ void Playground::handleEvent(Event* event)
     else if (typeid(*event) == typeid(ObjectPositionChangedEvent))
         handleObjectPositionChangedEvent(static_cast<ObjectPositionChangedEvent*>(event));
 
+    else if (typeid(*event) == typeid(ObjectVelocityChangedEvent))
+        handleObjectVelocityChangedEvent(static_cast<ObjectVelocityChangedEvent*>(event));
+
     else if (typeid(*event) == typeid(SimulationStatusChangedEvent))
         handleSimulationStatusChangedEvent(static_cast<SimulationStatusChangedEvent*>(event));
 
@@ -170,6 +173,12 @@ void Playground::handleObjectPositionChangedEvent(ObjectPositionChangedEvent* ev
 {
     float (&position)[3] = event->position;
     objects.find(event->id)->second->body->setPosition(position[0], position[1], position[2]);
+}
+
+void Playground::handleObjectVelocityChangedEvent(ObjectVelocityChangedEvent* event)
+{
+    float (&velocity)[3] = event->velocity;
+    objects.find(event->id)->second->body->setVelocity(velocity[0], velocity[1], velocity[2]);
 }
 
 void Playground::handleObjectGeometricDataChangedEvent(ObjectGeometricDataChangedEvent* event)

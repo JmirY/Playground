@@ -41,7 +41,7 @@ void GUI::renderAll(
     renderObjectPalette(windowFlags, eventQueue);
     renderSimulationControl(windowFlags, eventQueue, isSimulating);
     renderObjectList(windowFlags, eventQueue, objects);
-    renderObjectAttribute(windowFlags, eventQueue, objects, selectedObjectIDs);
+    renderObjectAttribute(windowFlags, eventQueue, objects, selectedObjectIDs, isSimulating);
 
     ImGui::ShowDemoWindow(); // test
 
@@ -173,7 +173,8 @@ void GUI::renderObjectAttribute(
     ImGuiWindowFlags windowFlags,
     EventQueue& eventQueue,
     const Objects& objects,
-    const std::vector<unsigned int>& selectedObjectIDs
+    const std::vector<unsigned int>& selectedObjectIDs,
+    const bool& isSimulating
 )
 {
     ImGui::SetNextWindowPos(ImVec2(1024, 286));
@@ -196,23 +197,29 @@ void GUI::renderObjectAttribute(
             /* 위치 */
             object->getPositionInArray(vecBuffer);
             ImGui::Text("Position"); ImGui::NextColumn();
-            if (ImGui::DragFloat("##PositionX", &vecBuffer[0], 0.1f))
+            if (ImGui::DragFloat("##PositionX", &vecBuffer[0], 0.05f))
                 eventQueue.push(new ObjectPositionChangedEvent(selectedObjectIDs[0], vecBuffer));
             ImGui::NextColumn();
-            if (ImGui::DragFloat("##PositionY", &vecBuffer[1], 0.1f, 0.0f, FLT_MAX))
+            if (ImGui::DragFloat("##PositionY", &vecBuffer[1], 0.05f, 0.0f, FLT_MAX))
                 eventQueue.push(new ObjectPositionChangedEvent(selectedObjectIDs[0], vecBuffer));
             ImGui::NextColumn();
-            if (ImGui::DragFloat("##PositionZ", &vecBuffer[2], 0.1f))
+            if (ImGui::DragFloat("##PositionZ", &vecBuffer[2], 0.05f))
                 eventQueue.push(new ObjectPositionChangedEvent(selectedObjectIDs[0], vecBuffer));
             ImGui::NextColumn();
             /* 속도 */
             object->getVelocityInArray(vecBuffer);
             ImGui::Text("Velocity"); ImGui::NextColumn();
-            ImGui::DragFloat("##VelocityX", &vecBuffer[0], 0.1f);
+            if (ImGui::DragFloat("##VelocityX", &vecBuffer[0], 0.1f))
+                if (!isSimulating)
+                    eventQueue.push(new ObjectVelocityChangedEvent(selectedObjectIDs[0], vecBuffer));
             ImGui::NextColumn();
-            ImGui::DragFloat("##VelocityY", &vecBuffer[1], 0.1f);
+            if (ImGui::DragFloat("##VelocityY", &vecBuffer[1], 0.1f))
+                if (!isSimulating)
+                    eventQueue.push(new ObjectVelocityChangedEvent(selectedObjectIDs[0], vecBuffer));
             ImGui::NextColumn();
-            ImGui::DragFloat("##VelocityZ", &vecBuffer[2], 0.1f);
+            if (ImGui::DragFloat("##VelocityZ", &vecBuffer[2], 0.1f))
+                if (!isSimulating)
+                    eventQueue.push(new ObjectVelocityChangedEvent(selectedObjectIDs[0], vecBuffer));
             ImGui::NextColumn();
             /* 가속도 */
             object->getAccelerationInArray(vecBuffer);

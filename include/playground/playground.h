@@ -47,6 +47,7 @@ private:
     void handleObjectRemovedEvent(ObjectRemovedEvent*);
     void handleSimulationStatusChangedEvent(SimulationStatusChangedEvent*);
     void handleObjectPositionChangedEvent(ObjectPositionChangedEvent*);
+    void handleObjectVelocityChangedEvent(ObjectVelocityChangedEvent*);
     void handleObjectGeometricDataChangedEvent(ObjectGeometricDataChangedEvent*);
     void handleObjectMassChangedEvent(ObjectMassChangedEvent*);
 };

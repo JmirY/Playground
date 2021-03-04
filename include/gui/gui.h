@@ -49,7 +49,8 @@ namespace gui
             ImGuiWindowFlags,
             EventQueue&,
             const Objects&,
-            const std::vector<unsigned int>& selectedObjectIDs
+            const std::vector<unsigned int>& selectedObjectIDs,
+            const bool& isSimulating
         );
     };
 } // namespace gui
