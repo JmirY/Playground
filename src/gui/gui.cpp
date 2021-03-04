@@ -37,7 +37,7 @@ void GUI::renderAll(
     windowFlags |= ImGuiWindowFlags_NoResize;
     windowFlags |= ImGuiWindowFlags_NoTitleBar;
 
-    renderScene(windowFlags, eventQueue);
+    renderScene(windowFlags, eventQueue, isSimulating);
     renderObjectPalette(windowFlags, eventQueue);
     renderSimulationControl(windowFlags, eventQueue, isSimulating);
     renderObjectList(windowFlags, eventQueue, objects);
@@ -50,8 +50,15 @@ void GUI::renderAll(
     ImGui::EndFrame();
 }
 
-void GUI::renderScene(ImGuiWindowFlags windowFlags, EventQueue& eventQueue)
+void GUI::renderScene(
+    ImGuiWindowFlags windowFlags,
+    EventQueue& eventQueue,
+    const bool& isSimulating
+)
 {
+    if (!isSimulating)
+        ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(1.0f, 0.0f, 0.0f, 0.5f));
+
     ImGui::SetNextWindowPos(ImVec2(0, 0));
     ImGui::SetNextWindowSize(ImVec2(1024, 576));
     ImGui::Begin("Scene", NULL, windowFlags);
@@ -66,6 +73,9 @@ void GUI::renderScene(ImGuiWindowFlags windowFlags, EventQueue& eventQueue)
         ImGui::EndChild();
     }
     ImGui::End();
+
+    if (!isSimulating)
+        ImGui::PopStyleColor();
 }
 
 void GUI::renderObjectPalette(ImGuiWindowFlags windowFlags, EventQueue& eventQueue)

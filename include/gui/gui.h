@@ -29,7 +29,11 @@ namespace gui
         );
 
     private:
-        void renderScene(ImGuiWindowFlags, EventQueue&);
+        void renderScene(
+            ImGuiWindowFlags,
+            EventQueue&,
+            const bool& isSimulating
+        );
         void renderObjectPalette(ImGuiWindowFlags, EventQueue&);
         void renderSimulationControl(
             ImGuiWindowFlags,
