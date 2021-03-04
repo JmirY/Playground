@@ -79,6 +79,10 @@ namespace physics
     class CollisionDetector
     {
     public:
+        static const float STATIC_FRICTION;
+        static const float DYNAMIC_FRICTION;
+        
+    public:
         /* 충돌 검사 함수들.
             충돌이 있다면 충돌 정보 구조체를 생성하고 contacts 에 푸쉬하고 true 를 반환한다.
             총돌이 없다면 false 를 반환한다 */

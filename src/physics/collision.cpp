@@ -6,6 +6,10 @@
 
 using namespace physics;
 
+/* CollisionDetector 클래스 static 멤버 초기화 */
+const float CollisionDetector::STATIC_FRICTION = 0.5f;
+const float CollisionDetector::DYNAMIC_FRICTION = 0.4f;
+
 SphereCollider::SphereCollider(RigidBody* _body, float _radius)
 {
     body = _body;
@@ -95,6 +99,8 @@ bool CollisionDetector::sphereAndBox(
         newContact->contactPoint = closestPointWorld;
         newContact->penetration = sphere.radius - sqrtf(distanceSquared);
         newContact->restitution = RESTITUTION_OBJECT;
+        newContact->staticFriction = STATIC_FRICTION;
+        newContact->dynamicFriction = DYNAMIC_FRICTION;
 
         contacts.push_back(newContact);
         return true;
@@ -128,6 +134,8 @@ bool CollisionDetector::sphereAndSphere(
         newContact->contactPoint = sphere1.body->getPosition() - centerToCenter * 0.5f;
         newContact->penetration = radiusSum - sqrtf(distanceSquared);
         newContact->restitution = RESTITUTION_OBJECT;
+        newContact->staticFriction = STATIC_FRICTION;
+        newContact->dynamicFriction = DYNAMIC_FRICTION;
 
         contacts.push_back(newContact);
         return true;
@@ -157,6 +165,8 @@ bool CollisionDetector::sphereAndPlane(
         newContact->contactPoint = sphere.body->getPosition() - plane.normal * distance;
         newContact->penetration = sphere.radius - distance;
         newContact->restitution = RESTITUTION_PLANE;
+        newContact->staticFriction = STATIC_FRICTION;
+        newContact->dynamicFriction = DYNAMIC_FRICTION;
 
         contacts.push_back(newContact);
         return true;
@@ -219,6 +229,8 @@ bool CollisionDetector::boxAndBox(
     newContact->bodies[1] = box2.body;
     newContact->penetration = minPenetration;
     newContact->restitution = RESTITUTION_OBJECT;
+    newContact->staticFriction = STATIC_FRICTION;
+    newContact->dynamicFriction = DYNAMIC_FRICTION;
 
     /* 충돌 법선을 방향에 유의하여 설정한다 */
     Vector3 centerToCenter = box2.body->getPosition() - box1.body->getPosition();
@@ -282,6 +294,8 @@ bool CollisionDetector::boxAndPlane(
             newContact->contactPoint = vertices[i];
             newContact->penetration = -distance;
             newContact->restitution = RESTITUTION_PLANE;
+            newContact->staticFriction = STATIC_FRICTION;
+            newContact->dynamicFriction = DYNAMIC_FRICTION;
 
             contacts.push_back(newContact);
             hasContacted = true;

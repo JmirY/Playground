@@ -34,44 +34,96 @@ void Contact::resolveVelocity()
         return;
     
     /* 충격량의 크기를 계산한다 */
-    float numerator = (relativeVelocity * (1.0f + restitution)).dot(normal);
+    Vector3 contactNormal = normal * -1.0f;
+    float numerator = (relativeVelocity * (1.0f + restitution)).dot(contactNormal) * -1.0f;
 
-    Vector3 termInDenominator1 =
-        (bodies[0]->getInverseInertiaTensorWorld() * (contactPointFromCenter1.cross(normal * -1.0f))).cross(contactPointFromCenter1);
+    Vector3 termInDenominator1 = (bodies[0]->getInverseInertiaTensorWorld() * (contactPointFromCenter1.cross(contactNormal)))
+        .cross(contactPointFromCenter1);
     Vector3 termInDenominator2;
     if (bodies[1] != nullptr) {
         termInDenominator2 =
-            (bodies[1]->getInverseInertiaTensorWorld() * (contactPointFromCenter2.cross(normal * -1.0f))).cross(contactPointFromCenter2);
+            (bodies[1]->getInverseInertiaTensorWorld() * (contactPointFromCenter2.cross(contactNormal)))
+                .cross(contactPointFromCenter2);
     }
     float denominator = totalInverseMass +
-        (termInDenominator1 + termInDenominator2).dot(normal * -1.0f);
+        (termInDenominator1 + termInDenominator2).dot(contactNormal);
 
     float impulse = numerator / denominator;
-    Vector3 impulseVector = normal * impulse;
+    Vector3 impulseVector = contactNormal * impulse;
 
     /* 두 물체의 선속도를 갱신한다 */
     bodies[0]->setVelocity(
-        bodies[0]->getVelocity() + impulseVector * bodies[0]->getInverseMass()
+        bodies[0]->getVelocity() - impulseVector * bodies[0]->getInverseMass()
     );
 
     if (bodies[1] != nullptr)
     {
         bodies[1]->setVelocity(
-            bodies[1]->getVelocity() - impulseVector * bodies[1]->getInverseMass()
+            bodies[1]->getVelocity() + impulseVector * bodies[1]->getInverseMass()
         );
     }
 
     /* 두 물체의 각속도를 갱신한다 */
     Vector3 contactPointFromCenter = contactPoint - bodies[0]->getPosition();
     bodies[0]->setRotation(
-        bodies[0]->getRotation() + bodies[0]->getInverseInertiaTensorWorld() * impulse * (contactPointFromCenter.cross(normal))
+        bodies[0]->getRotation() - bodies[0]->getInverseInertiaTensorWorld() * impulse
+            * (contactPointFromCenter.cross(contactNormal))
     );
 
     if (bodies[1] != nullptr)
     {
         contactPointFromCenter = contactPoint - bodies[1]->getPosition();
         bodies[1]->setRotation(
-            bodies[1]->getRotation() - bodies[1]->getInverseInertiaTensorWorld() * impulse * (contactPointFromCenter.cross(normal))
+            bodies[1]->getRotation() + bodies[1]->getInverseInertiaTensorWorld() * impulse
+                * (contactPointFromCenter.cross(contactNormal))
+        );
+    }
+
+    /* 마찰을 계산한다 */
+
+    /* 접선 벡터를 계산한다 */
+    Vector3 tangentVector = relativeVelocity - contactNormal * (relativeVelocity.dot(contactNormal));
+    if (tangentVector.magnitudeSquared() == 0.0f)
+        return;
+    tangentVector.normalize();
+
+    /* 마찰 임펄스를 계산한다 */
+    float totalMass = bodies[0]->getMass();
+    if (bodies[1] != nullptr)
+        totalMass += bodies[1]->getMass();
+    
+    float term = (relativeVelocity * totalMass).dot(tangentVector);
+    Vector3 frictionalImpulse;
+    if (term <= impulse * staticFriction)
+        frictionalImpulse = tangentVector * term * -1.0f;
+    else
+        frictionalImpulse = tangentVector * (dynamicFriction * impulse) * -1.0f;
+
+    /* 두 물체의 선속도를 갱신한다 */
+    bodies[0]->setVelocity(
+        bodies[0]->getVelocity() - frictionalImpulse * bodies[0]->getInverseMass()
+    );
+
+    if (bodies[1] != nullptr)
+    {
+        bodies[1]->setVelocity(
+            bodies[1]->getVelocity() + frictionalImpulse * bodies[1]->getInverseMass()
+        );
+    }
+
+    /* 두 물체의 각속도를 갱신한다 */
+    contactPointFromCenter = contactPoint - bodies[0]->getPosition();
+    bodies[0]->setRotation(
+        bodies[0]->getRotation() - bodies[0]->getInverseInertiaTensorWorld() * frictionalImpulse.magnitude()
+            * (contactPointFromCenter.cross(contactNormal))
+    );
+
+    if (bodies[1] != nullptr)
+    {
+        contactPointFromCenter = contactPoint - bodies[1]->getPosition();
+        bodies[1]->setRotation(
+            bodies[1]->getRotation() + bodies[1]->getInverseInertiaTensorWorld() * frictionalImpulse.magnitude()
+                * (contactPointFromCenter.cross(contactNormal))
         );
     }
 }
