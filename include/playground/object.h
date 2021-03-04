@@ -35,6 +35,7 @@ public:
     void getPositionInArray(float (&array)[3]) const;
     void getVelocityInArray(float (&array)[3]) const;
     void getAccelerationInArray(float (&array)[3]) const;
+    void getMassInArray(float (&array)[3]) const;
     virtual void getGeometricDataInArray(float (&array)[3]) const = 0;
 
     /* 구의 반지름 또는 직육면체의 half-size 를 설정한다 */

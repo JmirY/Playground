@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <playground/geometry.h>
 #include <string>
+#include <cfloat>
 
 using namespace gui;
 
@@ -188,7 +189,7 @@ void GUI::renderObjectAttribute(
             if (ImGui::DragFloat("##PositionX", &vecBuffer[0], 0.1f))
                 eventQueue.push(new ObjectPositionChangedEvent(selectedObjectIDs[0], vecBuffer));
             ImGui::NextColumn();
-            if (ImGui::DragFloat("##PositionY", &vecBuffer[1], 0.1f))
+            if (ImGui::DragFloat("##PositionY", &vecBuffer[1], 0.1f, 0.0f, FLT_MAX))
                 eventQueue.push(new ObjectPositionChangedEvent(selectedObjectIDs[0], vecBuffer));
             ImGui::NextColumn();
             if (ImGui::DragFloat("##PositionZ", &vecBuffer[2], 0.1f))
@@ -212,6 +213,10 @@ void GUI::renderObjectAttribute(
             ImGui::NextColumn();
             ImGui::DragFloat("##AccelerationZ", &vecBuffer[2], 0.1f);
             ImGui::Columns(1); ImGui::Separator(); ImGui::Spacing();
+            /* 질량 */
+            object->getMassInArray(vecBuffer);
+            ImGui::Text("Mass");
+            ImGui::DragFloat("##Mass", &vecBuffer[0], 0.1f);
             /* 도형 데이터 */
             object->getGeometricDataInArray(vecBuffer);
             Geometry geometry = object->getGeometry();
@@ -219,20 +224,20 @@ void GUI::renderObjectAttribute(
             {
                 ImGui::Text("Half-size");
                 ImGui::Text("X"); ImGui::SameLine();
-                if (ImGui::DragFloat("##Half-X", &vecBuffer[0], 0.01f))
-                    eventQueue.push(new ObjectAttributeChangedEvent(selectedObjectIDs[0], vecBuffer));
+                if (ImGui::DragFloat("##Half-X", &vecBuffer[0], 0.01f, 0.1f, FLT_MAX))
+                    eventQueue.push(new ObjectGeometricDataChangedEvent(selectedObjectIDs[0], vecBuffer));
                 ImGui::Text("Y"); ImGui::SameLine();
-                if (ImGui::DragFloat("##Half-Y", &vecBuffer[1], 0.01f))
-                    eventQueue.push(new ObjectAttributeChangedEvent(selectedObjectIDs[0], vecBuffer));
+                if (ImGui::DragFloat("##Half-Y", &vecBuffer[1], 0.01f, 0.1f, FLT_MAX))
+                    eventQueue.push(new ObjectGeometricDataChangedEvent(selectedObjectIDs[0], vecBuffer));
                 ImGui::Text("Z"); ImGui::SameLine();
-                if (ImGui::DragFloat("##Half-Z", &vecBuffer[2], 0.01f))
-                    eventQueue.push(new ObjectAttributeChangedEvent(selectedObjectIDs[0], vecBuffer));
+                if (ImGui::DragFloat("##Half-Z", &vecBuffer[2], 0.01f, 0.1f, FLT_MAX))
+                    eventQueue.push(new ObjectGeometricDataChangedEvent(selectedObjectIDs[0], vecBuffer));
             }
             else if (geometry == SPHERE)
             {
                 ImGui::Text("Radius");
-                if (ImGui::DragFloat("##Radius", &vecBuffer[0], 0.01f))
-                    eventQueue.push(new ObjectAttributeChangedEvent(selectedObjectIDs[0], vecBuffer));
+                if (ImGui::DragFloat("##Radius", &vecBuffer[0], 0.01f, 0.1f, FLT_MAX))
+                    eventQueue.push(new ObjectGeometricDataChangedEvent(selectedObjectIDs[0], vecBuffer));
             }
         }
 

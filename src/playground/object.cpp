@@ -25,6 +25,12 @@ void Object::getAccelerationInArray(float (&array)[3]) const
     array[2] = acceleration.z;
 }
 
+void Object::getMassInArray(float (&array)[3]) const
+{
+    float mass = body->getMass();
+    array[0] = mass;
+}
+
 void SphereObject::getGeometricDataInArray(float (&array)[3]) const
 {
     array[0] = radius;

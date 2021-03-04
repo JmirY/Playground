@@ -64,21 +64,21 @@ public:
     ~ObjectPositionChangedEvent() {}
 };
 
-class ObjectAttributeChangedEvent : public Event
+class ObjectGeometricDataChangedEvent : public Event
 {
 public:
     unsigned int id;
     float value[3];
 public:
-    ObjectAttributeChangedEvent() {}
-    ObjectAttributeChangedEvent(unsigned int _id, float (&_value)[3])
+    ObjectGeometricDataChangedEvent() {}
+    ObjectGeometricDataChangedEvent(unsigned int _id, float (&_value)[3])
     {
         id = _id;
         value[0] = _value[0];
         value[1] = _value[1];
         value[2] = _value[2];
     }
-    ~ObjectAttributeChangedEvent() {}
+    ~ObjectGeometricDataChangedEvent() {}
 };
 
 #endif // EVENT_H
