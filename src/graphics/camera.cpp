@@ -19,12 +19,14 @@ glm::mat4 Camera::getViewMatrix()
     return glm::lookAt(position, lookAtPoint, up);
 }
 
-void Camera::pan(float xOffset, float yOffset)
+void Camera::pan(float xOffset, float yOffset, float zOffset)
 {
     position -= right * (float) xOffset * panSensitivity;
     lookAtPoint -= right * (float) xOffset * panSensitivity;
     position -= up * (float) yOffset * panSensitivity;
     lookAtPoint -= up * (float) yOffset * panSensitivity;
+    position -= glm::cross(up, right) * (float) zOffset * panSensitivity;
+    lookAtPoint -= glm::cross(up, right) * (float) zOffset * panSensitivity;
 }
 
 void Camera::rotate(glm::vec3 start, glm::vec3 end)

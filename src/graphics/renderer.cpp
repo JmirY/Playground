@@ -303,7 +303,7 @@ void Renderer::cursorPosCallback(GLFWwindow *window, double xPos, double yPos)
     /* 왼클릭 -> 카메라 panning */
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
     {        
-        camera.pan(xOffset, yOffset);
+        camera.pan(xOffset, yOffset, 0.0f);
     }
     /* 오른클릭 -> 카메라 회전 */
     else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
@@ -325,6 +325,11 @@ void Renderer::mouseScrollCallback(GLFWwindow *window, double xOffset, double yO
         return;
 
     camera.zoom((float) yOffset);
+}
+
+void Renderer::moveCamera(glm::vec3 offset)
+{
+    camera.pan(offset.x, offset.y, offset.z);
 }
 
 glm::vec3 Renderer::convertScreenToWorld(glm::vec2 screenPt)

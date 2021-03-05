@@ -29,7 +29,7 @@ namespace graphics
         glm::mat4 getViewMatrix();
 
         /* 카메라 상하좌우 이동 */
-        void pan(float xOffset, float yOffset);
+        void pan(float xOffset, float yOffset, float zOffset);
 
         /* 카메라 뷰의 중앙을 기준으로 회전 */
         void rotate(glm::vec3 start, glm::vec3 end);

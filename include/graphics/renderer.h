@@ -96,6 +96,8 @@ namespace graphics
         void setSceneViewport();
         void setWindowViewport();
 
+        void moveCamera(glm::vec3 offset);
+
         /* 마우스 입력에 따라 카메라를 조정한다 */
         static void cursorPosCallback(GLFWwindow *window, double xPos, double yPos);
         static void mouseScrollCallback(GLFWwindow *window, double xOffset, double yOffset);
