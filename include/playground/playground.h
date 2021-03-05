@@ -40,6 +40,7 @@ public:
     Objects::iterator removeObject(unsigned int id);
 
     void handleEvent(Event*);
+    void handleKeyboardInput();
 
 private:
     void handleObjectAddedEvent(ObjectAddedEvent*);

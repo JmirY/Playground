@@ -16,16 +16,19 @@ void Playground::run()
 
     while (!glfwWindowShouldClose(renderer.getWindow()))
     {
-        /* 시간 계산 */
-        curTime = glfwGetTime();
-        deltaTime = curTime - prevTime;
-        prevTime = curTime;
-
+        /* 키보드 입력 처리 */
+        handleKeyboardInput();
+        
         /* GUI 이벤트 처리 */
         while (!eventQueue.isEmpty())
         {
             handleEvent(eventQueue.pop());
         }
+
+        /* 시간 계산 */
+        curTime = glfwGetTime();
+        deltaTime = curTime - prevTime;
+        prevTime = curTime;
 
         /* 물리 시뮬레이션 */
         if (isSimulating)
@@ -135,6 +138,12 @@ void Playground::handleEvent(Event* event)
         handleObjectMassChangedEvent(static_cast<ObjectMassChangedEvent*>(event));
 
     delete event;
+}
+
+void Playground::handleKeyboardInput()
+{
+    if (glfwGetKey(renderer.getWindow(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(renderer.getWindow(), GLFW_TRUE);
 }
 
 void Playground::handleObjectAddedEvent(ObjectAddedEvent* event)
