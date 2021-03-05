@@ -38,7 +38,7 @@ namespace graphics
 
     /* Perspective frustum 에서의 near & far 값 */
     const float PERSPECTIVE_NEAR = 0.1f;
-    const float PERSPECTIVE_FAR = 100.0f;
+    const float PERSPECTIVE_FAR = 300.0f;
     
     class Renderer
     {

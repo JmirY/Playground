@@ -5,7 +5,7 @@ using namespace graphics;
 
 Camera::Camera()
 {
-    position = glm::vec3(5.0f, 5.0f, 5.0f);
+    position = glm::vec3(10.0f, 10.0f, 10.0f);
     lookAtPoint = glm::vec3(0.0f, 0.0f, 0.0f);
     worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
     fov = 45.0f;
@@ -49,8 +49,12 @@ void Camera::rotate(glm::vec3 start, glm::vec3 end)
     );
     /* 변환 행렬 계산 */
     glm::mat4 rotateMatrix = glm::mat4_cast(rotateQuat);
+    glm::mat4 transformMatrix(1.0f);
+    transformMatrix = glm::translate(transformMatrix, lookAtPoint);
+    transformMatrix *= rotateMatrix;
+    transformMatrix = glm::translate(transformMatrix, -lookAtPoint);
     
-    glm::vec4 newCameraPos = rotateMatrix * glm::vec4(position, 1.0f);
+    glm::vec4 newCameraPos = transformMatrix * glm::vec4(position, 1.0f);
     position.x = newCameraPos.x / newCameraPos.w;
     position.y = newCameraPos.y / newCameraPos.w;
     position.z = newCameraPos.z / newCameraPos.w;
