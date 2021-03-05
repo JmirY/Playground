@@ -79,8 +79,7 @@ namespace physics
     class CollisionDetector
     {
     public:
-        static const float STATIC_FRICTION;
-        static const float DYNAMIC_FRICTION;
+        static const float FRICTION;
         
     public:
         /* 충돌 검사 함수들.
