@@ -183,7 +183,7 @@ void Renderer::renderObject(
     /* 오브젝트 테두리 렌더 */
     glm::vec3 frameColor(0.0f, 0.0f, 0.0f);
     if (isSelected)
-        frameColor = glm::vec3(0.0f, 0.8f, 0.7f);
+        frameColor = glm::vec3(0.0f, 1.0f, 0.0f);
     objectShader.setVec3("objectColor", frameColor);
     glBindVertexArray(objectShape->frameVAO);
     glDrawElements(GL_LINE_STRIP, objectShape->frameIndices.size(), GL_UNSIGNED_INT, (void*)0);
