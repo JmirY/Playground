@@ -189,8 +189,26 @@ void Playground::handleObjectSelectedEvent(ObjectSelectedEvent* event)
             objects.find(id)->second->isSelected = false;
         selectedObjectIDs.clear();
     }
-    selectedObjectIDs.push_back(event->id);
-    objects.find(event->id)->second->isSelected = true;
+
+    bool& isSelected = objects.find(event->id)->second->isSelected;
+    if (isSelected) // TODO: 로직 개선
+    {
+        std::vector<unsigned int>::iterator it = selectedObjectIDs.begin();
+        for (; it != selectedObjectIDs.end(); ++it)
+        {
+            if (*it == event->id)
+            {
+                selectedObjectIDs.erase(it);
+                break;
+            }
+        }
+        isSelected = false;
+    }
+    else
+    {
+        selectedObjectIDs.push_back(event->id);
+        isSelected = true;
+    }
 }
 
 void Playground::handleObjectRemovedEvent(ObjectRemovedEvent* event)
