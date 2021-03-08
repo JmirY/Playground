@@ -142,21 +142,38 @@ void Playground::handleEvent(Event* event)
 
 void Playground::handleKeyboardInput()
 {
+    /* 프로그램 종료 */
     if (glfwGetKey(renderer.getWindow(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(renderer.getWindow(), GLFW_TRUE);
     
+    /* 카메라 이동 */
+    glm::vec3 offset(0.0f);
     if (glfwGetKey(renderer.getWindow(), GLFW_KEY_D) == GLFW_PRESS)
-        renderer.moveCamera(glm::vec3(-7.0f, 0.0f, 0.0f));
+        offset.x += -10.0f;
     if (glfwGetKey(renderer.getWindow(), GLFW_KEY_A) == GLFW_PRESS)
-        renderer.moveCamera(glm::vec3(7.0f, 0.0f, 0.0f));
+        offset.x += 10.0f;
     if (glfwGetKey(renderer.getWindow(), GLFW_KEY_W) == GLFW_PRESS)
-        renderer.moveCamera(glm::vec3(0.0f, 0.0f, -7.0f));
+        offset.z += -10.0f;
     if (glfwGetKey(renderer.getWindow(), GLFW_KEY_S) == GLFW_PRESS)
-        renderer.moveCamera(glm::vec3(0.0f, 0.0f, 7.0f));
-    if (glfwGetKey(renderer.getWindow(), GLFW_KEY_Q) == GLFW_PRESS)
-        renderer.moveCamera(glm::vec3(0.0f, -7.0f, 0.0f));
+        offset.z += 10.0f;
     if (glfwGetKey(renderer.getWindow(), GLFW_KEY_E) == GLFW_PRESS)
-        renderer.moveCamera(glm::vec3(0.0f, 7.0f, 0.0f));
+        offset.y += -10.0f;
+    if (glfwGetKey(renderer.getWindow(), GLFW_KEY_Q) == GLFW_PRESS)
+        offset.y += 10.0f;
+    renderer.moveCamera(offset);
+    
+    /* 시뮬레이션 멈춤 혹은 재개 */
+    static bool isRepeated = false;
+    if (glfwGetKey(renderer.getWindow(), GLFW_KEY_SPACE) == GLFW_PRESS)
+    {
+        if (!isRepeated)
+        {
+            isSimulating = !isSimulating;
+            isRepeated = true;
+        }
+    }
+    else if (glfwGetKey(renderer.getWindow(), GLFW_KEY_SPACE) == GLFW_RELEASE)
+        isRepeated = false;
 }
 
 void Playground::handleObjectAddedEvent(ObjectAddedEvent* event)
