@@ -112,7 +112,7 @@ Playground::Objects::iterator Playground::removeObject(unsigned int id)
 }
 
 void Playground::handleEvent(Event* event)
-{
+{    
     if (typeid(*event) == typeid(ObjectSelectedEvent))
         handleObjectSelectedEvent(static_cast<ObjectSelectedEvent*>(event));
 
@@ -136,6 +136,12 @@ void Playground::handleEvent(Event* event)
 
     else if (typeid(*event) == typeid(ObjectMassChangedEvent))
         handleObjectMassChangedEvent(static_cast<ObjectMassChangedEvent*>(event));
+
+    else if (typeid(*event) == typeid(LeftMouseDraggedOnSceneEvent))
+        handleLeftMouseDraggedOnSceneEvent(static_cast<LeftMouseDraggedOnSceneEvent*>(event));
+
+    else if (typeid(*event) == typeid(RightMouseDraggedOnSceneEvent))
+        handleRightMouseDraggedOnSceneEvent(static_cast<RightMouseDraggedOnSceneEvent*>(event));
 
     delete event;
 }
@@ -251,4 +257,31 @@ void Playground::handleObjectMassChangedEvent(ObjectMassChangedEvent* event)
 {
     Object* object = objects.find(event->id)->second;
     object->body->setMass(event->value);
+}
+
+void Playground::handleLeftMouseDraggedOnSceneEvent(LeftMouseDraggedOnSceneEvent* event)
+{
+    renderer.moveCamera(
+        glm::vec3(event->xOffset, event->yOffset, 0.0f)
+    );
+}
+
+void Playground::handleRightMouseDraggedOnSceneEvent(RightMouseDraggedOnSceneEvent* event)
+{
+    glm::vec3 dragStart = renderer.convertScreenToWorld(glm::vec2(event->prevX, event->prevY));
+    glm::vec3 dragEnd = renderer.convertScreenToWorld(glm::vec2(event->curX, event->curY));
+
+    /* 회전축 벡터 계산 */
+    glm::vec3 axis = glm::cross(dragStart, dragEnd);
+    axis = glm::normalize(axis);
+    /* 두 벡터 사이각 계산 */
+    dragEnd = glm::normalize(dragEnd);
+    dragStart = glm::normalize(dragStart);
+    float dotProduct = glm::dot(dragEnd, dragStart);
+    if (dotProduct > 1.0f)
+        dotProduct = 1.0f;
+    float angle = -glm::acos(dotProduct);
+    angle = glm::degrees(angle);
+    
+    renderer.rotateCamera(axis, angle);
 }

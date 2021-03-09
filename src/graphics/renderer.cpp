@@ -49,7 +49,6 @@ Renderer::Renderer()
     );
 
     /* 콜백 함수 등록 */
-    glfwSetCursorPosCallback(window, cursorPosCallback);
     glfwSetScrollCallback(window, mouseScrollCallback);
 
     /* 배경 VAO 설정 */
@@ -269,54 +268,6 @@ void Renderer::setWindowViewport()
     glViewport(0, 0, windowWidth, windowHeight);
 }
 
-void Renderer::cursorPosCallback(GLFWwindow *window, double xPos, double yPos)
-{    
-    static bool isLeftButtonClickedOutside = false;
-    static bool isRightButtonClickedOutside = false;
-
-    /* Scene 외부를 클릭하여 드래그하였는지 검사 */
-    if ((xPos > (double) sceneWidth || yPos > (double) sceneHeight || xPos < 0.0f || yPos < 0.0f)
-            && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-        isLeftButtonClickedOutside = true;
-    else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
-        isLeftButtonClickedOutside = false;
-    
-    if ((xPos > (double) sceneWidth || yPos > (double) sceneHeight || xPos < 0.0f || yPos < 0.0f)
-            && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
-        isRightButtonClickedOutside = true;
-    else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE)
-        isRightButtonClickedOutside = false;
-
-    if (isLeftButtonClickedOutside || isRightButtonClickedOutside)
-        return;
-
-    /* 직전 호출에서의 커서 위치 저장 */
-    static double xPosPrev = SCENE_WIDTH / 2.0f;
-    static double yPosPrev = SCENE_HEIGHT / 2.0f;
-    /* 커서의 이동 거리 */
-    double xOffset = xPos - xPosPrev;
-    double yOffset = yPosPrev - yPos;
-    /* 커서가 이동하지 않았다면 종료 */
-    if (xOffset == 0 && yOffset == 0)
-        return;
-
-    /* 왼클릭 -> 카메라 panning */
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-    {        
-        camera.pan(xOffset, yOffset, 0.0f);
-    }
-    /* 오른클릭 -> 카메라 회전 */
-    else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
-    {
-        glm::vec3 end = convertScreenToWorld(glm::vec2(xPos, yPos));
-        glm::vec3 start = convertScreenToWorld(glm::vec2(xPosPrev, yPosPrev));
-        camera.rotate(start, end);
-    }
-
-    xPosPrev = xPos;
-    yPosPrev = yPos;
-}
-
 void Renderer::mouseScrollCallback(GLFWwindow *window, double xOffset, double yOffset)
 {
     double xPos, yPos;
@@ -330,6 +281,11 @@ void Renderer::mouseScrollCallback(GLFWwindow *window, double xOffset, double yO
 void Renderer::moveCamera(glm::vec3 offset)
 {
     camera.pan(offset.x, offset.y, offset.z);
+}
+
+void Renderer::rotateCamera(glm::vec3 axis, float angle)
+{
+    camera.rotate(axis, angle);
 }
 
 glm::vec3 Renderer::convertScreenToWorld(glm::vec2 screenPt)

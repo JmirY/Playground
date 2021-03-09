@@ -18,7 +18,6 @@ namespace gui
         unsigned int textureBufferID;
 
     public:
-        GUI() {}
         GUI(GLFWwindow* window, unsigned int textureBufferID);
 
         void renderAll(

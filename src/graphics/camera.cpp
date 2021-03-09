@@ -29,25 +29,14 @@ void Camera::pan(float xOffset, float yOffset, float zOffset)
     lookAtPoint -= glm::cross(up, right) * (float) zOffset * panSensitivity;
 }
 
-void Camera::rotate(glm::vec3 start, glm::vec3 end)
+void Camera::rotate(glm::vec3 axis, float angle)
 {
-    /* 회전축 벡터 계산 */
-    glm::vec3 rotateAxis = glm::cross(start, end);
-    rotateAxis = glm::normalize(rotateAxis);
-    /* 두 벡터 사이각 계산 */
-    end = glm::normalize(end);
-    start = glm::normalize(start);
-    float dotProduct = glm::dot(end, start);
-    if (dotProduct > 1.0f)
-        dotProduct = 1.0f;
-    float angle = -glm::acos(dotProduct);
-    angle = glm::degrees(angle);
     /* 카메라의 회전을 사원수로 표현 */
     glm::quat rotateQuat(
         glm::cos(angle / 2),
-        rotateAxis.x * glm::sin(angle / 2),
-        rotateAxis.y * glm::sin(angle / 2),
-        rotateAxis.z * glm::sin(angle / 2)
+        axis.x * glm::sin(angle / 2),
+        axis.y * glm::sin(angle / 2),
+        axis.z * glm::sin(angle / 2)
     );
     /* 변환 행렬 계산 */
     glm::mat4 rotateMatrix = glm::mat4_cast(rotateQuat);

@@ -51,6 +51,8 @@ private:
     void handleObjectVelocityChangedEvent(ObjectVelocityChangedEvent*);
     void handleObjectGeometricDataChangedEvent(ObjectGeometricDataChangedEvent*);
     void handleObjectMassChangedEvent(ObjectMassChangedEvent*);
+    void handleLeftMouseDraggedOnSceneEvent(LeftMouseDraggedOnSceneEvent*);
+    void handleRightMouseDraggedOnSceneEvent(RightMouseDraggedOnSceneEvent*);
 };
 
 #endif // PLAYGROUND_H

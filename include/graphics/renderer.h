@@ -97,14 +97,13 @@ namespace graphics
         void setWindowViewport();
 
         void moveCamera(glm::vec3 offset);
+        void rotateCamera(glm::vec3 axis, float angle);
 
         /* 마우스 입력에 따라 카메라를 조정한다 */
-        static void cursorPosCallback(GLFWwindow *window, double xPos, double yPos);
         static void mouseScrollCallback(GLFWwindow *window, double xOffset, double yOffset);
 
-    private:
         /* 스크린 좌표계 -> 월드 좌표계 변환 */
-        static glm::vec3 convertScreenToWorld(glm::vec2 screenPt);
+        glm::vec3 convertScreenToWorld(glm::vec2 screenPt);
     };
 } // namespace graphics
 
