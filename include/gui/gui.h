@@ -51,6 +51,8 @@ namespace gui
             const std::vector<unsigned int>& selectedObjectIDs,
             const bool& isSimulating
         );
+
+        bool isInScene(ImVec2);
     };
 } // namespace gui
 

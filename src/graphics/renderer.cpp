@@ -48,9 +48,6 @@ Renderer::Renderer()
         "./shaders/object_fragment.glsl"
     );
 
-    /* 콜백 함수 등록 */
-    glfwSetScrollCallback(window, mouseScrollCallback);
-
     /* 배경 VAO 설정 */
     glGenVertexArrays(1, &backgroundVAO);
     glBindVertexArray(backgroundVAO);
@@ -268,16 +265,6 @@ void Renderer::setWindowViewport()
     glViewport(0, 0, windowWidth, windowHeight);
 }
 
-void Renderer::mouseScrollCallback(GLFWwindow *window, double xOffset, double yOffset)
-{
-    double xPos, yPos;
-    glfwGetCursorPos(window, &xPos, &yPos);
-    if (xPos > sceneWidth || yPos > sceneHeight)
-        return;
-
-    camera.zoom((float) yOffset);
-}
-
 void Renderer::moveCamera(glm::vec3 offset)
 {
     camera.pan(offset.x, offset.y, offset.z);
@@ -286,6 +273,11 @@ void Renderer::moveCamera(glm::vec3 offset)
 void Renderer::rotateCamera(glm::vec3 axis, float angle)
 {
     camera.rotate(axis, angle);
+}
+
+void Renderer::zoomCamera(float degree)
+{
+    camera.zoom(degree);
 }
 
 glm::vec3 Renderer::convertScreenToWorld(glm::vec2 screenPt)

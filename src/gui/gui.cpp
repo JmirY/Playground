@@ -64,24 +64,28 @@ void GUI::renderScene(
     ImGui::Begin("Scene", NULL, windowFlags);
     {
         ImGui::BeginChild("SceneRender");
+
+        /* Scene 렌더 */
         ImGui::Image(
             (ImTextureID)(uintptr_t) textureBufferID,
             ImGui::GetWindowSize(),
             ImVec2(0, 1),
             ImVec2(1, 0)
         );
+
+        const ImGuiIO& io = ImGui::GetIO();
         /* 왼쪽 마우스 드래그 */
-        if (ImGui::IsWindowFocused() && ImGui::IsMouseDragging(0))
+        ImVec2 clickedPos = io.MouseClickedPos[0];
+        if (isInScene(clickedPos) && ImGui::IsMouseDragging(0))
         {
-            ImVec2 dragDelta = ImGui::GetIO().MouseDelta;
+            ImVec2 dragDelta = io.MouseDelta;
             eventQueue.push(new LeftMouseDraggedOnSceneEvent(dragDelta.x, -dragDelta.y));
         }
         /* 오른쪽 마우스 드래그 */
-        const ImVec2& clickedPos = ImGui::GetIO().MouseClickedPos[1];
-        if (clickedPos.x > 0.0f && clickedPos.x < 1024.0f
-                && clickedPos.y > 0.0f && clickedPos.y < 576.0f && ImGui::IsMouseDragging(1))
+        clickedPos = io.MouseClickedPos[1];
+        if (isInScene(clickedPos) && ImGui::IsMouseDragging(1))
         {
-            ImVec2 dragDelta = ImGui::GetIO().MouseDelta;
+            ImVec2 dragDelta = io.MouseDelta;
             if (dragDelta.x != 0.0f && dragDelta.y != 0.0f)
             {
                 eventQueue.push(new RightMouseDraggedOnSceneEvent(
@@ -92,6 +96,15 @@ void GUI::renderScene(
                 ));
             }
         }
+        /* 마우스 휠 스크롤 */
+        ImVec2 mousePos = ImGui::GetMousePos();
+        if (isInScene(mousePos))
+        {
+            float mouseWheel = io.MouseWheel;
+            if (mouseWheel != 0.0f)
+                eventQueue.push(new MouseWheelOnSceneEvent(mouseWheel));
+        }
+
         ImGui::EndChild();
     }
     ImGui::End();
@@ -284,4 +297,12 @@ void GUI::renderObjectAttribute(
         ImGui::EndChild();
     }
     ImGui::End();
+}
+
+bool GUI::isInScene(ImVec2 vec)
+{
+    if (vec.x > 0.0f && vec.x < 1024.0f && vec.y > 0.0f && vec.y < 576.0f)
+        return true;
+    else
+        return false;
 }

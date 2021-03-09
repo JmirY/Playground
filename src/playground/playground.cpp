@@ -143,6 +143,9 @@ void Playground::handleEvent(Event* event)
     else if (typeid(*event) == typeid(RightMouseDraggedOnSceneEvent))
         handleRightMouseDraggedOnSceneEvent(static_cast<RightMouseDraggedOnSceneEvent*>(event));
 
+    else if (typeid(*event) == typeid(MouseWheelOnSceneEvent))
+        handleMouseWheelOnSceneEvent(static_cast<MouseWheelOnSceneEvent*>(event));
+
     delete event;
 }
 
@@ -284,4 +287,9 @@ void Playground::handleRightMouseDraggedOnSceneEvent(RightMouseDraggedOnSceneEve
     angle = glm::degrees(angle);
     
     renderer.rotateCamera(axis, angle);
+}
+
+void Playground::handleMouseWheelOnSceneEvent(MouseWheelOnSceneEvent* event)
+{
+    renderer.zoomCamera(event->value);
 }

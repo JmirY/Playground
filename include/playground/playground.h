@@ -53,6 +53,7 @@ private:
     void handleObjectMassChangedEvent(ObjectMassChangedEvent*);
     void handleLeftMouseDraggedOnSceneEvent(LeftMouseDraggedOnSceneEvent*);
     void handleRightMouseDraggedOnSceneEvent(RightMouseDraggedOnSceneEvent*);
+    void handleMouseWheelOnSceneEvent(MouseWheelOnSceneEvent*);
 };
 
 #endif // PLAYGROUND_H
