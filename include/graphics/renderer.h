@@ -47,14 +47,11 @@ namespace graphics
 
     private:
         int windowWidth, windowHeight;
-    
-        /* static 멤버 함수 convertScreenToWorld 에서 사용되므로 static 선언 */
-        static int sceneWidth, sceneHeight;
+        int sceneWidth, sceneHeight;
 
         GLFWwindow *window;
 
-        /* static 멤버 함수 convertScreenToWorld 에서 사용되므로 static 선언 */
-        static Camera camera;
+        Camera camera;
         Shader objectShader;
 
         /* Shape 포인터 저장 */
@@ -75,6 +72,7 @@ namespace graphics
 
         GLFWwindow* getWindow() const;
         unsigned int getTextureBufferID() const;
+        glm::vec3 getViewPlaneNormal() const;
 
         Shape* addShape(unsigned int id, Geometry);
         void removeShape(unsigned int id);

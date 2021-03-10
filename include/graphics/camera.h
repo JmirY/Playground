@@ -25,7 +25,8 @@ namespace graphics
         Camera();
 
         /* 현재 상태를 기준으로 뷰 매트릭스 리턴 */
-        glm::mat4 getViewMatrix();
+        glm::mat4 getViewMatrix() const;
+        glm::vec3 getViewPlaneNormal() const;
 
         /* 카메라 상하좌우 이동 */
         void pan(float xOffset, float yOffset, float zOffset);

@@ -3,19 +3,9 @@
 
 using namespace graphics;
 
-/***********************
- * static 멤버 변수 초기화 *
- ***********************/
-
-int Renderer::sceneWidth = SCENE_WIDTH;
-int Renderer::sceneHeight = SCENE_HEIGHT;
-Camera Renderer::camera = Camera();
-
-/***************
- * 멤버 함수 정의 *
- ***************/
-
 Renderer::Renderer()
+    : windowWidth(WINDOW_WIDTH), windowHeight(WINDOW_HEIGHT),
+        sceneWidth(SCENE_WIDTH), sceneHeight(SCENE_HEIGHT)
 {
     /* GLFW 초기화 */
     glfwInit();
@@ -25,7 +15,7 @@ Renderer::Renderer()
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
     /* window 생성 */
-    window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Playground", NULL, NULL);
+    window = glfwCreateWindow(windowWidth, windowHeight, "Playground", NULL, NULL);
     if (!window)
     {
         std::cout << "ERROR::Renderer::Failed to create GLFW window" << std::endl;
@@ -123,6 +113,11 @@ GLFWwindow* Renderer::getWindow() const
 unsigned int Renderer::getTextureBufferID() const
 {
     return textureBufferID;
+}
+
+glm::vec3 Renderer::getViewPlaneNormal() const
+{
+    return camera.getViewPlaneNormal();
 }
 
 Shape* Renderer::addShape(unsigned int id, Geometry geometry)

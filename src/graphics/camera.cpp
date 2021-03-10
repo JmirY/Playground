@@ -14,9 +14,15 @@ Camera::Camera()
     updateCameraVectors();
 }
 
-glm::mat4 Camera::getViewMatrix()
+glm::mat4 Camera::getViewMatrix() const
 {
     return glm::lookAt(position, lookAtPoint, up);
+}
+
+glm::vec3 Camera::getViewPlaneNormal() const
+{
+    glm::vec3 viewPlaneNormal = glm::cross(up, right);
+    return glm::normalize(viewPlaneNormal);
 }
 
 void Camera::pan(float xOffset, float yOffset, float zOffset)
