@@ -76,11 +76,20 @@ void GUI::renderScene(
         const ImGuiIO& io = ImGui::GetIO();
         /* 왼쪽 마우스 드래그 */
         ImVec2 clickedPos = io.MouseClickedPos[0];
-        if (isInScene(clickedPos) && ImGui::IsMouseDragging(0))
+        if (isInScene(clickedPos))
         {
-            ImVec2 dragDelta = io.MouseDelta;
-            eventQueue.push(new LeftMouseDraggedOnSceneEvent(dragDelta.x, -dragDelta.y));
+            if (ImGui::IsMouseDragging(0))
+            {
+                ImVec2 dragDelta = io.MouseDelta;
+                if (dragDelta.x != 0.0f && dragDelta.y != 0.0f)
+                    eventQueue.push(new LeftMouseDraggedOnSceneEvent(dragDelta.x, -dragDelta.y));
+            }
+            else if (ImGui::IsMouseReleased(0) && io.MouseDownDurationPrev[0] < 0.03f)
+            {
+                eventQueue.push(new LeftMouseClickedOnSceneEvent(clickedPos.x, clickedPos.y));
+            }
         }
+
         /* 오른쪽 마우스 드래그 */
         clickedPos = io.MouseClickedPos[1];
         if (isInScene(clickedPos) && ImGui::IsMouseDragging(1))

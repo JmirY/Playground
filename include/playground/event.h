@@ -116,4 +116,13 @@ public:
         : value(_value) {}
 };
 
+class LeftMouseClickedOnSceneEvent : public Event
+{
+public:
+    float screenX, screenY;
+
+    LeftMouseClickedOnSceneEvent(float _x, float _y)
+        : screenX(_x), screenY(_y) {}
+};
+
 #endif // EVENT_H
