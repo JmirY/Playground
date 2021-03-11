@@ -299,6 +299,26 @@ bool CollisionDetector::boxAndPlane(
     return hasContacted;
 }
 
+float CollisionDetector::rayAndSphere(
+    const Vector3& origin,
+    const Vector3& direction,
+    const SphereCollider& sphere
+)
+{
+    Vector3 spherePos = sphere.body->getPosition();
+    Vector3 originToSphere = spherePos - origin;
+    float originToSphereProjected = originToSphere.dot(direction);
+    float orthogonalDistanceSquared =
+        originToSphere.magnitudeSquared() - originToSphereProjected * originToSphereProjected;
+    if (orthogonalDistanceSquared > sphere.radius*sphere.radius)
+        return -1.0f;
+
+    float t1 = sqrtf(sphere.radius*sphere.radius - orthogonalDistanceSquared);
+    float hitPointDistance = originToSphereProjected - t1;
+
+    return hitPointDistance;
+}
+
 float CollisionDetector::calcPenetration(const BoxCollider& box1, const BoxCollider& box2, const Vector3& axis)
 {
     /* 두 박스의 중심 간 거리를 계산한다 */

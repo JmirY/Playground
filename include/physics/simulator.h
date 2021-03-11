@@ -39,6 +39,12 @@ namespace physics
         /* 충돌체와 강체를 제거한다 */
         void removePhysicsObject(unsigned int id);
 
+        float calcDistanceBetweenRayAndObject(
+            const Vector3& rayOrigin,
+            const Vector3& rayDirection,
+            const unsigned int id
+        );
+
     private:
         /* 충돌을 검출하고 충돌 정보를 contacts 에 저장한다 */
         void detectCollision();

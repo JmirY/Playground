@@ -146,6 +146,9 @@ void Playground::handleEvent(Event* event)
     else if (typeid(*event) == typeid(MouseWheelOnSceneEvent))
         handleMouseWheelOnSceneEvent(static_cast<MouseWheelOnSceneEvent*>(event));
 
+    else if (typeid(*event) == typeid(LeftMouseClickedOnSceneEvent))
+        handleLeftMouseClickedOnSceneEvent(static_cast<LeftMouseClickedOnSceneEvent*>(event));
+
     delete event;
 }
 
@@ -183,6 +186,14 @@ void Playground::handleKeyboardInput()
     }
     else if (glfwGetKey(renderer.getWindow(), GLFW_KEY_SPACE) == GLFW_RELEASE)
         isRepeated = false;
+}
+
+void Playground::clearSelectedObjectIDs()
+{
+    for (const auto& id : selectedObjectIDs)
+        objects.find(id)->second->isSelected = false;
+    
+    selectedObjectIDs.clear();
 }
 
 void Playground::handleObjectAddedEvent(ObjectAddedEvent* event)
@@ -292,4 +303,46 @@ void Playground::handleRightMouseDraggedOnSceneEvent(RightMouseDraggedOnSceneEve
 void Playground::handleMouseWheelOnSceneEvent(MouseWheelOnSceneEvent* event)
 {
     renderer.zoomCamera(event->value);
+}
+
+void Playground::handleLeftMouseClickedOnSceneEvent(LeftMouseClickedOnSceneEvent* event)
+{
+    /* 클릭 지점의 좌표를 월드 좌표로 변환한다 */
+    glm::vec3 clickedPoint = renderer.convertScreenToWorld(
+        glm::vec2(event->screenX, event->screenY)
+    );
+    physics::Vector3 origin(clickedPoint.x, clickedPoint.y, clickedPoint.z);
+    
+    /* Ray 의 방향을 계산한다 */
+    glm::vec3 rayDirection = clickedPoint - renderer.getCameraPosition();
+    rayDirection = glm::normalize(rayDirection);
+    physics::Vector3 direction(rayDirection.x, rayDirection.y, rayDirection.z);
+    
+    /* Ray 와 부딪히는 오브젝트를 찾는다 */
+    float minDistance = FLT_MAX;
+    int minDistanceObjectID = -1;
+    for (const auto& object : objects)
+    {
+        float distance;
+
+        if (object.second->geometry == SPHERE)
+        {
+            distance = simulator.calcDistanceBetweenRayAndObject(origin, direction, object.second->id);
+        }
+        else if (object.second->geometry == BOX)
+        {
+
+        }
+
+        if (distance > 0.0f && distance < minDistance)
+        {
+            minDistance = distance;
+            minDistanceObjectID = object.second->id;
+        }
+    }
+
+    if (minDistanceObjectID >= 0)
+        eventQueue.push(new ObjectSelectedEvent(minDistanceObjectID, event->isCtrlPressed));
+    else
+        clearSelectedObjectIDs();
 }

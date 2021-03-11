@@ -120,9 +120,10 @@ class LeftMouseClickedOnSceneEvent : public Event
 {
 public:
     float screenX, screenY;
+    bool isCtrlPressed;
 
-    LeftMouseClickedOnSceneEvent(float _x, float _y)
-        : screenX(_x), screenY(_y) {}
+    LeftMouseClickedOnSceneEvent(float _x, float _y, bool _isCtrlPressed)
+        : screenX(_x), screenY(_y), isCtrlPressed(_isCtrlPressed) {}
 };
 
 #endif // EVENT_H

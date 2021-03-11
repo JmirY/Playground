@@ -89,6 +89,28 @@ void Simulator::removePhysicsObject(unsigned int id)
     colliders.erase(colliderIter);
 }
 
+float Simulator::calcDistanceBetweenRayAndObject(
+    const Vector3& rayOrigin,
+    const Vector3& rayDirection,
+    const unsigned int id
+)
+{
+    float distance;
+    Collider* collider = colliders.find(id)->second;
+
+    if (typeid(*collider) == typeid(SphereCollider))
+    {
+        SphereCollider* sphere = static_cast<SphereCollider*>(collider);
+        distance = CollisionDetector::rayAndSphere(rayOrigin, rayDirection, *sphere);
+    }
+    else if (typeid(*collider) == typeid(BoxCollider))
+    {
+
+    }
+
+    return distance;
+}
+
 void Simulator::detectCollision()
 {
     for (Colliders::iterator i = colliders.begin(); i != colliders.end(); ++i)

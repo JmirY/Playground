@@ -86,7 +86,7 @@ void GUI::renderScene(
             }
             else if (ImGui::IsMouseReleased(0) && io.MouseDownDurationPrev[0] < 0.03f)
             {
-                eventQueue.push(new LeftMouseClickedOnSceneEvent(clickedPos.x, clickedPos.y));
+                eventQueue.push(new LeftMouseClickedOnSceneEvent(clickedPos.x, clickedPos.y, io.KeyCtrl));
             }
         }
 

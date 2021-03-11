@@ -43,6 +43,8 @@ public:
     void handleKeyboardInput();
 
 private:
+    void clearSelectedObjectIDs();
+
     void handleObjectAddedEvent(ObjectAddedEvent*);
     void handleObjectSelectedEvent(ObjectSelectedEvent*);
     void handleObjectRemovedEvent(ObjectRemovedEvent*);
@@ -54,6 +56,7 @@ private:
     void handleLeftMouseDraggedOnSceneEvent(LeftMouseDraggedOnSceneEvent*);
     void handleRightMouseDraggedOnSceneEvent(RightMouseDraggedOnSceneEvent*);
     void handleMouseWheelOnSceneEvent(MouseWheelOnSceneEvent*);
+    void handleLeftMouseClickedOnSceneEvent(LeftMouseClickedOnSceneEvent*);
 };
 
 #endif // PLAYGROUND_H

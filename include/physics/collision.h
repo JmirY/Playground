@@ -111,6 +111,15 @@ namespace physics
             const BoxCollider&,
             const PlaneCollider&
         );
+
+        /* 선이 도형을 통과하는지 검사한다 
+            카메라로부터 hit point 까지의 거리를 반환한다
+            hit 하지 않는다면 음수를 반환한다 */
+        static float rayAndSphere(
+            const Vector3& origin,
+            const Vector3& direction,
+            const SphereCollider&
+        );
     
     private:
         /* 두 박스가 주어진 축에 대해 어느정도 겹치는지 반환한다 */
