@@ -98,8 +98,8 @@ void GUI::renderScene(
             if (dragDelta.x != 0.0f && dragDelta.y != 0.0f)
             {
                 eventQueue.push(new RightMouseDraggedOnSceneEvent(
-                    clickedPos.x + dragDelta.x,
-                    clickedPos.y + dragDelta.y,
+                    clickedPos.x + dragDelta.x * 10.0f,
+                    clickedPos.y + dragDelta.y * 10.0f,
                     clickedPos.x,
                     clickedPos.y
                 ));
