@@ -115,9 +115,9 @@ unsigned int Renderer::getTextureBufferID() const
     return textureBufferID;
 }
 
-glm::vec3 Renderer::getViewPlaneNormal() const
+glm::vec3 Renderer::getCameraPosition() const
 {
-    return camera.getViewPlaneNormal();
+    return camera.getPosition();
 }
 
 Shape* Renderer::addShape(unsigned int id, Geometry geometry)
@@ -277,26 +277,27 @@ void Renderer::zoomCamera(float degree)
 
 glm::vec3 Renderer::convertScreenToWorld(glm::vec2 screenPt)
 {
-    /* 스크린 좌표계 -> 뷰 좌표계 */
-    glm::vec3 viewPt = glm::vec3(
-        (float) screenPt.x / sceneWidth * 2 - 1.0f,
-		(float) screenPt.y / sceneHeight * 2 - 1.0f,
-		0.0f
+    glm::mat4 projectionMat = glm::perspective(
+        glm::radians(camera.getFov()),
+        ((float) sceneWidth) / sceneHeight,
+        PERSPECTIVE_NEAR,
+        PERSPECTIVE_FAR
     );
-    viewPt.y = -viewPt.y;
-    float lengthSquared = viewPt.x * viewPt.x + viewPt.y * viewPt.y;
-    if (lengthSquared <= 1.0f)
-    {
-        viewPt.z = glm::sqrt(1.0f - lengthSquared);
-    }
-    else
-    {
-        viewPt = glm::normalize(viewPt);
-    }
+    glm::mat4 viewMat = camera.getViewMatrix();
+    glm::mat4 inverseTransformMat = glm::inverse(projectionMat * viewMat);
 
-    /* 뷰 좌표계 -> 월드 좌표계 */
-    glm::vec3 worldPt;
-    worldPt = glm::inverse(camera.getViewMatrix()) * glm::vec4(viewPt, 1.0f);
+    glm::vec4 clickedPt;
+    clickedPt.w = 1.0f;
+    clickedPt.x = screenPt.x / sceneWidth * 2.0f - 1.0f;
+    clickedPt.y = screenPt.y / sceneHeight * 2.0f - 1.0f;
+    clickedPt.y *= -1.0f;
+    clickedPt.z = -1.0f;
 
-    return worldPt;
+    glm::vec4 worldPt = inverseTransformMat * clickedPt;
+    worldPt.w = 1.0f / worldPt.w;
+    worldPt.x *= worldPt.w;
+    worldPt.y *= worldPt.w;
+    worldPt.z *= worldPt.w;
+
+    return glm::vec3(worldPt.x, worldPt.y, worldPt.z);
 }

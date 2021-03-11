@@ -72,7 +72,7 @@ namespace graphics
 
         GLFWwindow* getWindow() const;
         unsigned int getTextureBufferID() const;
-        glm::vec3 getViewPlaneNormal() const;
+        glm::vec3 getCameraPosition() const;
 
         Shape* addShape(unsigned int id, Geometry);
         void removeShape(unsigned int id);
