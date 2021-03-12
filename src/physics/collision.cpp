@@ -319,6 +319,52 @@ float CollisionDetector::rayAndSphere(
     return hitPointDistance;
 }
 
+float CollisionDetector::rayAndBox(
+    const Vector3& origin,
+    const Vector3& direction,
+    const BoxCollider& box
+)
+{
+    Vector3 originToBox = box.body->getPosition() - origin;
+    float tNearMax = 0.0f;     // 가까운 평면과 ray 의 원점 사이의 거리 최댓값
+    float tFarMin = FLT_MAX;  // 먼 평면과 ray 의 원점 사이의 거리 최솟값
+    
+    for (int i = 0; i < 3; ++i)
+    {
+        Vector3 axis = box.body->getAxis(i);
+        float originToBoxProjected = axis.dot(originToBox);
+        float rayDirectionProjected = axis.dot(direction);
+
+        if (fabs(rayDirectionProjected) > 0.001f)
+        {
+            float t1 = (originToBoxProjected - box.halfSize[i]) / rayDirectionProjected;
+            float t2 = (originToBoxProjected + box.halfSize[i]) / rayDirectionProjected;
+            /* t1 이 가까운 평면에 대한 값이어야 하므로
+                t1 가 t2 보다 크다면 두 변수를 swap 한다 */
+            if (t1 > t2)
+            {
+                float temp = t1;
+                t1 = t2;
+                t2 = temp;
+            }
+            if (t1 > tNearMax)
+                tNearMax = t1;
+            if (t2 < tFarMin)
+                tFarMin = t2;
+            if (tFarMin < tNearMax)
+                return -1.0f;
+        }
+        else
+        {
+            if (-originToBoxProjected - box.halfSize[i] > 0.0f
+                    || -originToBoxProjected + box.halfSize[i] < 0.0f)
+                return -1.0f;
+        }
+    }
+
+    return tNearMax;
+}
+
 float CollisionDetector::calcPenetration(const BoxCollider& box1, const BoxCollider& box2, const Vector3& axis)
 {
     /* 두 박스의 중심 간 거리를 계산한다 */

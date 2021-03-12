@@ -105,7 +105,8 @@ float Simulator::calcDistanceBetweenRayAndObject(
     }
     else if (typeid(*collider) == typeid(BoxCollider))
     {
-
+        BoxCollider* box = static_cast<BoxCollider*>(collider);
+        distance = CollisionDetector::rayAndBox(rayOrigin, rayDirection, *box);
     }
 
     return distance;

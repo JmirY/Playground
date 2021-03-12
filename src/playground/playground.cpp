@@ -323,16 +323,11 @@ void Playground::handleLeftMouseClickedOnSceneEvent(LeftMouseClickedOnSceneEvent
     int minDistanceObjectID = -1;
     for (const auto& object : objects)
     {
-        float distance = -1.0f;
-
-        if (object.second->geometry == SPHERE)
-        {
-            distance = simulator.calcDistanceBetweenRayAndObject(origin, direction, object.second->id);
-        }
-        else if (object.second->geometry == BOX)
-        {
-
-        }
+        float distance = simulator.calcDistanceBetweenRayAndObject(
+            origin,
+            direction,
+            object.second->id
+        );
 
         if (distance > 0.0f && distance < minDistance)
         {
