@@ -3,6 +3,7 @@
 #include <iostream>
 #include <limits>
 #include <cstdarg>
+#include <cfloat>
 
 using namespace physics;
 
@@ -23,20 +24,20 @@ void SphereCollider::setGeometricData(double value, ...)
 BoxCollider::BoxCollider(RigidBody* _body, float _halfX, float _halfY, float _halfZ)
 {
     body = _body;
-    halfX = _halfX;
-    halfY = _halfY;
-    halfZ = _halfZ;
+    halfSize.x = _halfX;
+    halfSize.y = _halfY;
+    halfSize.z = _halfZ;
 }
 
 void BoxCollider::setGeometricData(double value, ...)
 {
-    halfX = value;
+    halfSize.x = value;
 
     va_list args;
     va_start(args, value);
     
-    halfY = va_arg(args, double);
-    halfZ = va_arg(args, double);
+    halfSize.y = va_arg(args, double);
+    halfSize.z = va_arg(args, double);
 
     va_end(args);
 }
@@ -60,24 +61,24 @@ bool CollisionDetector::sphereAndBox(
     /* 구의 중심과 가장 가까운 직육면체 위의 점을 찾는다 */
     Vector3 closestPoint;
     /* x 축 성분 비교 */
-    if (sphereInBoxLocal.x > box.halfX)
-        closestPoint.x = box.halfX;
-    else if (sphereInBoxLocal.x < -box.halfX)
-        closestPoint.x = -box.halfX;
+    if (sphereInBoxLocal.x > box.halfSize.x)
+        closestPoint.x = box.halfSize.x;
+    else if (sphereInBoxLocal.x < -box.halfSize.x)
+        closestPoint.x = -box.halfSize.x;
     else
         closestPoint.x = sphereInBoxLocal.x;
     /* y 축 성분 비교 */
-    if (sphereInBoxLocal.y > box.halfY)
-        closestPoint.y = box.halfY;
-    else if (sphereInBoxLocal.y < -box.halfY)
-        closestPoint.y = -box.halfY;
+    if (sphereInBoxLocal.y > box.halfSize.y)
+        closestPoint.y = box.halfSize.y;
+    else if (sphereInBoxLocal.y < -box.halfSize.y)
+        closestPoint.y = -box.halfSize.y;
     else
         closestPoint.y = sphereInBoxLocal.y;
     /* z 축 성분 비교 */
-    if (sphereInBoxLocal.z > box.halfZ)
-        closestPoint.z = box.halfZ;
-    else if (sphereInBoxLocal.z < -box.halfZ)
-        closestPoint.z = -box.halfZ;
+    if (sphereInBoxLocal.z > box.halfSize.z)
+        closestPoint.z = box.halfSize.z;
+    else if (sphereInBoxLocal.z < -box.halfSize.z)
+        closestPoint.z = -box.halfSize.z;
     else
         closestPoint.z = sphereInBoxLocal.z;
 
@@ -256,15 +257,15 @@ bool CollisionDetector::boxAndPlane(
 {
     /* 직육면체를 이루는 로컬 좌표계의 정점들 */
     Vector3 vertices[8];
-    vertices[0] = Vector3(-box.halfX, box.halfY, box.halfZ);
-    vertices[1] = Vector3(-box.halfX, -box.halfY, box.halfZ);
-    vertices[2] = Vector3(box.halfX, -box.halfY, box.halfZ);
-    vertices[3] = Vector3(box.halfX, box.halfY, box.halfZ);
+    vertices[0] = Vector3(-box.halfSize.x, box.halfSize.y, box.halfSize.z);
+    vertices[1] = Vector3(-box.halfSize.x, -box.halfSize.y, box.halfSize.z);
+    vertices[2] = Vector3(box.halfSize.x, -box.halfSize.y, box.halfSize.z);
+    vertices[3] = Vector3(box.halfSize.x, box.halfSize.y, box.halfSize.z);
 
-    vertices[4] = Vector3(-box.halfX, box.halfY, -box.halfZ);
-    vertices[5] = Vector3(-box.halfX, -box.halfY, -box.halfZ);
-    vertices[6] = Vector3(box.halfX, -box.halfY, -box.halfZ);
-    vertices[7] = Vector3(box.halfX, box.halfY, -box.halfZ);
+    vertices[4] = Vector3(-box.halfSize.x, box.halfSize.y, -box.halfSize.z);
+    vertices[5] = Vector3(-box.halfSize.x, -box.halfSize.y, -box.halfSize.z);
+    vertices[6] = Vector3(box.halfSize.x, -box.halfSize.y, -box.halfSize.z);
+    vertices[7] = Vector3(box.halfSize.x, box.halfSize.y, -box.halfSize.z);
 
     /* 정점들을 월드 좌표계로 변환한다 */
     for (int i = 0; i < 8; ++i)
@@ -305,8 +306,7 @@ float CollisionDetector::rayAndSphere(
     const SphereCollider& sphere
 )
 {
-    Vector3 spherePos = sphere.body->getPosition();
-    Vector3 originToSphere = spherePos - origin;
+    Vector3 originToSphere = sphere.body->getPosition() - origin;
     float originToSphereProjected = originToSphere.dot(direction);
     float orthogonalDistanceSquared =
         originToSphere.magnitudeSquared() - originToSphereProjected * originToSphereProjected;
@@ -326,12 +326,12 @@ float CollisionDetector::calcPenetration(const BoxCollider& box1, const BoxColli
     float projectedCenterToCenter = centerToCenter.dot(axis);
 
     /* 두 박스를 주어진 축에 사영시킨 길이의 합을 계산한다 */
-    float projectedSum = fabs((box1.body->getAxis(0) * box1.halfX).dot(axis))
-        + fabs((box1.body->getAxis(1) * box1.halfY).dot(axis))
-        + fabs((box1.body->getAxis(2) * box1.halfZ).dot(axis))
-        + fabs((box2.body->getAxis(0) * box2.halfX).dot(axis))
-        + fabs((box2.body->getAxis(1) * box2.halfY).dot(axis))
-        + fabs((box2.body->getAxis(2) * box2.halfZ).dot(axis));
+    float projectedSum = fabs((box1.body->getAxis(0) * box1.halfSize.x).dot(axis))
+        + fabs((box1.body->getAxis(1) * box1.halfSize.y).dot(axis))
+        + fabs((box1.body->getAxis(2) * box1.halfSize.z).dot(axis))
+        + fabs((box2.body->getAxis(0) * box2.halfSize.x).dot(axis))
+        + fabs((box2.body->getAxis(1) * box2.halfSize.y).dot(axis))
+        + fabs((box2.body->getAxis(2) * box2.halfSize.z).dot(axis));
 
     /* "사영시킨 길이의 합 - 중심 간 거리" 가 겹친 정도이다 */
     return projectedSum - projectedCenterToCenter;
@@ -349,7 +349,7 @@ Vector3 CollisionDetector::calcContactPointOnPlane(
 
     if (minAxisIdx < 3) // 충돌면이 box1 의 면일 때
     {
-        vertex = Vector3(box2.halfX, box2.halfY, box2.halfZ);
+        vertex = Vector3(box2.halfSize.x, box2.halfSize.y, box2.halfSize.z);
 
         if (box2.body->getAxis(0).dot(contactNormal) < 0)
             vertex.x *= -1.0f;
@@ -363,7 +363,7 @@ Vector3 CollisionDetector::calcContactPointOnPlane(
     }
     else // 충돌면이 box2 의 면일 때
     {
-        vertex = Vector3(box1.halfX, box1.halfY, box1.halfZ);
+        vertex = Vector3(box1.halfSize.x, box1.halfSize.y, box1.halfSize.z);
 
         if (box1.body->getAxis(0).dot(contactNormal) > 0)
             vertex.x *= -1.0f;
@@ -387,8 +387,8 @@ Vector3 CollisionDetector::calcContactPointOnLine(
 )
 {
     /* 접촉한 변 위의 정점을 찾는다 */
-    Vector3 vertexOne(box1.halfX, box1.halfY, box1.halfZ);
-    Vector3 vertexTwo(box2.halfX, box2.halfY, box2.halfZ);
+    Vector3 vertexOne(box1.halfSize.x, box1.halfSize.y, box1.halfSize.z);
+    Vector3 vertexTwo(box2.halfSize.x, box2.halfSize.y, box2.halfSize.z);
 
     if (box1.body->getAxis(0).dot(contactNormal) > 0)
         vertexOne.x *= -1.0f;

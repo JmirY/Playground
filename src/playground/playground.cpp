@@ -323,7 +323,7 @@ void Playground::handleLeftMouseClickedOnSceneEvent(LeftMouseClickedOnSceneEvent
     int minDistanceObjectID = -1;
     for (const auto& object : objects)
     {
-        float distance;
+        float distance = -1.0f;
 
         if (object.second->geometry == SPHERE)
         {

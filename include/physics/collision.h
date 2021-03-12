@@ -48,9 +48,7 @@ namespace physics
         friend class Simulator;
 
     protected:
-        float halfX;
-        float halfY;
-        float halfZ;
+        Vector3 halfSize;
 
     public:
         BoxCollider(RigidBody* body, float halfX, float halfY, float halfZ);
@@ -119,6 +117,12 @@ namespace physics
             const Vector3& origin,
             const Vector3& direction,
             const SphereCollider&
+        );
+
+        static float rayAndBox(
+            const Vector3& origin,
+            const Vector3& direction,
+            const BoxCollider&
         );
     
     private:
