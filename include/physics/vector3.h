@@ -44,6 +44,9 @@ namespace physics
         /* 벡터와 스칼라끼리 곱하기 */
         Vector3 operator*(const float value) const;
         void operator*=(const float value);
+
+        /* 인덱스로 접근하기 */
+        const float operator[](unsigned int idx) const;
     };
 } // namespace physics
 

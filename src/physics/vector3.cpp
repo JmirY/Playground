@@ -1,5 +1,7 @@
 #include <physics/vector3.h>
+#include <iostream>
 #include <cmath>
+#include <cfloat>
 
 using namespace physics;
 
@@ -70,4 +72,23 @@ void Vector3::operator*=(const float value)
     x *= value;
     y *= value;
     z *= value;
+}
+
+const float Vector3::operator[](unsigned int idx) const
+{
+    switch (idx)
+    {
+    case 0:
+        return x;
+
+    case 1:
+        return y;
+
+    case 2:
+        return z;
+    
+    default:
+        std::cout << "Vector3::operator[]::Out of index" << std::endl;
+        return FLT_MAX;
+    }
 }
