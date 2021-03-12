@@ -57,6 +57,7 @@ private:
     void handleRightMouseDraggedOnSceneEvent(RightMouseDraggedOnSceneEvent*);
     void handleMouseWheelOnSceneEvent(MouseWheelOnSceneEvent*);
     void handleLeftMouseClickedOnSceneEvent(LeftMouseClickedOnSceneEvent*);
+    void handleObjectPositionFixedEvent(ObjectPositionFixedEvent*);
 };
 
 #endif // PLAYGROUND_H

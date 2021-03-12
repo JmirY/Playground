@@ -24,14 +24,16 @@ protected:
     graphics::Shape* shape;
 
     bool isSelected;
+    bool isFixed;
 
 public:
-    Object() : isSelected(false) {}
+    Object() : isSelected(false), isFixed(false) {}
     virtual ~Object() {};
 
     unsigned int getID() const { return id; }
     Geometry getGeometry() const { return geometry; }
     bool getIsSelected() const { return isSelected; }
+    bool getIsFixed() const { return isFixed; }
     void getPositionInArray(float (&array)[3]) const;
     void getVelocityInArray(float (&array)[3]) const;
     void getAccelerationInArray(float (&array)[3]) const;

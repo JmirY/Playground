@@ -229,14 +229,18 @@ void GUI::renderObjectAttribute(
 
         if (selectedObjectIDs.size() == 1)
         {
+            const Object* object = objects.find(selectedObjectIDs[0])->second;
+            bool isObjectFixed = object->getIsFixed();
+
             ImGui::Columns(4);
+            if (ImGui::Checkbox("Fixed", &isObjectFixed))
+                eventQueue.push(new ObjectPositionFixedEvent(selectedObjectIDs[0], isObjectFixed));
             ImGui::NextColumn(); ImGui::AlignTextToFramePadding();
             ImGui::Text("X"); ImGui::NextColumn(); ImGui::AlignTextToFramePadding();
             ImGui::Text("Y"); ImGui::NextColumn(); ImGui::AlignTextToFramePadding();
             ImGui::Text("Z"); ImGui::NextColumn();
             ImGui::Separator();
 
-            const Object* object = objects.find(selectedObjectIDs[0])->second;
             float vecBuffer[3];
             /* 위치 */
             object->getPositionInArray(vecBuffer);

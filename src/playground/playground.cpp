@@ -149,6 +149,9 @@ void Playground::handleEvent(Event* event)
     else if (typeid(*event) == typeid(LeftMouseClickedOnSceneEvent))
         handleLeftMouseClickedOnSceneEvent(static_cast<LeftMouseClickedOnSceneEvent*>(event));
 
+    else if (typeid(*event) == typeid(ObjectPositionFixedEvent))
+        handleObjectPositionFixedEvent(static_cast<ObjectPositionFixedEvent*>(event));
+
     delete event;
 }
 
@@ -340,4 +343,19 @@ void Playground::handleLeftMouseClickedOnSceneEvent(LeftMouseClickedOnSceneEvent
         eventQueue.push(new ObjectSelectedEvent(minDistanceObjectID, event->isCtrlPressed));
     else
         clearSelectedObjectIDs();
+}
+
+void Playground::handleObjectPositionFixedEvent(ObjectPositionFixedEvent* event)
+{
+    Object* target = objects.find(event->id)->second;
+    if (event->hasToBeFixed)
+    {
+        target->isFixed = true;
+        target->body->setInverseMass(0.0f);
+    }
+    else
+    {
+        target->isFixed = false;
+        target->body->setMass(5.0f);
+    }
 }

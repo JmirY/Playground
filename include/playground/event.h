@@ -126,4 +126,14 @@ public:
         : screenX(_x), screenY(_y), isCtrlPressed(_isCtrlPressed) {}
 };
 
+class ObjectPositionFixedEvent : public Event
+{
+public:
+    unsigned int id;
+    bool hasToBeFixed;
+
+    ObjectPositionFixedEvent(unsigned int _id, bool _hasToBeFixed)
+        : id(_id), hasToBeFixed(_hasToBeFixed) {}
+};
+
 #endif // EVENT_H
