@@ -32,7 +32,6 @@ void Camera::pan(float xOffset, float yOffset, float zOffset)
     position -= up * (float) yOffset * panSensitivity;
     lookAtPoint -= up * (float) yOffset * panSensitivity;
     position -= glm::cross(up, right) * (float) zOffset * panSensitivity;
-    lookAtPoint -= glm::cross(up, right) * (float) zOffset * panSensitivity;
 }
 
 void Camera::rotate(glm::vec3 axis, float angle)
