@@ -87,6 +87,8 @@ namespace physics
 
         void setPosition(const Vector3& vec);
         void setPosition(float x, float y, float z);
+
+        void setOrientation(const Quaternion&);
         
         void setVelocity(const Vector3& vec);
         void setVelocity(float x, float y, float z);
@@ -105,6 +107,7 @@ namespace physics
         Matrix3 getInverseInertiaTensor() const;
         Matrix3 getInverseInertiaTensorWorld() const;
         Vector3 getPosition() const;
+        Quaternion getOrientation() const { return orientation; }
         Vector3 getVelocity() const;
         Vector3 getRotation() const;
         Vector3 getAcceleration() const;

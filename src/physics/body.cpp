@@ -142,6 +142,11 @@ void RigidBody::setPosition(float x, float y, float z)
     updateTransformMatrix();
 }
 
+void RigidBody::setOrientation(const Quaternion& quat)
+{
+    orientation = quat;
+}
+
 void RigidBody::setVelocity(const Vector3& vec)
 {
     velocity = vec;
