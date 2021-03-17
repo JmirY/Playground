@@ -171,3 +171,53 @@ void Contact::resolvePenetration()
     }
 }
 
+/* non-linear projection */
+// void Contact::resolvePenetration()
+// {
+//     float linearInertia[2], angularInertia[2];
+//     float linearMove[2], angularMove[2];
+//     float totalInertia = 0.0f;
+    
+//     for (int i = 0; i < 2; ++i)
+//     {
+//         if (bodies[i] != nullptr)
+//         {
+//             Matrix3 inverseInertiaTensor = bodies[i]->getInverseInertiaTensorWorld();
+
+//             Vector3 centerToContactPt = contactPoint - bodies[i]->getPosition();
+//             Vector3 angularInertialWorld = (centerToContactPt).cross(normal);
+//             angularInertialWorld = inverseInertiaTensor * angularInertialWorld;
+//             angularInertialWorld = angularInertialWorld.cross(centerToContactPt);
+//             angularInertia[i] = angularInertialWorld.dot(normal);
+
+//             linearInertia[i] = bodies[i]->getInverseMass();
+
+//             totalInertia += linearInertia[i] + angularInertia[i];
+//         }
+//     }
+
+//     float inverseTotalInertia = 1 / totalInertia;
+//     linearMove[0] = penetration * linearInertia[0] * inverseTotalInertia;
+//     linearMove[1] = -penetration * linearInertia[1] * inverseTotalInertia;
+//     angularMove[0] = penetration * angularInertia[1] * inverseTotalInertia;
+//     angularMove[1] = -penetration * angularInertia[1] * inverseTotalInertia;
+
+//     for (int i = 0; i < 2; ++i)
+//     {
+//         if (bodies[i] != nullptr)
+//         {
+//             /* 선 운동 적용 */
+//             Vector3 newPosition = bodies[i]->getPosition() + normal * linearMove[i];
+//             bodies[i]->setPosition(newPosition);
+
+//             /* 각 운동 적용 */
+//             Vector3 centerToContactPt = contactPoint - bodies[i]->getPosition();
+//             Vector3 impulsiveTorque = centerToContactPt.cross(normal);
+//             Vector3 impulsePerMove = bodies[i]->getInverseInertiaTensorWorld() * impulsiveTorque;
+//             Vector3 rotationPerMove = impulsePerMove * (1 / angularInertia[i]);
+//             Vector3 rotation = rotationPerMove * angularMove[i];
+//             Quaternion newOrientation = bodies[i]->getOrientation().rotateByVector(rotation);
+//             bodies[i]->setOrientation(newOrientation);
+//         }
+//     }
+// }
