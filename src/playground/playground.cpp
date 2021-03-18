@@ -274,6 +274,7 @@ void Playground::handleObjectMassChangedEvent(ObjectMassChangedEvent* event)
 {
     Object* object = objects.find(event->id)->second;
     object->body->setMass(event->value);
+    object->updateDerivedData();
 }
 
 void Playground::handleLeftMouseDraggedOnSceneEvent(LeftMouseDraggedOnSceneEvent* event)
@@ -352,6 +353,8 @@ void Playground::handleObjectPositionFixedEvent(ObjectPositionFixedEvent* event)
     {
         target->isFixed = true;
         target->body->setInverseMass(0.0f);
+        target->body->setVelocity(0.0f, 0.0f, 0.0f);
+        target->body->setRotation(0.0f, 0.0f, 0.0f);
     }
     else
     {

@@ -127,11 +127,13 @@ void RigidBody::setInverseMass(float value)
 void RigidBody::setInertiaTensor(const Matrix3& mat)
 {
     inverseInertiaTensor = mat.inverse();
+    transformInertiaTensor();
 }
 
 void RigidBody::setPosition(const Vector3& vec)
 {
     position = vec;
+    updateTransformMatrix();
 }
 
 void RigidBody::setPosition(float x, float y, float z)
@@ -145,6 +147,8 @@ void RigidBody::setPosition(float x, float y, float z)
 void RigidBody::setOrientation(const Quaternion& quat)
 {
     orientation = quat;
+    updateTransformMatrix();
+    transformInertiaTensor();
 }
 
 void RigidBody::setVelocity(const Vector3& vec)
