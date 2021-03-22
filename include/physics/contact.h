@@ -5,9 +5,6 @@
 
 namespace physics
 {
-    const float RESTITUTION_OBJECT = 0.5f; // 오브젝트 간 충돌의 탄성 계수
-    const float RESTITUTION_PLANE = 0.3f;  // 오브젝트와 평면 간 충돌의 탄성 계수
-
     /* 충돌 정보를 저장하는 구조체 */
     class Contact
     {

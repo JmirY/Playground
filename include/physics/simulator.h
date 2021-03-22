@@ -19,9 +19,10 @@ namespace physics
     private:
         RigidBodies bodies;
         Colliders colliders;
-        Contacts contacts;
-
         PlaneCollider groundCollider;
+        Contacts contacts;
+        
+        CollisionDetector detector;
 
     public:
         Simulator() : groundCollider(Vector3(0.0f, 1.0f, 0.0f), 0.0f) {}
