@@ -15,7 +15,7 @@ namespace physics
     
     public:
         CollisionDetector()
-            : friction(0.6f), objectRestitution(0.5f), groundRestitution(0.3f) {}
+            : friction(0.6f), objectRestitution(0.3f), groundRestitution(0.2f) {}
     
         /* 충돌 검사 함수들.
             충돌이 있다면 충돌 정보 구조체를 생성하고 contacts 에 푸쉬하고 true 를 반환한다.

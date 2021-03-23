@@ -3,6 +3,7 @@
 
 #include "body.h"
 #include "detector.h"
+#include "resolver.h"
 #include "../playground/geometry.h"
 #include <vector>
 #include <map>
@@ -23,6 +24,7 @@ namespace physics
         Contacts contacts;
         
         CollisionDetector detector;
+        CollisionResolver resolver;
 
     public:
         Simulator() : groundCollider(Vector3(0.0f, 1.0f, 0.0f), 0.0f) {}

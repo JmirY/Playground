@@ -1,6 +1,7 @@
 #include <physics/simulator.h>
 #include <iterator>
 #include <typeinfo>
+#include <cmath>
 
 using namespace physics;
 
@@ -33,8 +34,7 @@ void Simulator::simulate(float duration)
     /* 충돌들을 처리한다 */
     for (auto& contact : contacts)
     {
-        contact->resolveVelocity();
-        contact->resolvePenetration();
+        resolver.resolveContact(contact);
         delete contact;
     }
     contacts.clear();
@@ -59,6 +59,18 @@ RigidBody* Simulator::addRigidBody(unsigned int id, Geometry geometry)
         inertiaTensor.setDiagonal(0.208333f);
     }
     newBody->setInertiaTensor(inertiaTensor);
+
+    // const float PI = 3.141592f;
+    // const float param = 60.0f;
+    // float theta = param * PI / 180.0f;
+    // Quaternion quat(
+    //     cos(theta),
+    //     sin(theta),
+    //     sin(theta),
+    //     sin(theta)
+    // );
+    // quat.normalize();
+    // newBody->setOrientation(quat);
 
     bodies[id] = newBody;
     return newBody;
