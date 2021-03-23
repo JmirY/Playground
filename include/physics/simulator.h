@@ -2,7 +2,7 @@
 #define SIMULATOR_H
 
 #include "body.h"
-#include "collision.h"
+#include "detector.h"
 #include "../playground/geometry.h"
 #include <vector>
 #include <map>

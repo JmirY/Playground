@@ -3,7 +3,7 @@
 
 #include "geometry.h"
 #include "physics/body.h"
-#include "physics/collision.h"
+#include "physics/collider.h"
 #include "graphics/opengl/glm/glm.hpp"
 #include "graphics/shape.h"
 
