@@ -169,12 +169,14 @@ float CollisionResolver::calcDeltaVelocity(
     Vector3 relativeContactPoint = contactPoint - bodies[0]->getPosition();
     currentVelocity += bodies[0]->getRotation().cross(relativeContactPoint);
 
+    Vector3 currentVelocity2;
     if (bodies[1] != nullptr)
     {
-        currentVelocity += bodies[1]->getVelocity();
+        currentVelocity2 += bodies[1]->getVelocity();
         relativeContactPoint = contactPoint - bodies[1]->getPosition();
-        currentVelocity += bodies[1]->getRotation().cross(relativeContactPoint);
+        currentVelocity2 += bodies[1]->getRotation().cross(relativeContactPoint);
     }
+    currentVelocity -= currentVelocity2;
 
     Vector3 currentVelocityInContact = worldToContact * currentVelocity;
 
