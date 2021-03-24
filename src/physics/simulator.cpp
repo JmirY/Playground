@@ -44,7 +44,7 @@ RigidBody* Simulator::addRigidBody(unsigned int id, Geometry geometry)
 {
     /* 강체를 생성한다 */
     RigidBody* newBody = new RigidBody;
-    newBody->setMass(5.0f);
+    newBody->setMass(10.0f);
     newBody->setPosition(0.0f, 2.0f, 0.0f);
     newBody->setAcceleration(0.0f, -1.0f, 0.0f);
 
@@ -52,11 +52,13 @@ RigidBody* Simulator::addRigidBody(unsigned int id, Geometry geometry)
     Matrix3 inertiaTensor;
     if (geometry == SPHERE)
     {
-        inertiaTensor.setDiagonal(2.0f);
+        float value = 0.4f * newBody->getMass();
+        inertiaTensor.setDiagonal(value);
     }
     else if (geometry == BOX)
     {
-        inertiaTensor.setDiagonal(0.208333f);
+        float value = newBody->getMass() * 0.5f / 12.0f;
+        inertiaTensor.setDiagonal(value);
     }
     newBody->setInertiaTensor(inertiaTensor);
 
