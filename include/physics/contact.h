@@ -11,6 +11,7 @@ namespace physics
     public:
         friend class CollisionDetector;
         friend class CollisionResolver;
+        friend class Simulator;
 
     private:
         RigidBody* bodies[2];

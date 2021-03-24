@@ -4,7 +4,7 @@
 Playground::Playground()
     : eventQueue(50), userInterface(renderer.getWindow(), renderer.getTextureBufferID())
 {
-    newObjectID = 0;
+    newObjectID = 1;
     isSimulating = true;
 }
 
@@ -31,8 +31,9 @@ void Playground::run()
         prevTime = curTime;
 
         /* 물리 시뮬레이션 */
+        std::vector<ContactInfo*> contactInfo;
         if (isSimulating)
-            simulator.simulate(deltaTime);
+            simulator.simulate(deltaTime, contactInfo);
 
         renderer.updateWindowSize();
         
@@ -49,6 +50,14 @@ void Playground::run()
             object.second->body->getTransformMatrix(modelMatrix);
             renderer.renderObject(object.second->id, object.second->color, modelMatrix, object.second->isSelected);
         }
+
+        /* 충돌점 렌더 */
+        for (auto& info : contactInfo)
+        {
+            renderer.renderContactInfo(info);
+            delete info;
+        }
+        contactInfo.clear();
 
         renderer.bindDefaultFrameBuffer();
         renderer.setWindowViewport();

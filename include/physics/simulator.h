@@ -5,6 +5,7 @@
 #include "detector.h"
 #include "resolver.h"
 #include "../playground/geometry.h"
+#include "../playground/contact_info.h"
 #include <vector>
 #include <map>
 
@@ -31,7 +32,7 @@ namespace physics
         ~Simulator();
 
         /* 주어진 시간 동안의 물리 현상을 시뮬레이팅한다 */
-        void simulate(float duration);
+        void simulate(float duration, std::vector<ContactInfo*>&);
 
         /* 새로운 강체를 시뮬레이션에 추가하고 추가된 강체의 주소를 반환한다 */
         RigidBody* addRigidBody(unsigned int id, Geometry);
@@ -47,6 +48,8 @@ namespace physics
             const Vector3& rayDirection,
             const unsigned int id
         );
+
+        void getContactInfo(std::vector<ContactInfo*>&) const;
 
     private:
         /* 충돌을 검출하고 충돌 정보를 contacts 에 저장한다 */

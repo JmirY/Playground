@@ -6,6 +6,7 @@
 #include "camera.h"
 #include "shape.h"
 #include "../playground/geometry.h"
+#include "../playground/contact_info.h"
 #include <GLFW/glfw3.h>
 #include <map>
 
@@ -84,6 +85,7 @@ namespace graphics
             bool isSelected
         );
         void renderBackground();
+        void renderContactInfo(ContactInfo*);
 
         /* 프레임 버퍼를 쿼리해 windowWidth & windowHeight 을 업데이트 */
         void updateWindowSize();

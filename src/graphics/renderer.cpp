@@ -92,6 +92,8 @@ Renderer::Renderer()
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_LINE_SMOOTH);
+
+    addShape(0, SPHERE);
 }
 
 Renderer::~Renderer()
@@ -172,12 +174,15 @@ void Renderer::renderObject(
     glDrawElements(GL_TRIANGLES, objectShape->polygonIndices.size(), GL_UNSIGNED_INT, (void*)0);
 
     /* 오브젝트 테두리 렌더 */
-    glm::vec3 frameColor(0.0f, 0.0f, 0.0f);
-    if (isSelected)
-        frameColor = glm::vec3(0.0f, 1.0f, 0.0f);
-    objectShader.setVec3("objectColor", frameColor);
-    glBindVertexArray(objectShape->frameVAO);
-    glDrawElements(GL_LINE_STRIP, objectShape->frameIndices.size(), GL_UNSIGNED_INT, (void*)0);
+    if (id != 0)  // 충돌점이 아닐 때
+    {
+        glm::vec3 frameColor(0.0f, 0.0f, 0.0f);
+        if (isSelected)
+            frameColor = glm::vec3(0.0f, 1.0f, 0.0f);
+        objectShader.setVec3("objectColor", frameColor);
+        glBindVertexArray(objectShape->frameVAO);
+        glDrawElements(GL_LINE_STRIP, objectShape->frameIndices.size(), GL_UNSIGNED_INT, (void*)0);
+    }
 
     glBindVertexArray(0);
 }
@@ -232,6 +237,19 @@ void Renderer::renderBackground()
         glDrawArrays(GL_LINES, 0, 2);
     }
     glBindVertexArray(0);
+}
+
+void Renderer::renderContactInfo(ContactInfo* info)
+{
+    /* 충돌점 렌더 */
+    glm::vec3 contactPointColor(1.0f, 0.0f, 0.0f);
+    float modelMatrix[16] = {
+        0.2, 0, 0, 0,
+        0, 0.2, 0, 0,
+        0, 0, 0.2, 0,
+        info->pointX, info->pointY, info->pointZ, 1
+    };
+    renderObject(0, contactPointColor, modelMatrix, false);
 }
 
 void Renderer::updateWindowSize()

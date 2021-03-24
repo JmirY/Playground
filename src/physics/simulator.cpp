@@ -20,7 +20,7 @@ Simulator::~Simulator()
         delete body.second;
 }
 
-void Simulator::simulate(float duration)
+void Simulator::simulate(float duration, std::vector<ContactInfo*>& contactInfo)
 {
     /* 물체들을 적분한다 */
     for (auto& body : bodies)
@@ -30,6 +30,9 @@ void Simulator::simulate(float duration)
 
     /* 물체 간 충돌을 검출한다 */
     detectCollision();
+
+    /* 충돌 정보를 복사한다 */
+    getContactInfo(contactInfo);
 
     /* 충돌들을 처리한다 */
     for (auto& contact : contacts)
@@ -124,6 +127,23 @@ float Simulator::calcDistanceBetweenRayAndObject(
     }
 
     return distance;
+}
+
+void Simulator::getContactInfo(std::vector<ContactInfo*>& contactInfo) const
+{
+    for (const auto& contact : contacts)
+    {
+        ContactInfo* newContactInfo = new ContactInfo;
+
+        newContactInfo->pointX = contact->contactPoint.x;
+        newContactInfo->pointY = contact->contactPoint.y;
+        newContactInfo->pointZ = contact->contactPoint.z;
+        newContactInfo->normalX = contact->normal.x;
+        newContactInfo->normalY = contact->normal.y;
+        newContactInfo->normalZ = contact->normal.z;
+
+        contactInfo.push_back(newContactInfo);
+    }
 }
 
 void Simulator::detectCollision()
