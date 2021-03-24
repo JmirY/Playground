@@ -68,10 +68,7 @@ namespace physics
             단위 벡터화하여 반환한다. */
         Vector3 getAxis(int index) const;
 
-    private:
-        /* 강체에 가해진 힘과 토크를 0 으로 설정한다 */
-        void clearForceAndTorque();
-    
+    private:    
         /* 현재 상태를 참고하여 변환 행렬을 업데이트한다 */
         void updateTransformMatrix();
 

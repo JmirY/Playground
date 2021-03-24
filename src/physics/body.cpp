@@ -39,7 +39,8 @@ void RigidBody::integrate(float duration)
     transformInertiaTensor();
 
     /* 강체에 적용된 힘과 토크는 제거한다 */
-    clearForceAndTorque();
+    force.clear();
+    torque.clear();
 }
 
 void RigidBody::addForceAt(const Vector3& _force, const Vector3& point)
@@ -68,11 +69,6 @@ Vector3 RigidBody::getAxis(int index) const
     result.normalize();
 
     return result;
-}
-
-void RigidBody::clearForceAndTorque()
-{
-    force = torque = Vector3(0.0f, 0.0f, 0.0f);
 }
 
 void RigidBody::updateTransformMatrix()
