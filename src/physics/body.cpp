@@ -27,8 +27,7 @@ void RigidBody::integrate(float duration)
 
     /* 위치 & 방향을 업데이트한다 */
     position += velocity * duration;
-    orientation += (orientation * Quaternion(0.0f, rotation.x, rotation.y, rotation.z))
-        * (duration / 2.0f);
+    orientation += orientation.rotateByScaledVector(rotation, duration / 2.0f);
 
     /* 사원수를 정규화한다 */
     orientation.normalize();

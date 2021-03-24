@@ -24,7 +24,7 @@ namespace physics
         void normalize();
 
         /* 주어진 벡터만큼 회전한 사원수를 반환한다 */
-        Quaternion rotateByVector(const Vector3& vec) const;
+        Quaternion rotateByScaledVector(const Vector3& vec, const float scale) const;
 
         /*****************
          * 연산자 오버로딩 *
