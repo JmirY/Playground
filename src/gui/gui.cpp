@@ -269,6 +269,21 @@ void GUI::renderObjectAttribute(
                 if (!isSimulating)
                     eventQueue.push(new ObjectVelocityChangedEvent(selectedObjectIDs[0], vecBuffer));
             ImGui::NextColumn();
+            /* 각속도 */
+            object->getRotationInArray(vecBuffer);
+            ImGui::Text("Rotation"); ImGui::NextColumn();
+            ImGui::DragFloat("##RotationX", &vecBuffer[0], 0.1f);
+                // if (!isSimulating)
+                //     eventQueue.push(new ObjectVelocityChangedEvent(selectedObjectIDs[0], vecBuffer));
+            ImGui::NextColumn();
+            ImGui::DragFloat("##RotationY", &vecBuffer[1], 0.1f);
+                // if (!isSimulating)
+                //     eventQueue.push(new ObjectVelocityChangedEvent(selectedObjectIDs[0], vecBuffer));
+            ImGui::NextColumn();
+            ImGui::DragFloat("##RotationZ", &vecBuffer[2], 0.1f);
+                // if (!isSimulating)
+                //     eventQueue.push(new ObjectVelocityChangedEvent(selectedObjectIDs[0], vecBuffer));
+            ImGui::NextColumn();
             /* 가속도 */
             object->getAccelerationInArray(vecBuffer);
             ImGui::Text("Acceleration"); ImGui::NextColumn();

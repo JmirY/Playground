@@ -17,6 +17,14 @@ void Object::getVelocityInArray(float (&array)[3]) const
     array[2] = velocity.z;
 }
 
+void Object::getRotationInArray(float (&array)[3]) const
+{
+    physics::Vector3 rotation = body->getRotation();
+    array[0] = rotation.x;
+    array[1] = rotation.y;
+    array[2] = rotation.z;
+}
+
 void Object::getAccelerationInArray(float (&array)[3]) const
 {
     physics::Vector3 acceleration = body->getAcceleration();
