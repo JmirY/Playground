@@ -211,3 +211,10 @@ void Matrix3::operator*=(const float value)
         entries[i] *= value;
     }
 }
+
+Matrix3& Matrix3::operator=(const Matrix3& other)
+{
+    for (int i = 0; i < 9; ++i)
+        entries[i] = other.entries[i];
+    return *this;
+}
