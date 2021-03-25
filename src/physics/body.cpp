@@ -106,7 +106,9 @@ void RigidBody::transformInertiaTensor()
         for (int j = 0; j < 3; ++j)
             rotationMatrix.entries[3*i + j] = transformMatrix.entries[4*i + j];
 
-    inverseInertiaTensorWorld = (rotationMatrix * inverseInertiaTensor) * rotationMatrix.transpose();
+    Matrix3 inertiaTensor = getInverseInertiaTensor().inverse();
+    Matrix3 inertiaTensorWorld = (rotationMatrix * inertiaTensor) * rotationMatrix.transpose();
+    inverseInertiaTensorWorld = inertiaTensorWorld.inverse();
 }
 
 void RigidBody::setMass(float value)
