@@ -89,9 +89,12 @@ void BoxObject::updateDerivedData()
     /* 강체의 데이터를 갱신한다 */
     physics::Matrix3 inertiaTensor;
     float k = body->getMass() / 12;
-    inertiaTensor.entries[0] = k * (halfY*halfY + halfZ*halfZ);
-    inertiaTensor.entries[4] = k * (halfX*halfX + halfZ*halfZ);
-    inertiaTensor.entries[8] = k * (halfY*halfY + halfX*halfX);
+    float x = halfX * 2.0f;
+    float y = halfY * 2.0f;
+    float z = halfZ * 2.0f;
+    inertiaTensor.entries[0] = k * (y*y + z*z);
+    inertiaTensor.entries[4] = k * (x*x + z*z);
+    inertiaTensor.entries[8] = k * (y*y + x*x);
     body->setInertiaTensor(inertiaTensor);
 
     /* 충돌체의 데이터를 갱신한다 */

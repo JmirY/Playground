@@ -60,7 +60,7 @@ RigidBody* Simulator::addRigidBody(unsigned int id, Geometry geometry)
     }
     else if (geometry == BOX)
     {
-        float value = newBody->getMass() * 0.5f / 12.0f;
+        float value = newBody->getMass() / 6.0f;
         inertiaTensor.setDiagonal(value);
     }
     newBody->setInertiaTensor(inertiaTensor);
