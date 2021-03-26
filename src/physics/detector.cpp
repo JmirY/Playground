@@ -239,7 +239,7 @@ bool CollisionDetector::boxAndPlane(
         if (distance < 0)
         {
             /* 충돌을 생성한다 */
-            Contact* newContact = new Contact;;
+            Contact* newContact = new Contact;
             newContact->bodies[0] = box.body;
             newContact->bodies[1] = nullptr;
             newContact->normal = plane.normal;
