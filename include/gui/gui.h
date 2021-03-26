@@ -45,12 +45,12 @@ namespace gui
             const Objects&
         );
         void renderObjectAttribute(
-            ImGuiWindowFlags,
             EventQueue&,
             const Objects&,
             const std::vector<unsigned int>& selectedObjectIDs,
             const bool& isSimulating
         );
+        void renderGlobalAttribute(EventQueue&);
 
         bool isInScene(ImVec2);
     };

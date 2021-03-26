@@ -6,6 +6,7 @@ Playground::Playground()
 {
     newObjectID = 1;
     isSimulating = true;
+    shouldRenderContactInfo = false;
 }
 
 void Playground::run()
@@ -54,7 +55,8 @@ void Playground::run()
         /* 충돌점 렌더 */
         for (auto& info : contactInfo)
         {
-            renderer.renderContactInfo(info);
+            if (shouldRenderContactInfo)
+                renderer.renderContactInfo(info);
             delete info;
         }
         contactInfo.clear();
@@ -160,6 +162,9 @@ void Playground::handleEvent(Event* event)
 
     else if (typeid(*event) == typeid(ObjectPositionFixedEvent))
         handleObjectPositionFixedEvent(static_cast<ObjectPositionFixedEvent*>(event));
+
+    else if (typeid(*event) == typeid(RenderContactInfoFlagChangedEvent))
+        handleRenderContactInfoFlagChangedEvent(static_cast<RenderContactInfoFlagChangedEvent*>(event));
 
     delete event;
 }
@@ -358,7 +363,7 @@ void Playground::handleLeftMouseClickedOnSceneEvent(LeftMouseClickedOnSceneEvent
 void Playground::handleObjectPositionFixedEvent(ObjectPositionFixedEvent* event)
 {
     Object* target = objects.find(event->id)->second;
-    if (event->hasToBeFixed)
+    if (event->shouldBeFixed)
     {
         target->isFixed = true;
         target->body->setInverseMass(0.0f);
@@ -370,4 +375,9 @@ void Playground::handleObjectPositionFixedEvent(ObjectPositionFixedEvent* event)
         target->isFixed = false;
         target->body->setMass(5.0f);
     }
+}
+
+void Playground::handleRenderContactInfoFlagChangedEvent(RenderContactInfoFlagChangedEvent* event)
+{
+    shouldRenderContactInfo = event->flag;
 }

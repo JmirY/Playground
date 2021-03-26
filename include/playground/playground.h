@@ -29,6 +29,7 @@ private:
 
     EventQueue eventQueue;
     bool isSimulating;
+    bool shouldRenderContactInfo;
 
 public:
     Playground();
@@ -58,6 +59,7 @@ private:
     void handleMouseWheelOnSceneEvent(MouseWheelOnSceneEvent*);
     void handleLeftMouseClickedOnSceneEvent(LeftMouseClickedOnSceneEvent*);
     void handleObjectPositionFixedEvent(ObjectPositionFixedEvent*);
+    void handleRenderContactInfoFlagChangedEvent(RenderContactInfoFlagChangedEvent*);
 };
 
 #endif // PLAYGROUND_H
