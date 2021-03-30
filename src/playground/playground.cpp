@@ -320,7 +320,7 @@ void Playground::handleRightMouseDraggedOnSceneEvent(RightMouseDraggedOnSceneEve
 
 void Playground::handleMouseWheelOnSceneEvent(MouseWheelOnSceneEvent* event)
 {
-    renderer.zoomCamera(event->value);
+    renderer.moveCamera(glm::vec3(0.0f, 0.0f, event->value * 10.0f));
 }
 
 void Playground::handleLeftMouseClickedOnSceneEvent(LeftMouseClickedOnSceneEvent* event)
