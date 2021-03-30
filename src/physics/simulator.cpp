@@ -47,9 +47,9 @@ RigidBody* Simulator::addRigidBody(unsigned int id, Geometry geometry)
 {
     /* 강체를 생성한다 */
     RigidBody* newBody = new RigidBody;
-    newBody->setMass(10.0f);
-    newBody->setPosition(0.0f, 2.0f, 0.0f);
-    newBody->setAcceleration(0.0f, -1.0f, 0.0f);
+    newBody->setMass(5.0f);
+    newBody->setPosition(0.0f, 4.0f, 0.0f);
+    newBody->setAcceleration(0.0f, -9.0f, 0.0f);
 
     /* 강체의 관성 모멘트 텐서를 도형에 따라 결정한다 */
     Matrix3 inertiaTensor;
@@ -64,18 +64,6 @@ RigidBody* Simulator::addRigidBody(unsigned int id, Geometry geometry)
         inertiaTensor.setDiagonal(value);
     }
     newBody->setInertiaTensor(inertiaTensor);
-
-    // const float PI = 3.141592f;
-    // const float param = 60.0f;
-    // float theta = param * PI / 180.0f;
-    // Quaternion quat(
-    //     cos(theta),
-    //     sin(theta),
-    //     sin(theta),
-    //     sin(theta)
-    // );
-    // quat.normalize();
-    // newBody->setOrientation(quat);
 
     bodies[id] = newBody;
     return newBody;

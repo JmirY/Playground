@@ -106,9 +106,7 @@ void RigidBody::transformInertiaTensor()
         for (int j = 0; j < 3; ++j)
             rotationMatrix.entries[3*i + j] = transformMatrix.entries[4*i + j];
 
-    Matrix3 inertiaTensor = inverseInertiaTensor.inverse();
-    Matrix3 inertiaTensorWorld = (rotationMatrix * inertiaTensor) * rotationMatrix.transpose();
-    inverseInertiaTensorWorld = inertiaTensorWorld.inverse();
+    inverseInertiaTensorWorld = (rotationMatrix * inverseInertiaTensor) * rotationMatrix.transpose();
 }
 
 void RigidBody::setMass(float value)
@@ -162,14 +160,24 @@ void RigidBody::setVelocity(float x, float y, float z)
 
 void RigidBody::setRotation(const Vector3& vec)
 {
-    rotation = vec;
+    Matrix3 rotationMatrix;
+    for (int i = 0; i < 3; ++i)
+        for (int j = 0; j < 3; ++j)
+            rotationMatrix.entries[3*i + j] = transformMatrix.entries[4*i + j];
+
+    rotation = rotationMatrix.transpose() * vec;
 }
 
 void RigidBody::setRotation(float x, float y, float z)
 {
-    rotation.x = x;
-    rotation.y = y;
-    rotation.z = z;
+    Matrix3 rotationMatrix;
+    for (int i = 0; i < 3; ++i)
+        for (int j = 0; j < 3; ++j)
+            rotationMatrix.entries[3*i + j] = transformMatrix.entries[4*i + j];
+    
+    Vector3 newRotation = rotationMatrix.transpose() * Vector3(x, y, z);
+
+    rotation = newRotation;
 }
 
 void RigidBody::setAcceleration(const Vector3& vec)
@@ -221,7 +229,12 @@ Vector3 RigidBody::getVelocity() const
 
 Vector3 RigidBody::getRotation() const
 {
-    return rotation;
+    Matrix3 rotationMatrix;
+    for (int i = 0; i < 3; ++i)
+        for (int j = 0; j < 3; ++j)
+            rotationMatrix.entries[3*i + j] = transformMatrix.entries[4*i + j];
+
+    return rotationMatrix * rotation;
 }
 
 Vector3 RigidBody::getAcceleration() const
