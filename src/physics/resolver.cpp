@@ -77,16 +77,16 @@ void CollisionResolver::resolveVelocity(Contact* contact)
     /* 두 물체의 각속도를 갱신한다 */
     Vector3 contactPointFromCenter = contact->contactPoint - contact->bodies[0]->getPosition();
     contact->bodies[0]->setRotation(
-        contact->bodies[0]->getRotation() - contact->bodies[0]->getInverseInertiaTensorWorld() * impulse
-            * (contactPointFromCenter.cross(contactNormal))
+        contact->bodies[0]->getRotation() - contact->bodies[0]->getInverseInertiaTensorWorld()
+            * (contactPointFromCenter.cross(impulseVector))
     );
 
     if (contact->bodies[1] != nullptr)
     {
         contactPointFromCenter = contact->contactPoint - contact->bodies[1]->getPosition();
         contact->bodies[1]->setRotation(
-            contact->bodies[1]->getRotation() + contact->bodies[1]->getInverseInertiaTensorWorld() * impulse
-                * (contactPointFromCenter.cross(contactNormal))
+            contact->bodies[1]->getRotation() + contact->bodies[1]->getInverseInertiaTensorWorld()
+                * (contactPointFromCenter.cross(impulseVector))
         );
     }
 
