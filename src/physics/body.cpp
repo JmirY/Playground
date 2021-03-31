@@ -125,6 +125,12 @@ void RigidBody::setInertiaTensor(const Matrix3& mat)
     transformInertiaTensor();
 }
 
+void RigidBody::setInverseInertiaTensor(const Matrix3& mat)
+{
+    inverseInertiaTensor = mat;
+    transformInertiaTensor();
+}
+
 void RigidBody::setPosition(const Vector3& vec)
 {
     position = vec;

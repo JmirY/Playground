@@ -81,6 +81,7 @@ namespace physics
         void setInverseMass(float value);
 
         void setInertiaTensor(const Matrix3& mat);
+        void setInverseInertiaTensor(const Matrix3& mat);
 
         void setPosition(const Vector3& vec);
         void setPosition(float x, float y, float z);
