@@ -29,6 +29,9 @@ namespace physics
         /* 주어진 벡터와의 외적을 반환한다 */
         Vector3 cross(const Vector3& other) const;
 
+        /* 벡터를 0 으로 초기화한다 */
+        void clear();
+
         /*****************
          * 연산자 오버로딩 *
          *****************/

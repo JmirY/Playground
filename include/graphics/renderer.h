@@ -6,16 +6,13 @@
 #include "camera.h"
 #include "shape.h"
 #include "../playground/geometry.h"
+#include "../playground/contact_info.h"
 #include <GLFW/glfw3.h>
 #include <map>
 
 namespace graphics
 {
-    /**********************
-     * 배경 vertices 데이터 *
-     **********************/
-
-    /* 바닥 그리드 */
+    /* 지면 그리드 vertices */
     const std::vector<float> GRID_VERTICES = {
         /* z축과 평행한 선을 이루는 두 정점 */
         0.0f, 0.0f, 100.0f,
@@ -23,6 +20,12 @@ namespace graphics
     };
     /* 그리드를 이루는 선 간격 */
     const float GRID_GAP = 1.0f;
+
+    /* 충돌 법선 vertices */
+    const std::vector<float> CONTACT_NORMAL_VERTICES = {
+        0.0f, 0.0f, 0.0f,
+        0.0f, 3.0f, 0.0f
+    };
 
     /******************************
      * Renderer 클래스 속성 초기값 *
@@ -60,6 +63,9 @@ namespace graphics
         /* 배경 VAO 의 ID */
         unsigned int backgroundVAO;
 
+        /* 충돌 법선 VAO 의 ID */
+        unsigned int contactNormalVAO;
+
         /* 프레임 버퍼의 ID */
         unsigned int sceneFrameBufferID;
 
@@ -84,6 +90,7 @@ namespace graphics
             bool isSelected
         );
         void renderBackground();
+        void renderContactInfo(ContactInfo*);
 
         /* 프레임 버퍼를 쿼리해 windowWidth & windowHeight 을 업데이트 */
         void updateWindowSize();

@@ -57,6 +57,24 @@ Renderer::Renderer()
 
     glBindVertexArray(0);
 
+    /* 충돌 법선 VAO 설정 */
+    glGenVertexArrays(1, &contactNormalVAO);
+    glBindVertexArray(contactNormalVAO);
+
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(
+        GL_ARRAY_BUFFER,
+        sizeof(float) * CONTACT_NORMAL_VERTICES.size(),
+        &CONTACT_NORMAL_VERTICES[0],
+        GL_STATIC_DRAW
+    );
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glBindVertexArray(0);
+
     /* 프레임 버퍼 오브젝트 생성 */
     glGenFramebuffers(1, &sceneFrameBufferID);
     glBindFramebuffer(GL_FRAMEBUFFER, sceneFrameBufferID);
@@ -92,6 +110,8 @@ Renderer::Renderer()
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_LINE_SMOOTH);
+
+    addShape(0, SPHERE);
 }
 
 Renderer::~Renderer()
@@ -172,12 +192,15 @@ void Renderer::renderObject(
     glDrawElements(GL_TRIANGLES, objectShape->polygonIndices.size(), GL_UNSIGNED_INT, (void*)0);
 
     /* 오브젝트 테두리 렌더 */
-    glm::vec3 frameColor(0.0f, 0.0f, 0.0f);
-    if (isSelected)
-        frameColor = glm::vec3(0.0f, 1.0f, 0.0f);
-    objectShader.setVec3("objectColor", frameColor);
-    glBindVertexArray(objectShape->frameVAO);
-    glDrawElements(GL_LINE_STRIP, objectShape->frameIndices.size(), GL_UNSIGNED_INT, (void*)0);
+    if (id != 0)  // 충돌점이 아닐 때
+    {
+        glm::vec3 frameColor(0.0f, 0.0f, 0.0f);
+        if (isSelected)
+            frameColor = glm::vec3(0.0f, 1.0f, 0.0f);
+        objectShader.setVec3("objectColor", frameColor);
+        glBindVertexArray(objectShape->frameVAO);
+        glDrawElements(GL_LINE_STRIP, objectShape->frameIndices.size(), GL_UNSIGNED_INT, (void*)0);
+    }
 
     glBindVertexArray(0);
 }
@@ -231,6 +254,55 @@ void Renderer::renderBackground()
         objectShader.setMat4("model", model);
         glDrawArrays(GL_LINES, 0, 2);
     }
+    glBindVertexArray(0);
+}
+
+void Renderer::renderContactInfo(ContactInfo* info)
+{
+    /* 충돌점 렌더 */
+
+    /* 변환 행렬 설정 */
+    glm::mat4 view = camera.getViewMatrix();
+    glm::mat4 projection = glm::perspective(
+        glm::radians(camera.getFov()),
+        ((float) sceneWidth) / sceneHeight,
+        PERSPECTIVE_NEAR,
+        PERSPECTIVE_FAR
+    );
+    glm::mat4 model(1.0f);
+    model = glm::translate(model, glm::vec3(info->pointX, info->pointY, info->pointZ));
+    model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
+
+    /* 셰이더 설정 */
+    objectShader.use();
+    objectShader.setMat4("model", model);
+    objectShader.setMat4("view", view);
+    objectShader.setMat4("projection", projection);
+    objectShader.setVec3("objectColor", glm::vec3(1.0f, 0.0f, 0.0f));
+    objectShader.setVec3("viewPos", camera.getPosition());
+
+    Shape *objectShape = shapes.find(0)->second;
+    glBindVertexArray(objectShape->polygonVAO);
+    glDrawElements(GL_TRIANGLES, objectShape->polygonIndices.size(), GL_UNSIGNED_INT, (void*)0);
+    
+    /* 충돌 법선 렌더 */
+    glm::vec3 defaultNormal(0.0f, 1.0f, 0.0f);
+    glm::vec3 contactNormal(info->normalX, info->normalY, info->normalZ);
+    glm::vec3 rotateAxis = glm::cross(contactNormal, defaultNormal);
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(info->pointX, info->pointY, info->pointZ));
+    if (glm::length(rotateAxis) != 0.0f)
+    {
+        model = glm::rotate(
+            model,
+            glm::asin(glm::length(rotateAxis)),
+            glm::normalize(rotateAxis)
+        );
+    }
+    objectShader.setMat4("model", model);
+
+    glBindVertexArray(contactNormalVAO);
+    glDrawArrays(GL_LINES, 0, 2);
     glBindVertexArray(0);
 }
 

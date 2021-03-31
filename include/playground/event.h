@@ -130,10 +130,19 @@ class ObjectPositionFixedEvent : public Event
 {
 public:
     unsigned int id;
-    bool hasToBeFixed;
+    bool shouldBeFixed;
 
-    ObjectPositionFixedEvent(unsigned int _id, bool _hasToBeFixed)
-        : id(_id), hasToBeFixed(_hasToBeFixed) {}
+    ObjectPositionFixedEvent(unsigned int _id, bool _shouldBeFixed)
+        : id(_id), shouldBeFixed(_shouldBeFixed) {}
+};
+
+class RenderContactInfoFlagChangedEvent : public Event
+{
+public:
+    bool flag;
+
+    RenderContactInfoFlagChangedEvent(bool _flag)
+        : flag(_flag) {}
 };
 
 #endif // EVENT_H

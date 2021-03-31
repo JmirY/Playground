@@ -3,7 +3,7 @@
 
 #include "geometry.h"
 #include "physics/body.h"
-#include "physics/collision.h"
+#include "physics/collider.h"
 #include "graphics/opengl/glm/glm.hpp"
 #include "graphics/shape.h"
 
@@ -36,6 +36,7 @@ public:
     bool getIsFixed() const { return isFixed; }
     void getPositionInArray(float (&array)[3]) const;
     void getVelocityInArray(float (&array)[3]) const;
+    void getRotationInArray(float (&array)[3]) const;
     void getAccelerationInArray(float (&array)[3]) const;
     void getMassInArray(float (&array)[3]) const;
     virtual void getGeometricDataInArray(float (&array)[3]) const = 0;

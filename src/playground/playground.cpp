@@ -4,8 +4,9 @@
 Playground::Playground()
     : eventQueue(50), userInterface(renderer.getWindow(), renderer.getTextureBufferID())
 {
-    newObjectID = 0;
+    newObjectID = 1;
     isSimulating = true;
+    shouldRenderContactInfo = false;
 }
 
 void Playground::run()
@@ -31,8 +32,9 @@ void Playground::run()
         prevTime = curTime;
 
         /* 물리 시뮬레이션 */
+        std::vector<ContactInfo*> contactInfo;
         if (isSimulating)
-            simulator.simulate(deltaTime);
+            simulator.simulate(deltaTime, contactInfo);
 
         renderer.updateWindowSize();
         
@@ -49,6 +51,15 @@ void Playground::run()
             object.second->body->getTransformMatrix(modelMatrix);
             renderer.renderObject(object.second->id, object.second->color, modelMatrix, object.second->isSelected);
         }
+
+        /* 충돌점 렌더 */
+        for (auto& info : contactInfo)
+        {
+            if (shouldRenderContactInfo)
+                renderer.renderContactInfo(info);
+            delete info;
+        }
+        contactInfo.clear();
 
         renderer.bindDefaultFrameBuffer();
         renderer.setWindowViewport();
@@ -152,6 +163,9 @@ void Playground::handleEvent(Event* event)
     else if (typeid(*event) == typeid(ObjectPositionFixedEvent))
         handleObjectPositionFixedEvent(static_cast<ObjectPositionFixedEvent*>(event));
 
+    else if (typeid(*event) == typeid(RenderContactInfoFlagChangedEvent))
+        handleRenderContactInfoFlagChangedEvent(static_cast<RenderContactInfoFlagChangedEvent*>(event));
+
     delete event;
 }
 
@@ -252,7 +266,10 @@ void Playground::handleSimulationStatusChangedEvent(SimulationStatusChangedEvent
 void Playground::handleObjectPositionChangedEvent(ObjectPositionChangedEvent* event)
 {
     float (&position)[3] = event->position;
-    objects.find(event->id)->second->body->setPosition(position[0], position[1], position[2]);
+    physics::RigidBody* body = objects.find(event->id)->second->body;
+    body->setPosition(position[0], position[1], position[2]);
+    body->setVelocity(0.0f, 0.0f, 0.0f);
+    body->setRotation(0.0f, 0.0f, 0.0f);
 }
 
 void Playground::handleObjectVelocityChangedEvent(ObjectVelocityChangedEvent* event)
@@ -306,7 +323,7 @@ void Playground::handleRightMouseDraggedOnSceneEvent(RightMouseDraggedOnSceneEve
 
 void Playground::handleMouseWheelOnSceneEvent(MouseWheelOnSceneEvent* event)
 {
-    renderer.zoomCamera(event->value);
+    renderer.moveCamera(glm::vec3(0.0f, 0.0f, event->value * 10.0f));
 }
 
 void Playground::handleLeftMouseClickedOnSceneEvent(LeftMouseClickedOnSceneEvent* event)
@@ -349,10 +366,11 @@ void Playground::handleLeftMouseClickedOnSceneEvent(LeftMouseClickedOnSceneEvent
 void Playground::handleObjectPositionFixedEvent(ObjectPositionFixedEvent* event)
 {
     Object* target = objects.find(event->id)->second;
-    if (event->hasToBeFixed)
+    if (event->shouldBeFixed)
     {
         target->isFixed = true;
         target->body->setInverseMass(0.0f);
+        target->body->setInverseInertiaTensor(physics::Matrix3(0.0f));
         target->body->setVelocity(0.0f, 0.0f, 0.0f);
         target->body->setRotation(0.0f, 0.0f, 0.0f);
     }
@@ -360,5 +378,31 @@ void Playground::handleObjectPositionFixedEvent(ObjectPositionFixedEvent* event)
     {
         target->isFixed = false;
         target->body->setMass(5.0f);
+
+        physics::Matrix3 inertiaTensor;
+        float geometricData[3] = {0};
+        target->getGeometricDataInArray(geometricData);
+        if (typeid(*target) == typeid(SphereObject))
+        {
+            SphereObject* sphere = static_cast<SphereObject*>(target);
+            inertiaTensor.setDiagonal(0.4f * sphere->body->getMass() * geometricData[0]*geometricData[0]);
+        }
+        else if (typeid(*target) == typeid(BoxObject))
+        {
+            BoxObject* box = static_cast<BoxObject*>(target);
+            float k = box->body->getMass() / 12;
+            float x = geometricData[0] * 2.0f;
+            float y = geometricData[1] * 2.0f;
+            float z = geometricData[2] * 2.0f;
+            inertiaTensor.entries[0] = k * (y*y + z*z);
+            inertiaTensor.entries[4] = k * (x*x + z*z);
+            inertiaTensor.entries[8] = k * (y*y + x*x);
+        }
+        target->body->setInertiaTensor(inertiaTensor);
     }
+}
+
+void Playground::handleRenderContactInfoFlagChangedEvent(RenderContactInfoFlagChangedEvent* event)
+{
+    shouldRenderContactInfo = event->flag;
 }

@@ -41,7 +41,34 @@ void GUI::renderAll(
     renderObjectPalette(windowFlags, eventQueue);
     renderSimulationControl(windowFlags, eventQueue, isSimulating);
     renderObjectList(windowFlags, eventQueue, objects);
-    renderObjectAttribute(windowFlags, eventQueue, objects, selectedObjectIDs, isSimulating);
+
+    ImGui::SetNextWindowPos(ImVec2(1024, 286));
+    ImGui::SetNextWindowSize(ImVec2(256, 434));
+
+    ImGui::Begin("Attribute", NULL, windowFlags);
+    {
+        ImGui::BeginChild("AttributeRender");
+
+        if (ImGui::BeginTabBar("TabBar"))
+        {
+            if (ImGui::BeginTabItem("Global"))
+            {
+                ImGui::Spacing();
+                renderGlobalAttribute(eventQueue);
+                ImGui::EndTabItem();
+            }
+            if (ImGui::BeginTabItem("Object"))
+            {
+                ImGui::Spacing();
+                renderObjectAttribute(eventQueue, objects, selectedObjectIDs, isSimulating);
+                ImGui::EndTabItem();
+            }
+            ImGui::EndTabBar();
+        }
+
+        ImGui::EndChild();
+    }
+    ImGui::End();
 
     ImGui::ShowDemoWindow(); // test
 
@@ -214,102 +241,116 @@ void GUI::renderObjectList(
 }
 
 void GUI::renderObjectAttribute(
-    ImGuiWindowFlags windowFlags,
     EventQueue& eventQueue,
     const Objects& objects,
     const std::vector<unsigned int>& selectedObjectIDs,
     const bool& isSimulating
 )
 {
-    ImGui::SetNextWindowPos(ImVec2(1024, 286));
-    ImGui::SetNextWindowSize(ImVec2(256, 434));
-    ImGui::Begin("ObjectAttribute", NULL, windowFlags);
+    if (selectedObjectIDs.size() == 1)
     {
-        ImGui::BeginChild("ObjectAttributeRender");
+        const Object* object = objects.find(selectedObjectIDs[0])->second;
+        bool isObjectFixed = object->getIsFixed();
 
-        if (selectedObjectIDs.size() == 1)
+        ImGui::Columns(4);
+        if (ImGui::Checkbox("Fixed", &isObjectFixed))
+            eventQueue.push(new ObjectPositionFixedEvent(selectedObjectIDs[0], isObjectFixed));
+        ImGui::NextColumn(); ImGui::AlignTextToFramePadding();
+        ImGui::Text("X"); ImGui::NextColumn(); ImGui::AlignTextToFramePadding();
+        ImGui::Text("Y"); ImGui::NextColumn(); ImGui::AlignTextToFramePadding();
+        ImGui::Text("Z"); ImGui::NextColumn();
+        ImGui::Separator();
+
+        float vecBuffer[3];
+        /* 위치 */
+        object->getPositionInArray(vecBuffer);
+        ImGui::Text("Position"); ImGui::NextColumn();
+        if (ImGui::DragFloat("##PositionX", &vecBuffer[0], 0.05f))
+            eventQueue.push(new ObjectPositionChangedEvent(selectedObjectIDs[0], vecBuffer));
+        ImGui::NextColumn();
+        if (ImGui::DragFloat("##PositionY", &vecBuffer[1], 0.05f, 0.0f, FLT_MAX))
+            eventQueue.push(new ObjectPositionChangedEvent(selectedObjectIDs[0], vecBuffer));
+        ImGui::NextColumn();
+        if (ImGui::DragFloat("##PositionZ", &vecBuffer[2], 0.05f))
+            eventQueue.push(new ObjectPositionChangedEvent(selectedObjectIDs[0], vecBuffer));
+        ImGui::NextColumn();
+        /* 속도 */
+        object->getVelocityInArray(vecBuffer);
+        ImGui::Text("Velocity"); ImGui::NextColumn();
+        if (ImGui::DragFloat("##VelocityX", &vecBuffer[0], 0.1f))
+            if (!isSimulating)
+                eventQueue.push(new ObjectVelocityChangedEvent(selectedObjectIDs[0], vecBuffer));
+        ImGui::NextColumn();
+        if (ImGui::DragFloat("##VelocityY", &vecBuffer[1], 0.1f))
+            if (!isSimulating)
+                eventQueue.push(new ObjectVelocityChangedEvent(selectedObjectIDs[0], vecBuffer));
+        ImGui::NextColumn();
+        if (ImGui::DragFloat("##VelocityZ", &vecBuffer[2], 0.1f))
+            if (!isSimulating)
+                eventQueue.push(new ObjectVelocityChangedEvent(selectedObjectIDs[0], vecBuffer));
+        ImGui::NextColumn();
+        /* 각속도 */
+        object->getRotationInArray(vecBuffer);
+        ImGui::Text("Rotation"); ImGui::NextColumn();
+        ImGui::DragFloat("##RotationX", &vecBuffer[0], 0.1f);
+            // if (!isSimulating)
+            //     eventQueue.push(new ObjectVelocityChangedEvent(selectedObjectIDs[0], vecBuffer));
+        ImGui::NextColumn();
+        ImGui::DragFloat("##RotationY", &vecBuffer[1], 0.1f);
+            // if (!isSimulating)
+            //     eventQueue.push(new ObjectVelocityChangedEvent(selectedObjectIDs[0], vecBuffer));
+        ImGui::NextColumn();
+        ImGui::DragFloat("##RotationZ", &vecBuffer[2], 0.1f);
+            // if (!isSimulating)
+            //     eventQueue.push(new ObjectVelocityChangedEvent(selectedObjectIDs[0], vecBuffer));
+        ImGui::NextColumn();
+        /* 가속도 */
+        object->getAccelerationInArray(vecBuffer);
+        ImGui::Text("Acceleration"); ImGui::NextColumn();
+        ImGui::DragFloat("##AccelerationX", &vecBuffer[0], 0.1f);
+        ImGui::NextColumn();
+        ImGui::DragFloat("##AccelerationY", &vecBuffer[1], 0.1f);
+        ImGui::NextColumn();
+        ImGui::DragFloat("##AccelerationZ", &vecBuffer[2], 0.1f);
+        ImGui::Columns(1); ImGui::Separator(); ImGui::Spacing();
+        /* 질량 */
+        object->getMassInArray(vecBuffer);
+        ImGui::Text("Mass");
+        if (ImGui::DragFloat("##Mass", &vecBuffer[0], 0.1f, 0.1f, FLT_MAX))
+            eventQueue.push(new ObjectMassChangedEvent(selectedObjectIDs[0], vecBuffer[0]));
+        /* 도형 데이터 */
+        object->getGeometricDataInArray(vecBuffer);
+        Geometry geometry = object->getGeometry();
+        if (geometry == BOX)
         {
-            const Object* object = objects.find(selectedObjectIDs[0])->second;
-            bool isObjectFixed = object->getIsFixed();
-
-            ImGui::Columns(4);
-            if (ImGui::Checkbox("Fixed", &isObjectFixed))
-                eventQueue.push(new ObjectPositionFixedEvent(selectedObjectIDs[0], isObjectFixed));
-            ImGui::NextColumn(); ImGui::AlignTextToFramePadding();
-            ImGui::Text("X"); ImGui::NextColumn(); ImGui::AlignTextToFramePadding();
-            ImGui::Text("Y"); ImGui::NextColumn(); ImGui::AlignTextToFramePadding();
-            ImGui::Text("Z"); ImGui::NextColumn();
-            ImGui::Separator();
-
-            float vecBuffer[3];
-            /* 위치 */
-            object->getPositionInArray(vecBuffer);
-            ImGui::Text("Position"); ImGui::NextColumn();
-            if (ImGui::DragFloat("##PositionX", &vecBuffer[0], 0.05f))
-                eventQueue.push(new ObjectPositionChangedEvent(selectedObjectIDs[0], vecBuffer));
-            ImGui::NextColumn();
-            if (ImGui::DragFloat("##PositionY", &vecBuffer[1], 0.05f, 0.0f, FLT_MAX))
-                eventQueue.push(new ObjectPositionChangedEvent(selectedObjectIDs[0], vecBuffer));
-            ImGui::NextColumn();
-            if (ImGui::DragFloat("##PositionZ", &vecBuffer[2], 0.05f))
-                eventQueue.push(new ObjectPositionChangedEvent(selectedObjectIDs[0], vecBuffer));
-            ImGui::NextColumn();
-            /* 속도 */
-            object->getVelocityInArray(vecBuffer);
-            ImGui::Text("Velocity"); ImGui::NextColumn();
-            if (ImGui::DragFloat("##VelocityX", &vecBuffer[0], 0.1f))
-                if (!isSimulating)
-                    eventQueue.push(new ObjectVelocityChangedEvent(selectedObjectIDs[0], vecBuffer));
-            ImGui::NextColumn();
-            if (ImGui::DragFloat("##VelocityY", &vecBuffer[1], 0.1f))
-                if (!isSimulating)
-                    eventQueue.push(new ObjectVelocityChangedEvent(selectedObjectIDs[0], vecBuffer));
-            ImGui::NextColumn();
-            if (ImGui::DragFloat("##VelocityZ", &vecBuffer[2], 0.1f))
-                if (!isSimulating)
-                    eventQueue.push(new ObjectVelocityChangedEvent(selectedObjectIDs[0], vecBuffer));
-            ImGui::NextColumn();
-            /* 가속도 */
-            object->getAccelerationInArray(vecBuffer);
-            ImGui::Text("Acceleration"); ImGui::NextColumn();
-            ImGui::DragFloat("##AccelerationX", &vecBuffer[0], 0.1f);
-            ImGui::NextColumn();
-            ImGui::DragFloat("##AccelerationY", &vecBuffer[1], 0.1f);
-            ImGui::NextColumn();
-            ImGui::DragFloat("##AccelerationZ", &vecBuffer[2], 0.1f);
-            ImGui::Columns(1); ImGui::Separator(); ImGui::Spacing();
-            /* 질량 */
-            object->getMassInArray(vecBuffer);
-            ImGui::Text("Mass");
-            if (ImGui::DragFloat("##Mass", &vecBuffer[0], 0.1f, 0.1f, FLT_MAX))
-                eventQueue.push(new ObjectMassChangedEvent(selectedObjectIDs[0], vecBuffer[0]));
-            /* 도형 데이터 */
-            object->getGeometricDataInArray(vecBuffer);
-            Geometry geometry = object->getGeometry();
-            if (geometry == BOX)
-            {
-                ImGui::Text("Half-size");
-                ImGui::Text("X"); ImGui::SameLine();
-                if (ImGui::DragFloat("##Half-X", &vecBuffer[0], 0.01f, 0.1f, FLT_MAX))
-                    eventQueue.push(new ObjectGeometricDataChangedEvent(selectedObjectIDs[0], vecBuffer));
-                ImGui::Text("Y"); ImGui::SameLine();
-                if (ImGui::DragFloat("##Half-Y", &vecBuffer[1], 0.01f, 0.1f, FLT_MAX))
-                    eventQueue.push(new ObjectGeometricDataChangedEvent(selectedObjectIDs[0], vecBuffer));
-                ImGui::Text("Z"); ImGui::SameLine();
-                if (ImGui::DragFloat("##Half-Z", &vecBuffer[2], 0.01f, 0.1f, FLT_MAX))
-                    eventQueue.push(new ObjectGeometricDataChangedEvent(selectedObjectIDs[0], vecBuffer));
-            }
-            else if (geometry == SPHERE)
-            {
-                ImGui::Text("Radius");
-                if (ImGui::DragFloat("##Radius", &vecBuffer[0], 0.01f, 0.1f, FLT_MAX))
-                    eventQueue.push(new ObjectGeometricDataChangedEvent(selectedObjectIDs[0], vecBuffer));
-            }
+            ImGui::Text("Half-size");
+            ImGui::Text("X"); ImGui::SameLine();
+            if (ImGui::DragFloat("##Half-X", &vecBuffer[0], 0.01f, 0.1f, FLT_MAX))
+                eventQueue.push(new ObjectGeometricDataChangedEvent(selectedObjectIDs[0], vecBuffer));
+            ImGui::Text("Y"); ImGui::SameLine();
+            if (ImGui::DragFloat("##Half-Y", &vecBuffer[1], 0.01f, 0.1f, FLT_MAX))
+                eventQueue.push(new ObjectGeometricDataChangedEvent(selectedObjectIDs[0], vecBuffer));
+            ImGui::Text("Z"); ImGui::SameLine();
+            if (ImGui::DragFloat("##Half-Z", &vecBuffer[2], 0.01f, 0.1f, FLT_MAX))
+                eventQueue.push(new ObjectGeometricDataChangedEvent(selectedObjectIDs[0], vecBuffer));
         }
-
-        ImGui::EndChild();
+        else if (geometry == SPHERE)
+        {
+            ImGui::Text("Radius");
+            if (ImGui::DragFloat("##Radius", &vecBuffer[0], 0.01f, 0.1f, FLT_MAX))
+                eventQueue.push(new ObjectGeometricDataChangedEvent(selectedObjectIDs[0], vecBuffer));
+        }
     }
-    ImGui::End();
+}
+
+void GUI::renderGlobalAttribute(EventQueue& eventQueue)
+{
+    static bool shouldRenderContactInfo = false;
+
+    if (ImGui::Checkbox("Render contact info.", &shouldRenderContactInfo))
+    {
+        eventQueue.push(new RenderContactInfoFlagChangedEvent(shouldRenderContactInfo));
+    }
 }
 
 bool GUI::isInScene(ImVec2 vec)

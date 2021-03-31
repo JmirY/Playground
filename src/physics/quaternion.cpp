@@ -20,9 +20,9 @@ void Quaternion::normalize()
     z *= magnitude;
 }
 
-Quaternion Quaternion::rotateByVector(const Vector3& vec) const
+Quaternion Quaternion::rotateByScaledVector(const Vector3& vec, const float scale) const
 {
-    return *this * Quaternion(0.0f, vec.x, vec.y, vec.z);
+    return *this * Quaternion(0.0f, vec.x * scale, vec.y * scale, vec.z * scale);
 }
 
 Quaternion Quaternion::operator+(const Quaternion& other) const

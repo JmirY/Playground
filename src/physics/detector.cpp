@@ -1,52 +1,8 @@
-#include <physics/collision.h>
+#include <physics/detector.h>
 #include <cmath>
-#include <iostream>
-#include <limits>
-#include <cstdarg>
 #include <cfloat>
 
 using namespace physics;
-
-/* CollisionDetector 클래스 static 멤버 초기화 */
-const float CollisionDetector::FRICTION = 0.6f;
-
-SphereCollider::SphereCollider(RigidBody* _body, float _radius)
-{
-    body = _body;
-    radius = _radius;
-}
-
-void SphereCollider::setGeometricData(double value, ...)
-{
-    radius = value;
-}
-
-BoxCollider::BoxCollider(RigidBody* _body, float _halfX, float _halfY, float _halfZ)
-{
-    body = _body;
-    halfSize.x = _halfX;
-    halfSize.y = _halfY;
-    halfSize.z = _halfZ;
-}
-
-void BoxCollider::setGeometricData(double value, ...)
-{
-    halfSize.x = value;
-
-    va_list args;
-    va_start(args, value);
-    
-    halfSize.y = va_arg(args, double);
-    halfSize.z = va_arg(args, double);
-
-    va_end(args);
-}
-
-PlaneCollider::PlaneCollider(Vector3 _normal, float _offset)
-{
-    normal = _normal;
-    offset = _offset;
-}
 
 bool CollisionDetector::sphereAndBox(
     std::vector<Contact*>& contacts,
@@ -98,8 +54,8 @@ bool CollisionDetector::sphereAndBox(
         newContact->normal.normalize();
         newContact->contactPoint = closestPointWorld;
         newContact->penetration = sphere.radius - sqrtf(distanceSquared);
-        newContact->restitution = RESTITUTION_OBJECT;
-        newContact->friction = FRICTION;
+        newContact->restitution = objectRestitution;
+        newContact->friction = friction;
 
         contacts.push_back(newContact);
         return true;
@@ -132,8 +88,8 @@ bool CollisionDetector::sphereAndSphere(
         newContact->normal.normalize();
         newContact->contactPoint = sphere1.body->getPosition() - centerToCenter * 0.5f;
         newContact->penetration = radiusSum - sqrtf(distanceSquared);
-        newContact->restitution = RESTITUTION_OBJECT;
-        newContact->friction = FRICTION;
+        newContact->restitution = objectRestitution;
+        newContact->friction = friction;
 
         contacts.push_back(newContact);
         return true;
@@ -162,8 +118,8 @@ bool CollisionDetector::sphereAndPlane(
         newContact->normal = plane.normal;
         newContact->contactPoint = sphere.body->getPosition() - plane.normal * distance;
         newContact->penetration = sphere.radius - distance;
-        newContact->restitution = RESTITUTION_PLANE;
-        newContact->friction = FRICTION;
+        newContact->restitution = groundRestitution;
+        newContact->friction = friction;
 
         contacts.push_back(newContact);
         return true;
@@ -225,8 +181,8 @@ bool CollisionDetector::boxAndBox(
     newContact->bodies[0] = box1.body;
     newContact->bodies[1] = box2.body;
     newContact->penetration = minPenetration;
-    newContact->restitution = RESTITUTION_OBJECT;
-    newContact->friction = FRICTION;
+    newContact->restitution = objectRestitution;
+    newContact->friction = friction;
 
     /* 충돌 법선을 방향에 유의하여 설정한다 */
     Vector3 centerToCenter = box2.body->getPosition() - box1.body->getPosition();
@@ -283,14 +239,14 @@ bool CollisionDetector::boxAndPlane(
         if (distance < 0)
         {
             /* 충돌을 생성한다 */
-            Contact* newContact = new Contact;;
+            Contact* newContact = new Contact;
             newContact->bodies[0] = box.body;
             newContact->bodies[1] = nullptr;
             newContact->normal = plane.normal;
             newContact->contactPoint = vertices[i];
             newContact->penetration = -distance;
-            newContact->restitution = RESTITUTION_PLANE;
-            newContact->friction = FRICTION;
+            newContact->restitution = groundRestitution;
+            newContact->friction = friction;
 
             contacts.push_back(newContact);
             hasContacted = true;

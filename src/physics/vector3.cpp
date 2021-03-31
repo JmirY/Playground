@@ -38,6 +38,13 @@ Vector3 Vector3::cross(const Vector3& other) const
     );
 }
 
+void Vector3::clear()
+{
+    x = 0.0f;
+    y = 0.0f;
+    z = 0.0f;
+}
+
 Vector3 Vector3::operator+(const Vector3& other) const
 {
     return Vector3(x + other.x, y + other.y, z + other.z);
