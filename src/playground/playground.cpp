@@ -367,6 +367,7 @@ void Playground::handleObjectPositionFixedEvent(ObjectPositionFixedEvent* event)
     {
         target->isFixed = true;
         target->body->setInverseMass(0.0f);
+        target->body->setInverseInertiaTensor(physics::Matrix3(0.0f));
         target->body->setVelocity(0.0f, 0.0f, 0.0f);
         target->body->setRotation(0.0f, 0.0f, 0.0f);
     }
@@ -374,6 +375,27 @@ void Playground::handleObjectPositionFixedEvent(ObjectPositionFixedEvent* event)
     {
         target->isFixed = false;
         target->body->setMass(5.0f);
+
+        physics::Matrix3 inertiaTensor;
+        float geometricData[3] = {0};
+        target->getGeometricDataInArray(geometricData);
+        if (typeid(*target) == typeid(SphereObject))
+        {
+            SphereObject* sphere = static_cast<SphereObject*>(target);
+            inertiaTensor.setDiagonal(0.4f * sphere->body->getMass() * geometricData[0]*geometricData[0]);
+        }
+        else if (typeid(*target) == typeid(BoxObject))
+        {
+            BoxObject* box = static_cast<BoxObject*>(target);
+            float k = box->body->getMass() / 12;
+            float x = geometricData[0] * 2.0f;
+            float y = geometricData[1] * 2.0f;
+            float z = geometricData[2] * 2.0f;
+            inertiaTensor.entries[0] = k * (y*y + z*z);
+            inertiaTensor.entries[4] = k * (x*x + z*z);
+            inertiaTensor.entries[8] = k * (y*y + x*x);
+        }
+        target->body->setInertiaTensor(inertiaTensor);
     }
 }
 
