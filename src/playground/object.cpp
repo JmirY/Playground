@@ -52,9 +52,12 @@ void SphereObject::setGeometricData(double value, ...)
 void SphereObject::updateDerivedData()
 {
     /* 강체의 데이터를 갱신한다 */
-    physics::Matrix3 inertiaTensor;
-    inertiaTensor.setDiagonal(0.4f * body->getMass() * radius*radius);
-    body->setInertiaTensor(inertiaTensor);
+    if (body->getInverseMass() != 0.0f)
+    {
+        physics::Matrix3 inertiaTensor;
+        inertiaTensor.setDiagonal(0.4f * body->getMass() * radius*radius);
+        body->setInertiaTensor(inertiaTensor);
+    }
 
     /* 충돌체의 데이터를 갱신한다 */
     collider->setGeometricData(radius);
@@ -87,16 +90,18 @@ void BoxObject::setGeometricData(double value, ...)
 void BoxObject::updateDerivedData()
 {
     /* 강체의 데이터를 갱신한다 */
-    physics::Matrix3 inertiaTensor;
-    float k = body->getMass() / 12;
-    float x = halfX * 2.0f;
-    float y = halfY * 2.0f;
-    float z = halfZ * 2.0f;
-    inertiaTensor.entries[0] = k * (y*y + z*z);
-    inertiaTensor.entries[4] = k * (x*x + z*z);
-    inertiaTensor.entries[8] = k * (y*y + x*x);
-    body->setInertiaTensor(inertiaTensor);
-
+    if (body->getInverseMass() != 0.0f)
+    {
+        physics::Matrix3 inertiaTensor;
+        float k = body->getMass() / 12;
+        float x = halfX * 2.0f;
+        float y = halfY * 2.0f;
+        float z = halfZ * 2.0f;
+        inertiaTensor.entries[0] = k * (y*y + z*z);
+        inertiaTensor.entries[4] = k * (x*x + z*z);
+        inertiaTensor.entries[8] = k * (y*y + x*x);
+        body->setInertiaTensor(inertiaTensor);
+    }
     /* 충돌체의 데이터를 갱신한다 */
     collider->setGeometricData(halfX, halfY, halfZ);
 
