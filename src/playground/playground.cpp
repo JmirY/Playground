@@ -266,7 +266,10 @@ void Playground::handleSimulationStatusChangedEvent(SimulationStatusChangedEvent
 void Playground::handleObjectPositionChangedEvent(ObjectPositionChangedEvent* event)
 {
     float (&position)[3] = event->position;
-    objects.find(event->id)->second->body->setPosition(position[0], position[1], position[2]);
+    physics::RigidBody* body = objects.find(event->id)->second->body;
+    body->setPosition(position[0], position[1], position[2]);
+    body->setVelocity(0.0f, 0.0f, 0.0f);
+    body->setRotation(0.0f, 0.0f, 0.0f);
 }
 
 void Playground::handleObjectVelocityChangedEvent(ObjectVelocityChangedEvent* event)
