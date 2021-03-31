@@ -42,8 +42,8 @@ void GUI::renderAll(
     renderSimulationControl(windowFlags, eventQueue, isSimulating);
     renderObjectList(windowFlags, eventQueue, objects);
 
-    ImGui::SetNextWindowPos(ImVec2(1024, 286));
-    ImGui::SetNextWindowSize(ImVec2(256, 434));
+    ImGui::SetNextWindowPos(ImVec2(1024, 316));
+    ImGui::SetNextWindowSize(ImVec2(256, 404));
 
     ImGui::Begin("Attribute", NULL, windowFlags);
     {
@@ -181,7 +181,7 @@ void GUI::renderSimulationControl(
 )
 {
     ImGui::SetNextWindowPos(ImVec2(1024, 0));
-    ImGui::SetNextWindowSize(ImVec2(256, 70));
+    ImGui::SetNextWindowSize(ImVec2(256, 100));
     ImGui::Begin("SimulationControl", NULL, windowFlags);
     {
         ImGui::BeginChild("SimulationControlRender");
@@ -197,6 +197,10 @@ void GUI::renderSimulationControl(
         if (ImGui::Button("Remove Selected Objects"))
             eventQueue.push(new ObjectRemovedEvent);
 
+        /* 모든 오브젝트 삭제 버튼 */
+        if (ImGui::Button("Remove All Objects"))
+            eventQueue.push(new AllObjectRemovedEvent);
+
         ImGui::EndChild();
     }
     ImGui::End();
@@ -208,7 +212,7 @@ void GUI::renderObjectList(
     const Objects& objects
 )
 {
-    ImGui::SetNextWindowPos(ImVec2(1024, 70));
+    ImGui::SetNextWindowPos(ImVec2(1024, 100));
     ImGui::SetNextWindowSize(ImVec2(256, 216));
     ImGui::Begin("ObjectList", NULL, windowFlags);
     {

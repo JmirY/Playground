@@ -60,6 +60,7 @@ private:
     void handleLeftMouseClickedOnSceneEvent(LeftMouseClickedOnSceneEvent*);
     void handleObjectPositionFixedEvent(ObjectPositionFixedEvent*);
     void handleRenderContactInfoFlagChangedEvent(RenderContactInfoFlagChangedEvent*);
+    void handleAllObjectRemovedEvent(AllObjectRemovedEvent*);
 };
 
 #endif // PLAYGROUND_H

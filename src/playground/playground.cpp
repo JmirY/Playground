@@ -166,6 +166,9 @@ void Playground::handleEvent(Event* event)
     else if (typeid(*event) == typeid(RenderContactInfoFlagChangedEvent))
         handleRenderContactInfoFlagChangedEvent(static_cast<RenderContactInfoFlagChangedEvent*>(event));
 
+    else if (typeid(*event) == typeid(AllObjectRemovedEvent))
+        handleAllObjectRemovedEvent(static_cast<AllObjectRemovedEvent*>(event));
+
     delete event;
 }
 
@@ -405,4 +408,14 @@ void Playground::handleObjectPositionFixedEvent(ObjectPositionFixedEvent* event)
 void Playground::handleRenderContactInfoFlagChangedEvent(RenderContactInfoFlagChangedEvent* event)
 {
     shouldRenderContactInfo = event->flag;
+}
+
+void Playground::handleAllObjectRemovedEvent(AllObjectRemovedEvent* event)
+{
+    Objects::iterator iter = objects.begin();
+    while (iter != objects.end())
+    {
+        iter = removeObject(iter->first);
+    }
+    selectedObjectIDs.clear();
 }

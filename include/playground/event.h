@@ -145,4 +145,6 @@ public:
         : flag(_flag) {}
 };
 
+class AllObjectRemovedEvent : public Event {};
+
 #endif // EVENT_H
