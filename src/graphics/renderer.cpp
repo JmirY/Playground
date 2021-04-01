@@ -1,5 +1,6 @@
 #include <graphics/renderer.h>
 #include <iostream>
+#include <typeinfo>
 
 using namespace graphics;
 
@@ -194,12 +195,21 @@ void Renderer::renderObject(
     /* 오브젝트 테두리 렌더 */
     if (id != 0)  // 충돌점이 아닐 때
     {
-        glm::vec3 frameColor(0.0f, 0.0f, 0.0f);
+        glm::vec3 frameColor(0.1f, 0.1f, 0.1f);
         if (isSelected)
             frameColor = glm::vec3(0.0f, 1.0f, 0.0f);
         objectShader.setVec3("objectColor", frameColor);
         glBindVertexArray(objectShape->frameVAO);
         glDrawElements(GL_LINE_STRIP, objectShape->frameIndices.size(), GL_UNSIGNED_INT, (void*)0);
+        if (typeid(*objectShape) == typeid(Sphere))
+        {
+            for (int i = 0; i < 5; ++i)
+            {
+                model = glm::rotate(model, glm::radians(60.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+                objectShader.setMat4("model", model);
+                glDrawElements(GL_LINE_STRIP, objectShape->frameIndices.size(), GL_UNSIGNED_INT, (void*)0);
+            }
+        }
     }
 
     glBindVertexArray(0);
