@@ -147,4 +147,22 @@ public:
 
 class AllObjectRemovedEvent : public Event {};
 
+class GroundRestitutionChangedEvent : public Event
+{
+public:
+    float value;
+
+    GroundRestitutionChangedEvent(float _value)
+        : value(_value) {}
+};
+
+class ObjectRestitutionChangedEvent : public Event
+{
+public:
+    float value;
+
+    ObjectRestitutionChangedEvent(float _value)
+        : value(_value) {}
+};
+
 #endif // EVENT_H

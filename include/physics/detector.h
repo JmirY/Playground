@@ -8,6 +8,8 @@ namespace physics
 {
     class CollisionDetector
     {
+        friend class Simulator;
+        
     private:
         float friction;
         float objectRestitution;

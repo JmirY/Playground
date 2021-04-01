@@ -61,6 +61,8 @@ private:
     void handleObjectPositionFixedEvent(ObjectPositionFixedEvent*);
     void handleRenderContactInfoFlagChangedEvent(RenderContactInfoFlagChangedEvent*);
     void handleAllObjectRemovedEvent(AllObjectRemovedEvent*);
+    void handleGroundRestitutionChangedEvent(GroundRestitutionChangedEvent*);
+    void handleObjectRestitutionChangedEvent(ObjectRestitutionChangedEvent*);
 };
 
 #endif // PLAYGROUND_H

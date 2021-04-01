@@ -51,6 +51,9 @@ namespace physics
 
         void getContactInfo(std::vector<ContactInfo*>&) const;
 
+        void setGroundRestitution(float value);
+        void setObjectRestitution(float value);
+
     private:
         /* 충돌을 검출하고 충돌 정보를 contacts 에 저장한다 */
         void detectCollision();

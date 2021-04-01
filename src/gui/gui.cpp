@@ -360,10 +360,24 @@ void GUI::renderObjectAttribute(
 void GUI::renderGlobalAttribute(EventQueue& eventQueue)
 {
     static bool shouldRenderContactInfo = false;
+    static float groundRestitution = 0.2f;
+    static float objectRestitution = 0.3f;
 
     if (ImGui::Checkbox("Render contact info.", &shouldRenderContactInfo))
     {
         eventQueue.push(new RenderContactInfoFlagChangedEvent(shouldRenderContactInfo));
+    } ImGui::Spacing();
+
+    ImGui::Text("Ground Restituion");
+    if (ImGui::SliderFloat("##Ground_Restitution", &groundRestitution, 0.0f, 1.0f))
+    {
+        eventQueue.push(new GroundRestitutionChangedEvent(groundRestitution));
+    }
+
+    ImGui::Text("Object Restituion");
+    if (ImGui::SliderFloat("##Object_Restitution", &objectRestitution, 0.0f, 1.0f))
+    {
+        eventQueue.push(new ObjectRestitutionChangedEvent(objectRestitution));
     }
 }
 

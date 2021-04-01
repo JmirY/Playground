@@ -169,6 +169,12 @@ void Playground::handleEvent(Event* event)
     else if (typeid(*event) == typeid(AllObjectRemovedEvent))
         handleAllObjectRemovedEvent(static_cast<AllObjectRemovedEvent*>(event));
 
+    else if (typeid(*event) == typeid(GroundRestitutionChangedEvent))
+        handleGroundRestitutionChangedEvent(static_cast<GroundRestitutionChangedEvent*>(event));
+
+    else if (typeid(*event) == typeid(ObjectRestitutionChangedEvent))
+        handleObjectRestitutionChangedEvent(static_cast<ObjectRestitutionChangedEvent*>(event));
+
     delete event;
 }
 
@@ -418,4 +424,14 @@ void Playground::handleAllObjectRemovedEvent(AllObjectRemovedEvent* event)
         iter = removeObject(iter->first);
     }
     selectedObjectIDs.clear();
+}
+
+void Playground::handleGroundRestitutionChangedEvent(GroundRestitutionChangedEvent* event)
+{
+    simulator.setGroundRestitution(event->value);
+}
+
+void Playground::handleObjectRestitutionChangedEvent(ObjectRestitutionChangedEvent* event)
+{
+    simulator.setObjectRestitution(event->value);
 }

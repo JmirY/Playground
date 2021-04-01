@@ -134,6 +134,16 @@ void Simulator::getContactInfo(std::vector<ContactInfo*>& contactInfo) const
     }
 }
 
+void Simulator::setGroundRestitution(float value)
+{
+    detector.groundRestitution = value;
+}
+
+void Simulator::setObjectRestitution(float value)
+{
+    detector.objectRestitution = value;
+}
+
 void Simulator::detectCollision()
 {
     for (Colliders::iterator i = colliders.begin(); i != colliders.end(); ++i)
