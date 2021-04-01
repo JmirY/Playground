@@ -41,34 +41,7 @@ void GUI::renderAll(
     renderObjectPalette(windowFlags, eventQueue);
     renderSimulationControl(windowFlags, eventQueue, isSimulating);
     renderObjectList(windowFlags, eventQueue, objects);
-
-    ImGui::SetNextWindowPos(ImVec2(1024, 316));
-    ImGui::SetNextWindowSize(ImVec2(256, 404));
-
-    ImGui::Begin("Attribute", NULL, windowFlags);
-    {
-        ImGui::BeginChild("AttributeRender");
-
-        if (ImGui::BeginTabBar("TabBar"))
-        {
-            if (ImGui::BeginTabItem("Global"))
-            {
-                ImGui::Spacing();
-                renderGlobalAttribute(eventQueue);
-                ImGui::EndTabItem();
-            }
-            if (ImGui::BeginTabItem("Object"))
-            {
-                ImGui::Spacing();
-                renderObjectAttribute(eventQueue, objects, selectedObjectIDs, isSimulating);
-                ImGui::EndTabItem();
-            }
-            ImGui::EndTabBar();
-        }
-
-        ImGui::EndChild();
-    }
-    ImGui::End();
+    renderAttributes(windowFlags, eventQueue, objects, selectedObjectIDs, isSimulating);
 
     ImGui::ShowDemoWindow(); // test
 
@@ -237,6 +210,43 @@ void GUI::renderObjectList(
                 ImGui::SameLine();
             ++i;
             ImGui::PopID();
+        }
+
+        ImGui::EndChild();
+    }
+    ImGui::End();
+}
+
+void GUI::renderAttributes(
+    ImGuiWindowFlags windowFlags,
+    EventQueue& eventQueue,
+    const Objects& objects,
+    const std::vector<unsigned int>& selectedObjectIDs,
+    const bool& isSimulating
+)
+{
+    ImGui::SetNextWindowPos(ImVec2(1024, 316));
+    ImGui::SetNextWindowSize(ImVec2(256, 404));
+
+    ImGui::Begin("Attribute", NULL, windowFlags);
+    {
+        ImGui::BeginChild("AttributeRender");
+
+        if (ImGui::BeginTabBar("TabBar"))
+        {
+            if (ImGui::BeginTabItem("Global"))
+            {
+                ImGui::Spacing();
+                renderGlobalAttribute(eventQueue);
+                ImGui::EndTabItem();
+            }
+            if (ImGui::BeginTabItem("Object"))
+            {
+                ImGui::Spacing();
+                renderObjectAttribute(eventQueue, objects, selectedObjectIDs, isSimulating);
+                ImGui::EndTabItem();
+            }
+            ImGui::EndTabBar();
         }
 
         ImGui::EndChild();

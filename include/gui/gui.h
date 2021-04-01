@@ -44,6 +44,13 @@ namespace gui
             EventQueue&,
             const Objects&
         );
+        void renderAttributes(
+            ImGuiWindowFlags,
+            EventQueue&,
+            const Objects&,
+            const std::vector<unsigned int>& selectedObjectIDs,
+            const bool& isSimulating
+        );
         void renderObjectAttribute(
             EventQueue&,
             const Objects&,
