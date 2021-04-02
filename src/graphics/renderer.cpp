@@ -203,12 +203,19 @@ void Renderer::renderObject(
         glDrawElements(GL_LINE_STRIP, objectShape->frameIndices.size(), GL_UNSIGNED_INT, (void*)0);
         if (typeid(*objectShape) == typeid(Sphere))
         {
-            for (int i = 0; i < 5; ++i)
+            for (int i = 0; i < 3; ++i)
             {
-                model = glm::rotate(model, glm::radians(60.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+                model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
                 objectShader.setMat4("model", model);
                 glDrawElements(GL_LINE_STRIP, objectShape->frameIndices.size(), GL_UNSIGNED_INT, (void*)0);
             }
+            model = glm::make_mat4(modelMatrix);
+            model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+            objectShader.setMat4("model", model);
+            glDrawElements(GL_LINE_STRIP, objectShape->frameIndices.size(), GL_UNSIGNED_INT, (void*)0);
+            model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+            objectShader.setMat4("model", model);
+            glDrawElements(GL_LINE_STRIP, objectShape->frameIndices.size(), GL_UNSIGNED_INT, (void*)0);
         }
     }
 
