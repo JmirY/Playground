@@ -197,13 +197,38 @@ void GUI::renderObjectList(
         {
             ImGui::PushID(i);
 
-            if (ImGui::Selectable("Object", object.second->getIsSelected(), 0, ImVec2(50, 50)))
+            if (ImGui::Selectable("##Object", object.second->getIsSelected(), 0, ImVec2(50, 50)))
             {
                 /* ctrl 키를 누른 채로 클릭하면 다중 선택이 가능하다 */
                 if (ImGui::GetIO().KeyCtrl)
                     eventQueue.push(new ObjectSelectedEvent(object.second->getID(), true));
                 else
                     eventQueue.push(new ObjectSelectedEvent(object.second->getID(), false));
+            }
+
+            /* 도형 & 색상을 표시한다 */
+            glm::vec3 glmColor = object.second->getColor();
+            ImU32 color = ImColor(glmColor.x, glmColor.y, glmColor.z);
+
+            ImDrawList* drawList = ImGui::GetWindowDrawList();
+            ImVec2 selectableSize = ImGui::GetItemRectSize();
+            ImVec2 selectableMin = ImGui::GetItemRectMin();
+            if (object.second->getGeometry() == SPHERE)
+            {
+                ImVec2 center = selectableMin;
+                center.x += selectableSize.x * 0.5f;
+                center.y += selectableSize.y * 0.5f;
+                drawList->AddCircleFilled(center, 20.0f, color, 100);
+            }
+            else if (object.second->getGeometry() == BOX)
+            {
+                float padding = 10.f;
+                ImVec2 selectableMax = ImGui::GetItemRectMax();
+                selectableMin.x += padding;
+                selectableMin.y += padding;
+                selectableMax.x -= padding;
+                selectableMax.y -= padding;
+                drawList->AddRectFilled(selectableMin, selectableMax, color);
             }
 
             if (i % 4 != 0)

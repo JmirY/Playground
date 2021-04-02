@@ -32,6 +32,7 @@ public:
 
     unsigned int getID() const { return id; }
     Geometry getGeometry() const { return geometry; }
+    glm::vec3 getColor() const { return color; }
     bool getIsSelected() const { return isSelected; }
     bool getIsFixed() const { return isFixed; }
     void getPositionInArray(float (&array)[3]) const;
