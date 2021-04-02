@@ -165,4 +165,13 @@ public:
         : value(_value) {}
 };
 
+class GravityChangedEvent : public Event
+{
+public:
+    float value;
+
+    GravityChangedEvent(float _value)
+        : value(_value) {}
+};
+
 #endif // EVENT_H

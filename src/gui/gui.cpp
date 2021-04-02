@@ -304,28 +304,28 @@ void GUI::renderObjectAttribute(
                 eventQueue.push(new ObjectVelocityChangedEvent(selectedObjectIDs[0], vecBuffer));
         ImGui::NextColumn();
         /* 각속도 */
-        object->getRotationInArray(vecBuffer);
-        ImGui::Text("Rotation"); ImGui::NextColumn();
-        ImGui::DragFloat("##RotationX", &vecBuffer[0], 0.1f);
-            // if (!isSimulating)
-            //     eventQueue.push(new ObjectVelocityChangedEvent(selectedObjectIDs[0], vecBuffer));
-        ImGui::NextColumn();
-        ImGui::DragFloat("##RotationY", &vecBuffer[1], 0.1f);
-            // if (!isSimulating)
-            //     eventQueue.push(new ObjectVelocityChangedEvent(selectedObjectIDs[0], vecBuffer));
-        ImGui::NextColumn();
-        ImGui::DragFloat("##RotationZ", &vecBuffer[2], 0.1f);
-            // if (!isSimulating)
-            //     eventQueue.push(new ObjectVelocityChangedEvent(selectedObjectIDs[0], vecBuffer));
-        ImGui::NextColumn();
+        // object->getRotationInArray(vecBuffer);
+        // ImGui::Text("Rotation"); ImGui::NextColumn();
+        // ImGui::DragFloat("##RotationX", &vecBuffer[0], 0.1f);
+        //     // if (!isSimulating)
+        //     //     eventQueue.push(new ObjectVelocityChangedEvent(selectedObjectIDs[0], vecBuffer));
+        // ImGui::NextColumn();
+        // ImGui::DragFloat("##RotationY", &vecBuffer[1], 0.1f);
+        //     // if (!isSimulating)
+        //     //     eventQueue.push(new ObjectVelocityChangedEvent(selectedObjectIDs[0], vecBuffer));
+        // ImGui::NextColumn();
+        // ImGui::DragFloat("##RotationZ", &vecBuffer[2], 0.1f);
+        //     // if (!isSimulating)
+        //     //     eventQueue.push(new ObjectVelocityChangedEvent(selectedObjectIDs[0], vecBuffer));
+        // ImGui::NextColumn();
         /* 가속도 */
-        object->getAccelerationInArray(vecBuffer);
-        ImGui::Text("Acceleration"); ImGui::NextColumn();
-        ImGui::DragFloat("##AccelerationX", &vecBuffer[0], 0.1f);
-        ImGui::NextColumn();
-        ImGui::DragFloat("##AccelerationY", &vecBuffer[1], 0.1f);
-        ImGui::NextColumn();
-        ImGui::DragFloat("##AccelerationZ", &vecBuffer[2], 0.1f);
+        // object->getAccelerationInArray(vecBuffer);
+        // ImGui::Text("Acceleration"); ImGui::NextColumn();
+        // ImGui::DragFloat("##AccelerationX", &vecBuffer[0], 0.1f);
+        // ImGui::NextColumn();
+        // ImGui::DragFloat("##AccelerationY", &vecBuffer[1], 0.1f);
+        // ImGui::NextColumn();
+        // ImGui::DragFloat("##AccelerationZ", &vecBuffer[2], 0.1f);
         ImGui::Columns(1); ImGui::Separator(); ImGui::Spacing();
         /* 질량 */
         object->getMassInArray(vecBuffer);
@@ -360,6 +360,7 @@ void GUI::renderObjectAttribute(
 void GUI::renderGlobalAttribute(EventQueue& eventQueue)
 {
     static bool shouldRenderContactInfo = false;
+    static float gravity = 9.0f;
     static float groundRestitution = 0.2f;
     static float objectRestitution = 0.3f;
 
@@ -367,6 +368,12 @@ void GUI::renderGlobalAttribute(EventQueue& eventQueue)
     {
         eventQueue.push(new RenderContactInfoFlagChangedEvent(shouldRenderContactInfo));
     } ImGui::Spacing();
+
+    ImGui::Text("Gravity");
+    if (ImGui::SliderFloat("##Gravity", &gravity, 0.0f, 30.0f))
+    {
+        eventQueue.push(new GravityChangedEvent(gravity));
+    }
 
     ImGui::Text("Ground Restituion");
     if (ImGui::SliderFloat("##Ground_Restitution", &groundRestitution, 0.0f, 1.0f))

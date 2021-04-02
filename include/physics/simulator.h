@@ -27,8 +27,10 @@ namespace physics
         CollisionDetector detector;
         CollisionResolver resolver;
 
+        float gravity;
+
     public:
-        Simulator() : groundCollider(Vector3(0.0f, 1.0f, 0.0f), 0.0f) {}
+        Simulator() : groundCollider(Vector3(0.0f, 1.0f, 0.0f), 0.0f), gravity(9.0f) {}
         ~Simulator();
 
         /* 주어진 시간 동안의 물리 현상을 시뮬레이팅한다 */
@@ -53,6 +55,7 @@ namespace physics
 
         void setGroundRestitution(float value);
         void setObjectRestitution(float value);
+        void setGravity(float value);
 
     private:
         /* 충돌을 검출하고 충돌 정보를 contacts 에 저장한다 */

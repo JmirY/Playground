@@ -63,6 +63,7 @@ private:
     void handleAllObjectRemovedEvent(AllObjectRemovedEvent*);
     void handleGroundRestitutionChangedEvent(GroundRestitutionChangedEvent*);
     void handleObjectRestitutionChangedEvent(ObjectRestitutionChangedEvent*);
+    void handleGravityChangedEvent(GravityChangedEvent*);
 };
 
 #endif // PLAYGROUND_H

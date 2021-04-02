@@ -49,7 +49,7 @@ RigidBody* Simulator::addRigidBody(unsigned int id, Geometry geometry)
     RigidBody* newBody = new RigidBody;
     newBody->setMass(5.0f);
     newBody->setPosition(0.0f, 4.0f, 0.0f);
-    newBody->setAcceleration(0.0f, -9.0f, 0.0f);
+    newBody->setAcceleration(0.0f, -gravity, 0.0f);
 
     /* 강체의 관성 모멘트 텐서를 도형에 따라 결정한다 */
     Matrix3 inertiaTensor;
@@ -142,6 +142,13 @@ void Simulator::setGroundRestitution(float value)
 void Simulator::setObjectRestitution(float value)
 {
     detector.objectRestitution = value;
+}
+
+void Simulator::setGravity(float value)
+{
+    gravity = value;
+    for (auto& body : bodies)
+        body.second->setAcceleration(0.0f, -gravity, 0.0f);
 }
 
 void Simulator::detectCollision()

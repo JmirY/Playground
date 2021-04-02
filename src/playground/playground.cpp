@@ -175,6 +175,9 @@ void Playground::handleEvent(Event* event)
     else if (typeid(*event) == typeid(ObjectRestitutionChangedEvent))
         handleObjectRestitutionChangedEvent(static_cast<ObjectRestitutionChangedEvent*>(event));
 
+    else if (typeid(*event) == typeid(GravityChangedEvent))
+        handleGravityChangedEvent(static_cast<GravityChangedEvent*>(event));
+
     delete event;
 }
 
@@ -434,4 +437,9 @@ void Playground::handleGroundRestitutionChangedEvent(GroundRestitutionChangedEve
 void Playground::handleObjectRestitutionChangedEvent(ObjectRestitutionChangedEvent* event)
 {
     simulator.setObjectRestitution(event->value);
+}
+
+void Playground::handleGravityChangedEvent(GravityChangedEvent* event)
+{
+    simulator.setGravity(event->value);
 }
