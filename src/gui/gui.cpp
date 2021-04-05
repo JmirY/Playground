@@ -328,30 +328,29 @@ void GUI::renderObjectAttribute(
             if (!isSimulating)
                 eventQueue.push(new ObjectVelocityChangedEvent(selectedObjectIDs[0], vecBuffer));
         ImGui::NextColumn();
-        /* 각속도 */
-        // object->getRotationInArray(vecBuffer);
-        // ImGui::Text("Rotation"); ImGui::NextColumn();
-        // ImGui::DragFloat("##RotationX", &vecBuffer[0], 0.1f);
-        //     // if (!isSimulating)
-        //     //     eventQueue.push(new ObjectVelocityChangedEvent(selectedObjectIDs[0], vecBuffer));
-        // ImGui::NextColumn();
-        // ImGui::DragFloat("##RotationY", &vecBuffer[1], 0.1f);
-        //     // if (!isSimulating)
-        //     //     eventQueue.push(new ObjectVelocityChangedEvent(selectedObjectIDs[0], vecBuffer));
-        // ImGui::NextColumn();
-        // ImGui::DragFloat("##RotationZ", &vecBuffer[2], 0.1f);
-        //     // if (!isSimulating)
-        //     //     eventQueue.push(new ObjectVelocityChangedEvent(selectedObjectIDs[0], vecBuffer));
-        // ImGui::NextColumn();
-        /* 가속도 */
-        // object->getAccelerationInArray(vecBuffer);
-        // ImGui::Text("Acceleration"); ImGui::NextColumn();
-        // ImGui::DragFloat("##AccelerationX", &vecBuffer[0], 0.1f);
-        // ImGui::NextColumn();
-        // ImGui::DragFloat("##AccelerationY", &vecBuffer[1], 0.1f);
-        // ImGui::NextColumn();
-        // ImGui::DragFloat("##AccelerationZ", &vecBuffer[2], 0.1f);
         ImGui::Columns(1); ImGui::Separator(); ImGui::Spacing();
+        
+        /* 방향 */
+        ImGui::Text("Orientation");
+        ImVec2 buttonSize(ImGui::GetColumnWidth(), 0.0f);
+        ImGui::Button("X", buttonSize);
+        if (ImGui::IsItemActive())
+        {
+            ImVec2 dragDelta = ImGui::GetIO().MouseDelta;
+            eventQueue.push(new ObjectRotatedEvent(selectedObjectIDs[0], 1.0f, 0.0f, 0.0f, dragDelta.x));
+        }
+        ImGui::Button("Y", buttonSize);
+        if (ImGui::IsItemActive())
+        {
+            ImVec2 dragDelta = ImGui::GetIO().MouseDelta;
+            eventQueue.push(new ObjectRotatedEvent(selectedObjectIDs[0], 0.0f, 1.0f, 0.0f, dragDelta.x));
+        }
+        ImGui::Button("Z", buttonSize);
+        if (ImGui::IsItemActive())
+        {
+            ImVec2 dragDelta = ImGui::GetIO().MouseDelta;
+            eventQueue.push(new ObjectRotatedEvent(selectedObjectIDs[0], 0.0f, 0.0f, 1.0f, dragDelta.x));
+        }
         /* 질량 */
         object->getMassInArray(vecBuffer);
         ImGui::Text("Mass");

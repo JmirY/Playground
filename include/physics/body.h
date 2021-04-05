@@ -68,6 +68,9 @@ namespace physics
             단위 벡터화하여 반환한다. */
         Vector3 getAxis(int index) const;
 
+        /* 주어진 사원수만큼 강체의 방향을 변경한다 */
+        void rotateByQuat(const Quaternion&);
+
     private:    
         /* 현재 상태를 참고하여 변환 행렬을 업데이트한다 */
         void updateTransformMatrix();

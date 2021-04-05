@@ -71,6 +71,13 @@ Vector3 RigidBody::getAxis(int index) const
     return result;
 }
 
+void RigidBody::rotateByQuat(const Quaternion& quat)
+{
+    Quaternion newOrientation = getOrientation() * quat;
+    newOrientation.normalize();
+    setOrientation(newOrientation);
+}
+
 void RigidBody::updateTransformMatrix()
 {
     transformMatrix.entries[0] = 

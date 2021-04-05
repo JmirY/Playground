@@ -1,5 +1,8 @@
 #include <playground/playground.h>
 #include <typeinfo>
+#include <cmath>
+
+const float PI = 3.141592f;
 
 Playground::Playground()
     : eventQueue(50), userInterface(renderer.getWindow(), renderer.getTextureBufferID())
@@ -177,6 +180,9 @@ void Playground::handleEvent(Event* event)
 
     else if (typeid(*event) == typeid(GravityChangedEvent))
         handleGravityChangedEvent(static_cast<GravityChangedEvent*>(event));
+
+    else if (typeid(*event) == typeid(ObjectRotatedEvent))
+        handleObjectRotatedEvent(static_cast<ObjectRotatedEvent*>(event));
 
     delete event;
 }
@@ -442,4 +448,29 @@ void Playground::handleObjectRestitutionChangedEvent(ObjectRestitutionChangedEve
 void Playground::handleGravityChangedEvent(GravityChangedEvent* event)
 {
     simulator.setGravity(event->value);
+}
+
+void Playground::handleObjectRotatedEvent(ObjectRotatedEvent* event)
+{
+    Object* target = objects.find(event->id)->second;
+    /* 회전각을 라디안으로 변환한다 */
+    float radian = event->degree * PI / 180.0f;
+    /* 회전축을 오브젝트의 로컬 좌표계로 변환한다 */
+    physics::Matrix4 transformMat = target->body->getTransformMatrix();
+    physics::Matrix3 rotationMat;
+    for (int i = 0; i < 3; ++i)
+        for (int j = 0; j < 3; ++j)
+            rotationMat.entries[3*i + j] = transformMat.entries[4*i + j];
+
+    physics::Vector3 axisWorld(event->axisX, event->axisY, event->axisZ);
+    physics::Vector3 axisLocal = rotationMat.transpose() * axisWorld;
+    axisLocal.normalize();
+    /* 앞서 계산한 회전각과 축을 토대로 회전 사원수를 계산한다 */
+    physics::Quaternion quat(
+        cosf(radian * 0.5f),
+        sinf(radian * 0.5f) * axisLocal.x,
+        sinf(radian * 0.5f) * axisLocal.y,
+        sinf(radian * 0.5f) * axisLocal.z
+    );
+    target->body->rotateByQuat(quat);
 }

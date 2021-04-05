@@ -174,4 +174,17 @@ public:
         : value(_value) {}
 };
 
+class ObjectRotatedEvent : public Event
+{
+public:
+    unsigned int id;
+    float axisX;
+    float axisY;
+    float axisZ;
+    float degree;
+
+    ObjectRotatedEvent(unsigned int _id, float x, float y, float z, float _degree)
+        : id(_id), axisX(x), axisY(y), axisZ(z), degree(_degree) {}
+};
+
 #endif // EVENT_H
