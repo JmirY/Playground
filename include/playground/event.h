@@ -187,14 +187,4 @@ public:
         : id(_id), axisX(x), axisY(y), axisZ(z), degree(_degree) {}
 };
 
-class OrientationHoveredEvent : public Event
-{
-public:
-    unsigned int id;
-    int axisIdx;
-
-    OrientationHoveredEvent(unsigned int _id, int _axisIdx)
-        : id(_id), axisIdx(_axisIdx) {}
-};
-
 #endif // EVENT_H

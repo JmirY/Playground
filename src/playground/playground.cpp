@@ -55,6 +55,13 @@ void Playground::run()
             renderer.renderObject(object.second->id, object.second->color, modelMatrix, object.second->isSelected);
         }
 
+        /* 오브젝트의 위치를 원점으로 한 월드축 렌더 */
+        if (selectedObjectIDs.size() == 1)
+        {
+            physics::Vector3 position = objects.find(selectedObjectIDs[0])->second->body->getPosition();
+            renderer.renderWorldAxisAt(position.x, position.y, position.z);
+        }
+
         /* 충돌점 렌더 */
         for (auto& info : contactInfo)
         {
@@ -183,9 +190,6 @@ void Playground::handleEvent(Event* event)
 
     else if (typeid(*event) == typeid(ObjectRotatedEvent))
         handleObjectRotatedEvent(static_cast<ObjectRotatedEvent*>(event));
-
-    else if (typeid(*event) == typeid(OrientationHoveredEvent))
-        handleOrientationHoveredEvent(static_cast<OrientationHoveredEvent*>(event));
 
     delete event;
 }
@@ -476,12 +480,4 @@ void Playground::handleObjectRotatedEvent(ObjectRotatedEvent* event)
         sinf(radian * 0.5f) * axisLocal.z
     );
     target->body->rotateByQuat(quat);
-}
-
-void Playground::handleOrientationHoveredEvent(OrientationHoveredEvent* event)
-{
-    Object* target = objects.find(event->id)->second;
-    physics::Vector3 position = target->body->getPosition();
-
-    renderer.renderObjectAxis(event->axisIdx, position.x, position.y, position.z);
 }

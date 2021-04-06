@@ -91,7 +91,7 @@ namespace graphics
         );
         void renderBackground();
         void renderContactInfo(ContactInfo*);
-        void renderObjectAxis(int axisIdxm, float posX, float posY, float posZ);
+        void renderWorldAxisAt(float posX, float posY, float posZ);
 
         /* 프레임 버퍼를 쿼리해 windowWidth & windowHeight 을 업데이트 */
         void updateWindowSize();

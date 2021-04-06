@@ -323,7 +323,7 @@ void Renderer::renderContactInfo(ContactInfo* info)
     glBindVertexArray(0);
 }
 
-void Renderer::renderObjectAxis(int axisIdx, float posX, float posY, float posZ)
+void Renderer::renderWorldAxisAt(float posX, float posY, float posZ)
 {
     /* 변환 행렬 설정 */
     glm::mat4 view = camera.getViewMatrix();
@@ -335,27 +335,8 @@ void Renderer::renderObjectAxis(int axisIdx, float posX, float posY, float posZ)
     );
     glm::mat4 model(1.0f);
     model = glm::translate(model, glm::vec3(posX, posY, posZ));
-    glm::vec3 color(0.0f, 0.0f, 0.0f);
-    switch (axisIdx)
-    {
-    case 0:  // x 축
-        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, -1.0f));
-        color.x = 1.0f;
-        break;
-
-    case 1:  // y 축
-        color.y = 1.0f;
-        break;
-
-    case 2:  // z 축
-        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        color.z = 1.0f;
-        break;
-
-    default:
-        break;
-    }
-
+    glm::vec3 color(0.0f, 1.0f, 0.0f);
+    
     /* 셰이더 설정 */
     objectShader.use();
     objectShader.setMat4("model", model);
@@ -364,8 +345,31 @@ void Renderer::renderObjectAxis(int axisIdx, float posX, float posY, float posZ)
     objectShader.setVec3("objectColor", color);
     objectShader.setVec3("viewPos", camera.getPosition());
 
+    /* y 축 렌더 */
     glBindVertexArray(worldYaxisVAO);
     glDrawArrays(GL_LINES, 0, 2);
+
+    /* x 축 렌더 */
+    model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+    color.x = 1.0f;
+    color.y = 0.0f;
+
+    objectShader.setMat4("model", model);
+    objectShader.setVec3("objectColor", color);
+    glDrawArrays(GL_LINES, 0, 2);
+    
+    /* z 축 렌더 */
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(posX, posY, posZ));
+    model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    color.x = 0.0f;
+    color.y = 0.0f;
+    color.z = 1.0f;
+
+    objectShader.setMat4("model", model);
+    objectShader.setVec3("objectColor", color);
+    glDrawArrays(GL_LINES, 0, 2);
+    
     glBindVertexArray(0);
 }
 
