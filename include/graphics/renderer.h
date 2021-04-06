@@ -63,8 +63,8 @@ namespace graphics
         /* 배경 VAO 의 ID */
         unsigned int backgroundVAO;
 
-        /* 충돌 법선 VAO 의 ID */
-        unsigned int contactNormalVAO;
+        /* 월드 y 축 VAO 의 ID */
+        unsigned int worldYaxisVAO;
 
         /* 프레임 버퍼의 ID */
         unsigned int sceneFrameBufferID;
@@ -91,6 +91,7 @@ namespace graphics
         );
         void renderBackground();
         void renderContactInfo(ContactInfo*);
+        void renderObjectAxis(int axisIdxm, float posX, float posY, float posZ);
 
         /* 프레임 버퍼를 쿼리해 windowWidth & windowHeight 을 업데이트 */
         void updateWindowSize();

@@ -23,12 +23,6 @@ void Playground::run()
         /* 키보드 입력 처리 */
         handleKeyboardInput();
         
-        /* GUI 이벤트 처리 */
-        while (!eventQueue.isEmpty())
-        {
-            handleEvent(eventQueue.pop());
-        }
-
         /* 시간 계산 */
         curTime = glfwGetTime();
         deltaTime = curTime - prevTime;
@@ -44,6 +38,12 @@ void Playground::run()
         renderer.bindSceneFrameBuffer();
         renderer.setSceneViewport();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        /* GUI 이벤트 처리 */
+        while (!eventQueue.isEmpty())
+        {
+            handleEvent(eventQueue.pop());
+        }
 
         /* 배경 렌더 */
         renderer.renderBackground();
@@ -183,6 +183,9 @@ void Playground::handleEvent(Event* event)
 
     else if (typeid(*event) == typeid(ObjectRotatedEvent))
         handleObjectRotatedEvent(static_cast<ObjectRotatedEvent*>(event));
+
+    else if (typeid(*event) == typeid(OrientationHoveredEvent))
+        handleOrientationHoveredEvent(static_cast<OrientationHoveredEvent*>(event));
 
     delete event;
 }
@@ -473,4 +476,12 @@ void Playground::handleObjectRotatedEvent(ObjectRotatedEvent* event)
         sinf(radian * 0.5f) * axisLocal.z
     );
     target->body->rotateByQuat(quat);
+}
+
+void Playground::handleOrientationHoveredEvent(OrientationHoveredEvent* event)
+{
+    Object* target = objects.find(event->id)->second;
+    physics::Vector3 position = target->body->getPosition();
+
+    renderer.renderObjectAxis(event->axisIdx, position.x, position.y, position.z);
 }

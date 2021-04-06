@@ -58,9 +58,9 @@ Renderer::Renderer()
 
     glBindVertexArray(0);
 
-    /* 충돌 법선 VAO 설정 */
-    glGenVertexArrays(1, &contactNormalVAO);
-    glBindVertexArray(contactNormalVAO);
+    /* 월드 y 축 VAO 설정 */
+    glGenVertexArrays(1, &worldYaxisVAO);
+    glBindVertexArray(worldYaxisVAO);
 
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -318,7 +318,53 @@ void Renderer::renderContactInfo(ContactInfo* info)
     }
     objectShader.setMat4("model", model);
 
-    glBindVertexArray(contactNormalVAO);
+    glBindVertexArray(worldYaxisVAO);
+    glDrawArrays(GL_LINES, 0, 2);
+    glBindVertexArray(0);
+}
+
+void Renderer::renderObjectAxis(int axisIdx, float posX, float posY, float posZ)
+{
+    /* 변환 행렬 설정 */
+    glm::mat4 view = camera.getViewMatrix();
+    glm::mat4 projection = glm::perspective(
+        glm::radians(camera.getFov()),
+        ((float) sceneWidth) / sceneHeight,
+        PERSPECTIVE_NEAR,
+        PERSPECTIVE_FAR
+    );
+    glm::mat4 model(1.0f);
+    model = glm::translate(model, glm::vec3(posX, posY, posZ));
+    glm::vec3 color(0.0f, 0.0f, 0.0f);
+    switch (axisIdx)
+    {
+    case 0:  // x 축
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+        color.x = 1.0f;
+        break;
+
+    case 1:  // y 축
+        color.y = 1.0f;
+        break;
+
+    case 2:  // z 축
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        color.z = 1.0f;
+        break;
+
+    default:
+        break;
+    }
+
+    /* 셰이더 설정 */
+    objectShader.use();
+    objectShader.setMat4("model", model);
+    objectShader.setMat4("view", view);
+    objectShader.setMat4("projection", projection);
+    objectShader.setVec3("objectColor", color);
+    objectShader.setVec3("viewPos", camera.getPosition());
+
+    glBindVertexArray(worldYaxisVAO);
     glDrawArrays(GL_LINES, 0, 2);
     glBindVertexArray(0);
 }

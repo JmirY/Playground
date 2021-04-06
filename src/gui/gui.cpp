@@ -334,18 +334,30 @@ void GUI::renderObjectAttribute(
         ImGui::Text("Orientation");
         ImVec2 buttonSize(ImGui::GetColumnWidth(), 0.0f);
         ImGui::Button("X", buttonSize);
+        if (ImGui::IsItemHovered())
+        {
+            eventQueue.push(new OrientationHoveredEvent(selectedObjectIDs[0], 0));
+        }
         if (ImGui::IsItemActive())
         {
             ImVec2 dragDelta = ImGui::GetIO().MouseDelta;
             eventQueue.push(new ObjectRotatedEvent(selectedObjectIDs[0], 1.0f, 0.0f, 0.0f, dragDelta.x));
         }
         ImGui::Button("Y", buttonSize);
+        if (ImGui::IsItemHovered())
+        {
+            eventQueue.push(new OrientationHoveredEvent(selectedObjectIDs[0], 1));
+        }
         if (ImGui::IsItemActive())
         {
             ImVec2 dragDelta = ImGui::GetIO().MouseDelta;
             eventQueue.push(new ObjectRotatedEvent(selectedObjectIDs[0], 0.0f, 1.0f, 0.0f, dragDelta.x));
         }
         ImGui::Button("Z", buttonSize);
+        if (ImGui::IsItemHovered())
+        {
+            eventQueue.push(new OrientationHoveredEvent(selectedObjectIDs[0], 2));
+        }
         if (ImGui::IsItemActive())
         {
             ImVec2 dragDelta = ImGui::GetIO().MouseDelta;
