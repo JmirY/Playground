@@ -197,7 +197,7 @@ void Renderer::renderObject(
     {
         glm::vec3 frameColor(0.1f, 0.1f, 0.1f);
         if (isSelected)
-            frameColor = glm::vec3(0.0f, 1.0f, 0.0f);
+            frameColor = glm::vec3(0.9f, 0.9f, 0.9f);
         objectShader.setVec3("objectColor", frameColor);
         glBindVertexArray(objectShape->frameVAO);
         glDrawElements(GL_LINE_STRIP, objectShape->frameIndices.size(), GL_UNSIGNED_INT, (void*)0);
@@ -295,10 +295,11 @@ void Renderer::renderContactInfo(ContactInfo* info)
     objectShader.setMat4("model", model);
     objectShader.setMat4("view", view);
     objectShader.setMat4("projection", projection);
-    objectShader.setVec3("objectColor", glm::vec3(1.0f, 0.0f, 0.0f));
+    objectShader.setVec3("objectColor", glm::vec3(1.0f, 1.0f, 1.0f));
     objectShader.setVec3("viewPos", camera.getPosition());
 
     Shape *objectShape = shapes.find(0)->second;
+    glDisable(GL_DEPTH_TEST);
     glBindVertexArray(objectShape->polygonVAO);
     glDrawElements(GL_TRIANGLES, objectShape->polygonIndices.size(), GL_UNSIGNED_INT, (void*)0);
     
@@ -321,6 +322,7 @@ void Renderer::renderContactInfo(ContactInfo* info)
     glBindVertexArray(worldYaxisVAO);
     glDrawArrays(GL_LINES, 0, 2);
     glBindVertexArray(0);
+    glEnable(GL_DEPTH_TEST);
 }
 
 void Renderer::renderWorldAxisAt(float posX, float posY, float posZ)
