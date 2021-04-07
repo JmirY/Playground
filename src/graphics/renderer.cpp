@@ -346,6 +346,7 @@ void Renderer::renderWorldAxisAt(float posX, float posY, float posZ)
     objectShader.setVec3("viewPos", camera.getPosition());
 
     /* y 축 렌더 */
+    glDisable(GL_DEPTH_TEST);
     glBindVertexArray(worldYaxisVAO);
     glDrawArrays(GL_LINES, 0, 2);
 
@@ -371,6 +372,7 @@ void Renderer::renderWorldAxisAt(float posX, float posY, float posZ)
     glDrawArrays(GL_LINES, 0, 2);
     
     glBindVertexArray(0);
+    glEnable(GL_DEPTH_TEST);
 }
 
 void Renderer::updateWindowSize()
