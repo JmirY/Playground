@@ -191,6 +191,9 @@ void Playground::handleEvent(Event* event)
     else if (typeid(*event) == typeid(ObjectRotatedEvent))
         handleObjectRotatedEvent(static_cast<ObjectRotatedEvent*>(event));
 
+    else if (typeid(*event) == typeid(OrientationResetEvent))
+        handleOrientationResetEvent(static_cast<OrientationResetEvent*>(event));
+
     delete event;
 }
 
@@ -480,4 +483,10 @@ void Playground::handleObjectRotatedEvent(ObjectRotatedEvent* event)
         sinf(radian * 0.5f) * axisLocal.z
     );
     target->body->rotateByQuat(quat);
+}
+
+void Playground::handleOrientationResetEvent(OrientationResetEvent* event)
+{
+    Object* target = objects.find(event->id)->second;
+    target->body->setOrientation(physics::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
 }

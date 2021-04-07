@@ -187,4 +187,13 @@ public:
         : id(_id), axisX(x), axisY(y), axisZ(z), degree(_degree) {}
 };
 
+class OrientationResetEvent : public Event
+{
+public:
+    unsigned int id;
+
+    OrientationResetEvent(unsigned int _id)
+        : id(_id) {}
+};
+
 #endif // EVENT_H

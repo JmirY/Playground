@@ -331,7 +331,12 @@ void GUI::renderObjectAttribute(
         ImGui::Columns(1); ImGui::Separator(); ImGui::Spacing();
         
         /* 방향 */
-        ImGui::Text("Orientation");
+        ImGui::AlignTextToFramePadding();
+        ImGui::Text("Orientation"); ImGui::SameLine(0.0f, 10.0f);
+        if (ImGui::Button("Reset"))
+        {
+            eventQueue.push(new OrientationResetEvent(selectedObjectIDs[0]));
+        }
         ImVec2 buttonSize(ImGui::GetColumnWidth(), 0.0f);
         ImGui::Button("X", buttonSize);
         if (ImGui::IsItemActive())
@@ -350,18 +355,29 @@ void GUI::renderObjectAttribute(
         {
             ImVec2 dragDelta = ImGui::GetIO().MouseDelta;
             eventQueue.push(new ObjectRotatedEvent(selectedObjectIDs[0], 0.0f, 0.0f, 1.0f, dragDelta.x));
-        }
+        } ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
         /* 질량 */
         object->getMassInArray(vecBuffer);
+        ImGui::AlignTextToFramePadding();
         ImGui::Text("Mass");
         if (ImGui::DragFloat("##Mass", &vecBuffer[0], 0.1f, 0.1f, FLT_MAX))
             eventQueue.push(new ObjectMassChangedEvent(selectedObjectIDs[0], vecBuffer[0]));
+        ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
         /* 도형 데이터 */
         object->getGeometricDataInArray(vecBuffer);
         Geometry geometry = object->getGeometry();
         if (geometry == BOX)
         {
-            ImGui::Text("Half-size");
+            ImGui::AlignTextToFramePadding();
+            ImGui::Text("Half-size"); ImGui::SameLine(0.0f, 10.0f);
+            if (ImGui::Button("Reset##halfSize"))
+            {
+                vecBuffer[0] = 0.5f;
+                vecBuffer[1] = 0.5f;
+                vecBuffer[2] = 0.5f;
+                eventQueue.push(new ObjectGeometricDataChangedEvent(selectedObjectIDs[0], vecBuffer));
+            }
+            ImGui::AlignTextToFramePadding();
             ImGui::Text("X"); ImGui::SameLine();
             if (ImGui::DragFloat("##Half-X", &vecBuffer[0], 0.01f, 0.1f, FLT_MAX))
                 eventQueue.push(new ObjectGeometricDataChangedEvent(selectedObjectIDs[0], vecBuffer));
@@ -374,7 +390,13 @@ void GUI::renderObjectAttribute(
         }
         else if (geometry == SPHERE)
         {
-            ImGui::Text("Radius");
+            ImGui::AlignTextToFramePadding();
+            ImGui::Text("Radius"); ImGui::SameLine(0.0f, 10.0f);
+            if (ImGui::Button("Reset##radius"))
+            {
+                vecBuffer[0] = 0.5f;
+                eventQueue.push(new ObjectGeometricDataChangedEvent(selectedObjectIDs[0], vecBuffer));
+            }
             if (ImGui::DragFloat("##Radius", &vecBuffer[0], 0.01f, 0.1f, FLT_MAX))
                 eventQueue.push(new ObjectGeometricDataChangedEvent(selectedObjectIDs[0], vecBuffer));
         }
@@ -393,18 +415,21 @@ void GUI::renderGlobalAttribute(EventQueue& eventQueue)
         eventQueue.push(new RenderContactInfoFlagChangedEvent(shouldRenderContactInfo));
     } ImGui::Spacing();
 
+    ImGui::AlignTextToFramePadding();
     ImGui::Text("Gravity");
     if (ImGui::SliderFloat("##Gravity", &gravity, 0.0f, 30.0f))
     {
         eventQueue.push(new GravityChangedEvent(gravity));
     }
 
+    ImGui::AlignTextToFramePadding();
     ImGui::Text("Ground Restituion");
     if (ImGui::SliderFloat("##Ground_Restitution", &groundRestitution, 0.0f, 1.0f))
     {
         eventQueue.push(new GroundRestitutionChangedEvent(groundRestitution));
     }
 
+    ImGui::AlignTextToFramePadding();
     ImGui::Text("Object Restituion");
     if (ImGui::SliderFloat("##Object_Restitution", &objectRestitution, 0.0f, 1.0f))
     {

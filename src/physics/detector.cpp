@@ -156,7 +156,7 @@ bool CollisionDetector::boxAndBox(
         }
     }
 
-    float minPenetration = std::numeric_limits<float>::max();
+    float minPenetration = FLT_MAX;
     int minAxisIdx = 0;
 
     /* 모든 축에 대해 겹침 검사 */

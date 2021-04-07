@@ -65,6 +65,7 @@ private:
     void handleObjectRestitutionChangedEvent(ObjectRestitutionChangedEvent*);
     void handleGravityChangedEvent(GravityChangedEvent*);
     void handleObjectRotatedEvent(ObjectRotatedEvent*);
+    void handleOrientationResetEvent(OrientationResetEvent*);
 };
 
 #endif // PLAYGROUND_H
