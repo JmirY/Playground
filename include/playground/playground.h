@@ -67,6 +67,7 @@ private:
     void handleObjectRotatedEvent(ObjectRotatedEvent*);
     void handleOrientationResetEvent(OrientationResetEvent*);
     void handleShouldRenderWorldAxis(ShouldRenderWorldAxis*);
+    void handleRemoveUnfixedObjectsEvent(RemoveUnfixedObjectsEvent*);
 };
 
 #endif // PLAYGROUND_H

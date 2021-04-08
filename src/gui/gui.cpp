@@ -166,9 +166,13 @@ void GUI::renderSimulationControl(
         if (ImGui::Button(label.c_str()))
             eventQueue.push(new SimulationStatusChangedEvent);
 
-        /* 오브젝트 삭제 버튼 */
+        /* 선택된 오브젝트 삭제 버튼 */
         if (ImGui::Button("Remove Selected Objects"))
             eventQueue.push(new ObjectRemovedEvent);
+
+        /* 고정되지 않은 오브젝트 삭제 버튼 */
+        if (ImGui::Button("Remove Unfixed Objects"))
+            eventQueue.push(new RemoveUnfixedObjectsEvent);
 
         /* 모든 오브젝트 삭제 버튼 */
         if (ImGui::Button("Remove All Objects"))
@@ -306,27 +310,18 @@ void GUI::renderObjectAttribute(
         ImGui::AlignTextToFramePadding();
         ImGui::Text("Position"); ImGui::NextColumn();
         if (ImGui::DragFloat("##PositionX", &vecBuffer[0], 0.05f))
-        {
             eventQueue.push(new ObjectPositionChangedEvent(selectedObjectIDs[0], vecBuffer));
-            eventQueue.push(new ShouldRenderWorldAxis(selectedObjectIDs[0], 0));
-        }
-        if (ImGui::IsItemHovered())
+        if (ImGui::IsItemHovered() || ImGui::IsItemActive())
             eventQueue.push(new ShouldRenderWorldAxis(selectedObjectIDs[0], 0));
         ImGui::NextColumn();
         if (ImGui::DragFloat("##PositionY", &vecBuffer[1], 0.05f, 0.0f, FLT_MAX))
-        {
             eventQueue.push(new ObjectPositionChangedEvent(selectedObjectIDs[0], vecBuffer));
-            eventQueue.push(new ShouldRenderWorldAxis(selectedObjectIDs[0], 1));
-        }
-        if (ImGui::IsItemHovered())
+        if (ImGui::IsItemHovered() || ImGui::IsItemActive())
             eventQueue.push(new ShouldRenderWorldAxis(selectedObjectIDs[0], 1));
         ImGui::NextColumn();
         if (ImGui::DragFloat("##PositionZ", &vecBuffer[2], 0.05f))
-        {
             eventQueue.push(new ObjectPositionChangedEvent(selectedObjectIDs[0], vecBuffer));
-            eventQueue.push(new ShouldRenderWorldAxis(selectedObjectIDs[0], 2));
-        }
-        if (ImGui::IsItemHovered())
+        if (ImGui::IsItemHovered() || ImGui::IsItemActive())
             eventQueue.push(new ShouldRenderWorldAxis(selectedObjectIDs[0], 2));
         ImGui::NextColumn();
 
@@ -338,27 +333,24 @@ void GUI::renderObjectAttribute(
         {
             if (!isSimulating)
                 eventQueue.push(new ObjectVelocityChangedEvent(selectedObjectIDs[0], vecBuffer));
-            eventQueue.push(new ShouldRenderWorldAxis(selectedObjectIDs[0], 0));
         }
-        if (ImGui::IsItemHovered())
+        if (ImGui::IsItemHovered() || ImGui::IsItemActive())
             eventQueue.push(new ShouldRenderWorldAxis(selectedObjectIDs[0], 0));
         ImGui::NextColumn();
         if (ImGui::DragFloat("##VelocityY", &vecBuffer[1], 0.1f))
         {
             if (!isSimulating)
                 eventQueue.push(new ObjectVelocityChangedEvent(selectedObjectIDs[0], vecBuffer));
-            eventQueue.push(new ShouldRenderWorldAxis(selectedObjectIDs[0], 1));
         }
-        if (ImGui::IsItemHovered())
+        if (ImGui::IsItemHovered() || ImGui::IsItemActive())
             eventQueue.push(new ShouldRenderWorldAxis(selectedObjectIDs[0], 1));
         ImGui::NextColumn();
         if (ImGui::DragFloat("##VelocityZ", &vecBuffer[2], 0.1f))
         {
             if (!isSimulating)
                 eventQueue.push(new ObjectVelocityChangedEvent(selectedObjectIDs[0], vecBuffer));
-            eventQueue.push(new ShouldRenderWorldAxis(selectedObjectIDs[0], 2));
         }
-        if (ImGui::IsItemHovered())
+        if (ImGui::IsItemHovered() || ImGui::IsItemActive())
             eventQueue.push(new ShouldRenderWorldAxis(selectedObjectIDs[0], 2));
         ImGui::NextColumn();
         ImGui::Columns(1); ImGui::Separator(); ImGui::Spacing();

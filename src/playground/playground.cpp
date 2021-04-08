@@ -206,6 +206,9 @@ void Playground::handleEvent(Event* event)
     else if (typeid(*event) == typeid(ShouldRenderWorldAxis))
         handleShouldRenderWorldAxis(static_cast<ShouldRenderWorldAxis*>(event));
 
+    else if (typeid(*event) == typeid(RemoveUnfixedObjectsEvent))
+        handleRemoveUnfixedObjectsEvent(static_cast<RemoveUnfixedObjectsEvent*>(event));
+
     delete event;
 }
 
@@ -508,4 +511,16 @@ void Playground::handleShouldRenderWorldAxis(ShouldRenderWorldAxis* event)
     Object* target = objects.find(event->id)->second;
     physics::Vector3 pos = target->body->getPosition();
     renderer.renderWorldAxisAt(event->axisIdx, pos.x, pos.y, pos.z);
+}
+
+void Playground::handleRemoveUnfixedObjectsEvent(RemoveUnfixedObjectsEvent* event)
+{
+    Objects::iterator iter = objects.begin();
+    while (iter != objects.end())
+    {
+        if (!iter->second->isFixed)
+            iter = removeObject(iter->second->id);
+        else
+            ++iter;
+    }
 }

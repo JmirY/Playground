@@ -206,4 +206,6 @@ public:
         : id(_id), axisIdx(_axisIdx) {}
 };
 
+class RemoveUnfixedObjectsEvent : public Event {};
+
 #endif // EVENT_H
