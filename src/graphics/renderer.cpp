@@ -377,6 +377,53 @@ void Renderer::renderWorldAxisAt(float posX, float posY, float posZ)
     glEnable(GL_DEPTH_TEST);
 }
 
+void Renderer::renderObjectAxis(int axisIdx, float modelMatrix[])
+{
+    /* 변환 행렬 설정 */
+    glm::mat4 view = camera.getViewMatrix();
+    glm::mat4 projection = glm::perspective(
+        glm::radians(camera.getFov()),
+        ((float) sceneWidth) / sceneHeight,
+        PERSPECTIVE_NEAR,
+        PERSPECTIVE_FAR
+    );
+    glm::mat4 model = glm::make_mat4(modelMatrix);
+    glm::vec3 color(0.0f, 0.0f, 0.0f);
+    switch (axisIdx)
+    {
+    case 0:  // x 축
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+        color.x = 1.0f;
+        break;
+
+    case 1:  // y 축
+        color.y = 1.0f;
+        break;
+
+    case 2:  // z 축
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        color.z = 1.0f;
+        break;
+
+    default:
+        break;
+    }
+
+    /* 셰이더 설정 */
+    objectShader.use();
+    objectShader.setMat4("model", model);
+    objectShader.setMat4("view", view);
+    objectShader.setMat4("projection", projection);
+    objectShader.setVec3("objectColor", color);
+    objectShader.setVec3("viewPos", camera.getPosition());
+
+    glDisable(GL_DEPTH_TEST);
+    glBindVertexArray(worldYaxisVAO);
+    glDrawArrays(GL_LINES, 0, 2);
+    glBindVertexArray(0);
+    glEnable(GL_DEPTH_TEST);
+}
+
 void Renderer::updateWindowSize()
 {
     glfwGetFramebufferSize(window, &windowWidth, &windowHeight);

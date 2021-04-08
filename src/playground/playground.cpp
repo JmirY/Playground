@@ -55,11 +55,14 @@ void Playground::run()
             renderer.renderObject(object.second->id, object.second->color, modelMatrix, object.second->isSelected);
         }
 
-        /* 오브젝트의 위치를 원점으로 한 월드축 렌더 */
+        /* 선택된 오브젝트의 로컬축 렌더 */
         if (selectedObjectIDs.size() == 1)
         {
-            physics::Vector3 position = objects.find(selectedObjectIDs[0])->second->body->getPosition();
-            renderer.renderWorldAxisAt(position.x, position.y, position.z);
+            float modelMatrix[16];
+            objects.find(selectedObjectIDs[0])->second->body->getTransformMatrix(modelMatrix);
+            renderer.renderObjectAxis(0, modelMatrix);
+            renderer.renderObjectAxis(1, modelMatrix);
+            renderer.renderObjectAxis(2, modelMatrix);
         }
 
         /* 충돌점 렌더 */
