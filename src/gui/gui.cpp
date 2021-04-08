@@ -303,30 +303,63 @@ void GUI::renderObjectAttribute(
         float vecBuffer[3];
         /* 위치 */
         object->getPositionInArray(vecBuffer);
+        ImGui::AlignTextToFramePadding();
         ImGui::Text("Position"); ImGui::NextColumn();
         if (ImGui::DragFloat("##PositionX", &vecBuffer[0], 0.05f))
+        {
             eventQueue.push(new ObjectPositionChangedEvent(selectedObjectIDs[0], vecBuffer));
+            eventQueue.push(new ShouldRenderWorldAxis(selectedObjectIDs[0], 0));
+        }
+        if (ImGui::IsItemHovered())
+            eventQueue.push(new ShouldRenderWorldAxis(selectedObjectIDs[0], 0));
         ImGui::NextColumn();
         if (ImGui::DragFloat("##PositionY", &vecBuffer[1], 0.05f, 0.0f, FLT_MAX))
+        {
             eventQueue.push(new ObjectPositionChangedEvent(selectedObjectIDs[0], vecBuffer));
+            eventQueue.push(new ShouldRenderWorldAxis(selectedObjectIDs[0], 1));
+        }
+        if (ImGui::IsItemHovered())
+            eventQueue.push(new ShouldRenderWorldAxis(selectedObjectIDs[0], 1));
         ImGui::NextColumn();
         if (ImGui::DragFloat("##PositionZ", &vecBuffer[2], 0.05f))
+        {
             eventQueue.push(new ObjectPositionChangedEvent(selectedObjectIDs[0], vecBuffer));
+            eventQueue.push(new ShouldRenderWorldAxis(selectedObjectIDs[0], 2));
+        }
+        if (ImGui::IsItemHovered())
+            eventQueue.push(new ShouldRenderWorldAxis(selectedObjectIDs[0], 2));
         ImGui::NextColumn();
+
         /* 속도 */
         object->getVelocityInArray(vecBuffer);
+        ImGui::AlignTextToFramePadding();
         ImGui::Text("Velocity"); ImGui::NextColumn();
         if (ImGui::DragFloat("##VelocityX", &vecBuffer[0], 0.1f))
+        {
             if (!isSimulating)
                 eventQueue.push(new ObjectVelocityChangedEvent(selectedObjectIDs[0], vecBuffer));
+            eventQueue.push(new ShouldRenderWorldAxis(selectedObjectIDs[0], 0));
+        }
+        if (ImGui::IsItemHovered())
+            eventQueue.push(new ShouldRenderWorldAxis(selectedObjectIDs[0], 0));
         ImGui::NextColumn();
         if (ImGui::DragFloat("##VelocityY", &vecBuffer[1], 0.1f))
+        {
             if (!isSimulating)
                 eventQueue.push(new ObjectVelocityChangedEvent(selectedObjectIDs[0], vecBuffer));
+            eventQueue.push(new ShouldRenderWorldAxis(selectedObjectIDs[0], 1));
+        }
+        if (ImGui::IsItemHovered())
+            eventQueue.push(new ShouldRenderWorldAxis(selectedObjectIDs[0], 1));
         ImGui::NextColumn();
         if (ImGui::DragFloat("##VelocityZ", &vecBuffer[2], 0.1f))
+        {
             if (!isSimulating)
                 eventQueue.push(new ObjectVelocityChangedEvent(selectedObjectIDs[0], vecBuffer));
+            eventQueue.push(new ShouldRenderWorldAxis(selectedObjectIDs[0], 2));
+        }
+        if (ImGui::IsItemHovered())
+            eventQueue.push(new ShouldRenderWorldAxis(selectedObjectIDs[0], 2));
         ImGui::NextColumn();
         ImGui::Columns(1); ImGui::Separator(); ImGui::Spacing();
         
@@ -343,19 +376,35 @@ void GUI::renderObjectAttribute(
         {
             ImVec2 dragDelta = ImGui::GetIO().MouseDelta;
             eventQueue.push(new ObjectRotatedEvent(selectedObjectIDs[0], 1.0f, 0.0f, 0.0f, dragDelta.x));
+            eventQueue.push(new ShouldRenderWorldAxis(selectedObjectIDs[0], 0));
+        }
+        if (ImGui::IsItemHovered())
+        {
+            eventQueue.push(new ShouldRenderWorldAxis(selectedObjectIDs[0], 0));
         }
         ImGui::Button("Y", buttonSize);
         if (ImGui::IsItemActive())
         {
             ImVec2 dragDelta = ImGui::GetIO().MouseDelta;
             eventQueue.push(new ObjectRotatedEvent(selectedObjectIDs[0], 0.0f, 1.0f, 0.0f, dragDelta.x));
+            eventQueue.push(new ShouldRenderWorldAxis(selectedObjectIDs[0], 1));
+        }
+        if (ImGui::IsItemHovered())
+        {
+            eventQueue.push(new ShouldRenderWorldAxis(selectedObjectIDs[0], 1));
         }
         ImGui::Button("Z", buttonSize);
         if (ImGui::IsItemActive())
         {
             ImVec2 dragDelta = ImGui::GetIO().MouseDelta;
             eventQueue.push(new ObjectRotatedEvent(selectedObjectIDs[0], 0.0f, 0.0f, 1.0f, dragDelta.x));
-        } ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
+            eventQueue.push(new ShouldRenderWorldAxis(selectedObjectIDs[0], 2));
+        }
+        if (ImGui::IsItemHovered())
+        {
+            eventQueue.push(new ShouldRenderWorldAxis(selectedObjectIDs[0], 2));
+        }
+        ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
         /* 질량 */
         object->getMassInArray(vecBuffer);
         ImGui::AlignTextToFramePadding();

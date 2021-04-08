@@ -39,12 +39,6 @@ void Playground::run()
         renderer.setSceneViewport();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        /* GUI 이벤트 처리 */
-        while (!eventQueue.isEmpty())
-        {
-            handleEvent(eventQueue.pop());
-        }
-
         /* 배경 렌더 */
         renderer.renderBackground();
         /* 오브젝트 렌더 */
@@ -73,6 +67,12 @@ void Playground::run()
             delete info;
         }
         contactInfo.clear();
+
+        /* GUI 이벤트 처리 */
+        while (!eventQueue.isEmpty())
+        {
+            handleEvent(eventQueue.pop());
+        }
 
         renderer.bindDefaultFrameBuffer();
         renderer.setWindowViewport();
@@ -196,6 +196,9 @@ void Playground::handleEvent(Event* event)
 
     else if (typeid(*event) == typeid(OrientationResetEvent))
         handleOrientationResetEvent(static_cast<OrientationResetEvent*>(event));
+
+    else if (typeid(*event) == typeid(ShouldRenderWorldAxis))
+        handleShouldRenderWorldAxis(static_cast<ShouldRenderWorldAxis*>(event));
 
     delete event;
 }
@@ -492,4 +495,11 @@ void Playground::handleOrientationResetEvent(OrientationResetEvent* event)
 {
     Object* target = objects.find(event->id)->second;
     target->body->setOrientation(physics::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
+}
+
+void Playground::handleShouldRenderWorldAxis(ShouldRenderWorldAxis* event)
+{
+    Object* target = objects.find(event->id)->second;
+    physics::Vector3 pos = target->body->getPosition();
+    renderer.renderWorldAxisAt(event->axisIdx, pos.x, pos.y, pos.z);
 }

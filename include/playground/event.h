@@ -196,4 +196,14 @@ public:
         : id(_id) {}
 };
 
+class ShouldRenderWorldAxis : public Event
+{
+public:
+    unsigned int id;
+    int axisIdx;
+
+    ShouldRenderWorldAxis(unsigned int _id, int _axisIdx)
+        : id(_id), axisIdx(_axisIdx) {}
+};
+
 #endif // EVENT_H
