@@ -166,7 +166,8 @@ void Renderer::renderObject(
     unsigned int id,
     glm::vec3 color,
     float modelMatrix[],
-    bool isSelected
+    bool isSelected,
+    bool isFixed
 )
 {
     /* 변환 행렬 설정 */
@@ -198,6 +199,8 @@ void Renderer::renderObject(
         glm::vec3 frameColor(0.1f, 0.1f, 0.1f);
         if (isSelected)
             frameColor = glm::vec3(0.9f, 0.9f, 0.9f);
+        else if (isFixed)
+            frameColor = glm::vec3(1.0f, 0.0f, 0.0f);
         objectShader.setVec3("objectColor", frameColor);
         glBindVertexArray(objectShape->frameVAO);
         glDrawElements(GL_LINE_STRIP, objectShape->frameIndices.size(), GL_UNSIGNED_INT, (void*)0);

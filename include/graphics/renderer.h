@@ -87,7 +87,8 @@ namespace graphics
             unsigned int id,
             glm::vec3 color,
             float modelMatrix[],
-            bool isSelected
+            bool isSelected,
+            bool isFixed
         );
         void renderBackground();
         void renderContactInfo(ContactInfo*);

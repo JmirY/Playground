@@ -46,7 +46,13 @@ void Playground::run()
         {
             float modelMatrix[16];
             object.second->body->getTransformMatrix(modelMatrix);
-            renderer.renderObject(object.second->id, object.second->color, modelMatrix, object.second->isSelected);
+            renderer.renderObject(
+                object.second->id,
+                object.second->color,
+                modelMatrix,
+                object.second->isSelected,
+                object.second->isFixed
+            );
         }
 
         /* 선택된 오브젝트의 로컬축 렌더 */
