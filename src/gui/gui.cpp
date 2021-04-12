@@ -154,7 +154,7 @@ void GUI::renderSimulationControl(
 )
 {
     ImGui::SetNextWindowPos(ImVec2(1024, 0));
-    ImGui::SetNextWindowSize(ImVec2(256, 100));
+    ImGui::SetNextWindowSize(ImVec2(256, 110));
     ImGui::Begin("SimulationControl", NULL, windowFlags);
     {
         ImGui::BeginChild("SimulationControlRender");
@@ -189,8 +189,8 @@ void GUI::renderObjectList(
     const Objects& objects
 )
 {
-    ImGui::SetNextWindowPos(ImVec2(1024, 100));
-    ImGui::SetNextWindowSize(ImVec2(256, 216));
+    ImGui::SetNextWindowPos(ImVec2(1024, 110));
+    ImGui::SetNextWindowSize(ImVec2(256, 206));
     ImGui::Begin("ObjectList", NULL, windowFlags);
     {
         ImGui::BeginChild("ObjectListRender");
