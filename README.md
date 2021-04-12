@@ -12,3 +12,10 @@
 - 충돌 감지 (*Separating Axis Test*)
 - 충격량 (*Impulse*) 기반 충돌 처리
 - GUI 를 통한 시뮬레이션 조작  
+  
+## 빌드하기  
+---
+아래의 명령어를 터미널에 입력합니다.  
+```shell
+g++ -o playground src/main.cpp src/playground/* src/physics/* src/graphics/* src/gui/* -std=c++11 -framework OpenGL -lglfw -I include DIMGUI_IMPL_OPENGL_LOADER_GLAD
+```
