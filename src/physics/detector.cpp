@@ -413,65 +413,65 @@ Vector3 CollisionDetector::calcContactPointOnLine(
     {
     case 6: // box1 의 x 축 X box2 의 x 축
         directionOne = box1.body->getAxis(0);
-        if (vertexOne.x > 0) directionOne * -1.0f;
+        if (vertexOne.x > 0) directionOne *= -1.0f;
         directionTwo = box2.body->getAxis(0);
-        if (vertexTwo.x > 0) directionTwo * -1.0f;
+        if (vertexTwo.x > 0) directionTwo *= -1.0f;
         break;
 
     case 7: // box1 의 x 축 X box2 의 y 축
         directionOne = box1.body->getAxis(0);
-        if (vertexOne.x > 0) directionOne * -1.0f;
+        if (vertexOne.x > 0) directionOne *= -1.0f;
         directionTwo = box2.body->getAxis(1);
-        if (vertexTwo.y > 0) directionTwo * -1.0f;
+        if (vertexTwo.y > 0) directionTwo *= -1.0f;
         break;
 
     case 8: // box1 의 x 축 X box2 의 z 축
         directionOne = box1.body->getAxis(0);
-        if (vertexOne.x > 0) directionOne * -1.0f;
+        if (vertexOne.x > 0) directionOne *= -1.0f;
         directionTwo = box2.body->getAxis(2);
-        if (vertexTwo.z > 0) directionTwo * -1.0f;
+        if (vertexTwo.z > 0) directionTwo *= -1.0f;
         break;
 
     case 9: // box1 의 y 축 X box2 의 x 축
         directionOne = box1.body->getAxis(1);
-        if (vertexOne.y > 0) directionOne * -1.0f;
+        if (vertexOne.y > 0) directionOne *= -1.0f;
         directionTwo = box2.body->getAxis(0);
-        if (vertexTwo.x > 0) directionTwo * -1.0f;
+        if (vertexTwo.x > 0) directionTwo *= -1.0f;
         break;
 
     case 10: // box1 의 y 축 X box2 의 y 축
         directionOne = box1.body->getAxis(1);
-        if (vertexOne.y > 0) directionOne * -1.0f;
+        if (vertexOne.y > 0) directionOne *= -1.0f;
         directionTwo = box2.body->getAxis(1);
-        if (vertexTwo.y > 0) directionTwo * -1.0f;
+        if (vertexTwo.y > 0) directionTwo *= -1.0f;
         break;
     
     case 11: // box1 의 y 축 X box2 의 z 축
         directionOne = box1.body->getAxis(1);
-        if (vertexOne.y > 0) directionOne * -1.0f;
+        if (vertexOne.y > 0) directionOne *= -1.0f;
         directionTwo = box2.body->getAxis(2);
-        if (vertexTwo.z > 0) directionTwo * -1.0f;
+        if (vertexTwo.z > 0) directionTwo *= -1.0f;
         break;
     
     case 12: // box1 의 z 축 X box2 의 x 축
         directionOne = box1.body->getAxis(2);
-        if (vertexOne.z > 0) directionOne * -1.0f;
+        if (vertexOne.z > 0) directionOne *= -1.0f;
         directionTwo = box2.body->getAxis(0);
-        if (vertexTwo.x > 0) directionTwo * -1.0f;
+        if (vertexTwo.x > 0) directionTwo *= -1.0f;
         break;
     
     case 13: // box1 의 z 축 X box2 의 y 축
         directionOne = box1.body->getAxis(2);
-        if (vertexOne.z > 0) directionOne * -1.0f;
+        if (vertexOne.z > 0) directionOne *= -1.0f;
         directionTwo = box2.body->getAxis(1);
-        if (vertexTwo.y > 0) directionTwo * -1.0f;
+        if (vertexTwo.y > 0) directionTwo *= -1.0f;
         break;
     
     case 14: // box1 의 z 축 X box2 의 z 축
         directionOne = box1.body->getAxis(2);
-        if (vertexOne.z > 0) directionOne * -1.0f;
+        if (vertexOne.z > 0) directionOne *= -1.0f;
         directionTwo = box2.body->getAxis(2);
-        if (vertexTwo.z > 0) directionTwo * -1.0f;
+        if (vertexTwo.z > 0) directionTwo *= -1.0f;
         break;
     
     default:
