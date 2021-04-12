@@ -12,7 +12,3 @@
 - 충돌 감지 (*Separating Axis Test*)
 - 충격량 (*Impulse*) 기반 충돌 처리
 - GUI 를 통한 시뮬레이션 조작  
-  
-    ![Object Modification](./img/object_modification.gif)
-      
-    *오브젝트의 도형 데이터 & 방향 조작*
