@@ -68,10 +68,10 @@ namespace physics
             단위 벡터화하여 반환한다. */
         Vector3 getAxis(int index) const;
 
-    private:
-        /* 강체에 가해진 힘과 토크를 0 으로 설정한다 */
-        void clearForceAndTorque();
-    
+        /* 주어진 사원수만큼 강체의 방향을 변경한다 */
+        void rotateByQuat(const Quaternion&);
+
+    private:    
         /* 현재 상태를 참고하여 변환 행렬을 업데이트한다 */
         void updateTransformMatrix();
 
@@ -84,9 +84,12 @@ namespace physics
         void setInverseMass(float value);
 
         void setInertiaTensor(const Matrix3& mat);
+        void setInverseInertiaTensor(const Matrix3& mat);
 
         void setPosition(const Vector3& vec);
         void setPosition(float x, float y, float z);
+
+        void setOrientation(const Quaternion&);
         
         void setVelocity(const Vector3& vec);
         void setVelocity(float x, float y, float z);
@@ -105,6 +108,7 @@ namespace physics
         Matrix3 getInverseInertiaTensor() const;
         Matrix3 getInverseInertiaTensorWorld() const;
         Vector3 getPosition() const;
+        Quaternion getOrientation() const { return orientation; }
         Vector3 getVelocity() const;
         Vector3 getRotation() const;
         Vector3 getAcceleration() const;

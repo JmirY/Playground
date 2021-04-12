@@ -5,7 +5,7 @@ using namespace graphics;
 
 Camera::Camera()
 {
-    position = glm::vec3(5.0f, 5.0f, 5.0f);
+    position = glm::vec3(10.0f, 10.0f, 10.0f);
     lookAtPoint = glm::vec3(0.0f, 0.0f, 0.0f);
     worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
     fov = 45.0f;
@@ -14,43 +14,43 @@ Camera::Camera()
     updateCameraVectors();
 }
 
-glm::mat4 Camera::getViewMatrix()
+glm::mat4 Camera::getViewMatrix() const
 {
     return glm::lookAt(position, lookAtPoint, up);
 }
 
-void Camera::pan(float xOffset, float yOffset)
+glm::vec3 Camera::getViewPlaneNormal() const
+{
+    glm::vec3 viewPlaneNormal = glm::cross(up, right);
+    return glm::normalize(viewPlaneNormal);
+}
+
+void Camera::pan(float xOffset, float yOffset, float zOffset)
 {
     position -= right * (float) xOffset * panSensitivity;
     lookAtPoint -= right * (float) xOffset * panSensitivity;
     position -= up * (float) yOffset * panSensitivity;
     lookAtPoint -= up * (float) yOffset * panSensitivity;
+    position -= glm::cross(up, right) * (float) zOffset * panSensitivity;
 }
 
-void Camera::rotate(glm::vec3 start, glm::vec3 end)
+void Camera::rotate(glm::vec3 axis, float angle)
 {
-    /* 회전축 벡터 계산 */
-    glm::vec3 rotateAxis = glm::cross(start, end);
-    rotateAxis = glm::normalize(rotateAxis);
-    /* 두 벡터 사이각 계산 */
-    end = glm::normalize(end);
-    start = glm::normalize(start);
-    float dotProduct = glm::dot(end, start);
-    if (dotProduct > 1.0f)
-        dotProduct = 1.0f;
-    float angle = -glm::acos(dotProduct);
-    angle = glm::degrees(angle);
     /* 카메라의 회전을 사원수로 표현 */
     glm::quat rotateQuat(
         glm::cos(angle / 2),
-        rotateAxis.x * glm::sin(angle / 2),
-        rotateAxis.y * glm::sin(angle / 2),
-        rotateAxis.z * glm::sin(angle / 2)
+        axis.x * glm::sin(angle / 2),
+        axis.y * glm::sin(angle / 2),
+        axis.z * glm::sin(angle / 2)
     );
     /* 변환 행렬 계산 */
     glm::mat4 rotateMatrix = glm::mat4_cast(rotateQuat);
+    glm::mat4 transformMatrix(1.0f);
+    transformMatrix = glm::translate(transformMatrix, lookAtPoint);
+    transformMatrix *= rotateMatrix;
+    transformMatrix = glm::translate(transformMatrix, -lookAtPoint);
     
-    glm::vec4 newCameraPos = rotateMatrix * glm::vec4(position, 1.0f);
+    glm::vec4 newCameraPos = transformMatrix * glm::vec4(position, 1.0f);
     position.x = newCameraPos.x / newCameraPos.w;
     position.y = newCameraPos.y / newCameraPos.w;
     position.z = newCameraPos.z / newCameraPos.w;

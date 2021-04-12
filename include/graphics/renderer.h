@@ -6,16 +6,13 @@
 #include "camera.h"
 #include "shape.h"
 #include "../playground/geometry.h"
+#include "../playground/contact_info.h"
 #include <GLFW/glfw3.h>
 #include <map>
 
 namespace graphics
 {
-    /**********************
-     * 배경 vertices 데이터 *
-     **********************/
-
-    /* 바닥 그리드 */
+    /* 지면 그리드 vertices */
     const std::vector<float> GRID_VERTICES = {
         /* z축과 평행한 선을 이루는 두 정점 */
         0.0f, 0.0f, 100.0f,
@@ -23,6 +20,12 @@ namespace graphics
     };
     /* 그리드를 이루는 선 간격 */
     const float GRID_GAP = 1.0f;
+
+    /* 충돌 법선 vertices */
+    const std::vector<float> CONTACT_NORMAL_VERTICES = {
+        0.0f, 0.0f, 0.0f,
+        0.0f, 1.5f, 0.0f
+    };
 
     /******************************
      * Renderer 클래스 속성 초기값 *
@@ -38,7 +41,7 @@ namespace graphics
 
     /* Perspective frustum 에서의 near & far 값 */
     const float PERSPECTIVE_NEAR = 0.1f;
-    const float PERSPECTIVE_FAR = 100.0f;
+    const float PERSPECTIVE_FAR = 300.0f;
     
     class Renderer
     {
@@ -47,14 +50,11 @@ namespace graphics
 
     private:
         int windowWidth, windowHeight;
-    
-        /* static 멤버 함수 convertScreenToWorld 에서 사용되므로 static 선언 */
-        static int sceneWidth, sceneHeight;
+        int sceneWidth, sceneHeight;
 
         GLFWwindow *window;
 
-        /* static 멤버 함수 convertScreenToWorld 에서 사용되므로 static 선언 */
-        static Camera camera;
+        Camera camera;
         Shader objectShader;
 
         /* Shape 포인터 저장 */
@@ -62,6 +62,9 @@ namespace graphics
 
         /* 배경 VAO 의 ID */
         unsigned int backgroundVAO;
+
+        /* 월드 y 축 VAO 의 ID */
+        unsigned int worldYaxisVAO;
 
         /* 프레임 버퍼의 ID */
         unsigned int sceneFrameBufferID;
@@ -75,6 +78,7 @@ namespace graphics
 
         GLFWwindow* getWindow() const;
         unsigned int getTextureBufferID() const;
+        glm::vec3 getCameraPosition() const;
 
         Shape* addShape(unsigned int id, Geometry);
         void removeShape(unsigned int id);
@@ -83,9 +87,13 @@ namespace graphics
             unsigned int id,
             glm::vec3 color,
             float modelMatrix[],
-            bool isSelected
+            bool isSelected,
+            bool isFixed
         );
         void renderBackground();
+        void renderContactInfo(ContactInfo*);
+        void renderWorldAxisAt(int axisIdx, float posX, float posY, float posZ);
+        void renderObjectAxis(int axisIdx, float modelMatrix[]);
 
         /* 프레임 버퍼를 쿼리해 windowWidth & windowHeight 을 업데이트 */
         void updateWindowSize();
@@ -96,13 +104,12 @@ namespace graphics
         void setSceneViewport();
         void setWindowViewport();
 
-        /* 마우스 입력에 따라 카메라를 조정한다 */
-        static void cursorPosCallback(GLFWwindow *window, double xPos, double yPos);
-        static void mouseScrollCallback(GLFWwindow *window, double xOffset, double yOffset);
+        void moveCamera(glm::vec3 offset);
+        void rotateCamera(glm::vec3 axis, float angle);
+        void zoomCamera(float degree);
 
-    private:
         /* 스크린 좌표계 -> 월드 좌표계 변환 */
-        static glm::vec3 convertScreenToWorld(glm::vec2 screenPt);
+        glm::vec3 convertScreenToWorld(glm::vec2 screenPt);
     };
 } // namespace graphics
 

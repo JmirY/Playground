@@ -178,13 +178,8 @@ void Sphere::generateIndices()
 
             // store indices for lines
             // vertical lines for all stacks, k1 => k2
-            frameIndices.push_back(k1);
-            frameIndices.push_back(k2);
-            if(i != 0)  // horizontal lines except 1st stack, k1 => k+1
-            {
-                frameIndices.push_back(k1);
-                frameIndices.push_back(k1 + 1);
-            }
         }
+        frameIndices.push_back(k1);
+        frameIndices.push_back(k2);
     }
 }

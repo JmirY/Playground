@@ -48,6 +48,8 @@ namespace physics
         /* 실수와 곱하기 */
         Matrix3 operator*(const float value) const;
         void operator*=(const float value);
+
+        Matrix3& operator=(const Matrix3& other);
     };    
 } // namespace physics
 

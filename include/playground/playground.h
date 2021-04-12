@@ -29,6 +29,7 @@ private:
 
     EventQueue eventQueue;
     bool isSimulating;
+    bool shouldRenderContactInfo;
 
 public:
     Playground();
@@ -40,13 +41,33 @@ public:
     Objects::iterator removeObject(unsigned int id);
 
     void handleEvent(Event*);
+    void handleKeyboardInput();
 
 private:
+    void clearSelectedObjectIDs();
+
     void handleObjectAddedEvent(ObjectAddedEvent*);
     void handleObjectSelectedEvent(ObjectSelectedEvent*);
     void handleObjectRemovedEvent(ObjectRemovedEvent*);
     void handleSimulationStatusChangedEvent(SimulationStatusChangedEvent*);
     void handleObjectPositionChangedEvent(ObjectPositionChangedEvent*);
+    void handleObjectVelocityChangedEvent(ObjectVelocityChangedEvent*);
+    void handleObjectGeometricDataChangedEvent(ObjectGeometricDataChangedEvent*);
+    void handleObjectMassChangedEvent(ObjectMassChangedEvent*);
+    void handleLeftMouseDraggedOnSceneEvent(LeftMouseDraggedOnSceneEvent*);
+    void handleRightMouseDraggedOnSceneEvent(RightMouseDraggedOnSceneEvent*);
+    void handleMouseWheelOnSceneEvent(MouseWheelOnSceneEvent*);
+    void handleLeftMouseClickedOnSceneEvent(LeftMouseClickedOnSceneEvent*);
+    void handleObjectPositionFixedEvent(ObjectPositionFixedEvent*);
+    void handleRenderContactInfoFlagChangedEvent(RenderContactInfoFlagChangedEvent*);
+    void handleAllObjectRemovedEvent(AllObjectRemovedEvent*);
+    void handleGroundRestitutionChangedEvent(GroundRestitutionChangedEvent*);
+    void handleObjectRestitutionChangedEvent(ObjectRestitutionChangedEvent*);
+    void handleGravityChangedEvent(GravityChangedEvent*);
+    void handleObjectRotatedEvent(ObjectRotatedEvent*);
+    void handleOrientationResetEvent(OrientationResetEvent*);
+    void handleShouldRenderWorldAxis(ShouldRenderWorldAxis*);
+    void handleRemoveUnfixedObjectsEvent(RemoveUnfixedObjectsEvent*);
 };
 
 #endif // PLAYGROUND_H

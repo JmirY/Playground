@@ -369,3 +369,10 @@ void Matrix4::operator*=(const float value)
         entries[i] *= value;
     }
 }
+
+Matrix4& Matrix4::operator=(const Matrix4& other)
+{
+    for (int i = 0; i < 16; ++i)
+        entries[i] = other.entries[i];
+    return *this;
+}

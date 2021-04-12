@@ -18,7 +18,6 @@ namespace gui
         unsigned int textureBufferID;
 
     public:
-        GUI() {}
         GUI(GLFWwindow* window, unsigned int textureBufferID);
 
         void renderAll(
@@ -29,15 +28,38 @@ namespace gui
         );
 
     private:
-        void renderScene(ImGuiWindowFlags, EventQueue&);
+        void renderScene(
+            ImGuiWindowFlags,
+            EventQueue&,
+            const bool& isSimulating
+        );
         void renderObjectPalette(ImGuiWindowFlags, EventQueue&);
-        void renderInspector(
+        void renderSimulationControl(
+            ImGuiWindowFlags,
+            EventQueue&,
+            const bool& isSimulating
+        );
+        void renderObjectList(
+            ImGuiWindowFlags,
+            EventQueue&,
+            const Objects&
+        );
+        void renderAttributes(
             ImGuiWindowFlags,
             EventQueue&,
             const Objects&,
-            const bool& isSimulating,
-            const std::vector<unsigned int>& selectedObjectIDs
+            const std::vector<unsigned int>& selectedObjectIDs,
+            const bool& isSimulating
         );
+        void renderObjectAttribute(
+            EventQueue&,
+            const Objects&,
+            const std::vector<unsigned int>& selectedObjectIDs,
+            const bool& isSimulating
+        );
+        void renderGlobalAttribute(EventQueue&);
+
+        bool isInScene(ImVec2);
     };
 } // namespace gui
 

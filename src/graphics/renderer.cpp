@@ -1,21 +1,12 @@
 #include <graphics/renderer.h>
 #include <iostream>
+#include <typeinfo>
 
 using namespace graphics;
 
-/***********************
- * static 멤버 변수 초기화 *
- ***********************/
-
-int Renderer::sceneWidth = SCENE_WIDTH;
-int Renderer::sceneHeight = SCENE_HEIGHT;
-Camera Renderer::camera = Camera();
-
-/***************
- * 멤버 함수 정의 *
- ***************/
-
 Renderer::Renderer()
+    : windowWidth(WINDOW_WIDTH), windowHeight(WINDOW_HEIGHT),
+        sceneWidth(SCENE_WIDTH), sceneHeight(SCENE_HEIGHT)
 {
     /* GLFW 초기화 */
     glfwInit();
@@ -25,7 +16,7 @@ Renderer::Renderer()
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
     /* window 생성 */
-    window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Playground", NULL, NULL);
+    window = glfwCreateWindow(windowWidth, windowHeight, "Playground", NULL, NULL);
     if (!window)
     {
         std::cout << "ERROR::Renderer::Failed to create GLFW window" << std::endl;
@@ -48,10 +39,6 @@ Renderer::Renderer()
         "./shaders/object_fragment.glsl"
     );
 
-    /* 콜백 함수 등록 */
-    glfwSetCursorPosCallback(window, cursorPosCallback);
-    glfwSetScrollCallback(window, mouseScrollCallback);
-
     /* 배경 VAO 설정 */
     glGenVertexArrays(1, &backgroundVAO);
     glBindVertexArray(backgroundVAO);
@@ -63,6 +50,24 @@ Renderer::Renderer()
         GL_ARRAY_BUFFER,
         sizeof(float) * GRID_VERTICES.size(),
         &GRID_VERTICES[0],
+        GL_STATIC_DRAW
+    );
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glBindVertexArray(0);
+
+    /* 월드 y 축 VAO 설정 */
+    glGenVertexArrays(1, &worldYaxisVAO);
+    glBindVertexArray(worldYaxisVAO);
+
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(
+        GL_ARRAY_BUFFER,
+        sizeof(float) * CONTACT_NORMAL_VERTICES.size(),
+        &CONTACT_NORMAL_VERTICES[0],
         GL_STATIC_DRAW
     );
 
@@ -106,6 +111,8 @@ Renderer::Renderer()
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_LINE_SMOOTH);
+
+    addShape(0, SPHERE);
 }
 
 Renderer::~Renderer()
@@ -127,6 +134,11 @@ GLFWwindow* Renderer::getWindow() const
 unsigned int Renderer::getTextureBufferID() const
 {
     return textureBufferID;
+}
+
+glm::vec3 Renderer::getCameraPosition() const
+{
+    return camera.getPosition();
 }
 
 Shape* Renderer::addShape(unsigned int id, Geometry geometry)
@@ -154,7 +166,8 @@ void Renderer::renderObject(
     unsigned int id,
     glm::vec3 color,
     float modelMatrix[],
-    bool isSelected
+    bool isSelected,
+    bool isFixed
 )
 {
     /* 변환 행렬 설정 */
@@ -181,12 +194,33 @@ void Renderer::renderObject(
     glDrawElements(GL_TRIANGLES, objectShape->polygonIndices.size(), GL_UNSIGNED_INT, (void*)0);
 
     /* 오브젝트 테두리 렌더 */
-    glm::vec3 frameColor(0.0f, 0.0f, 0.0f);
-    if (isSelected)
-        frameColor = glm::vec3(0.0f, 0.8f, 0.7f);
-    objectShader.setVec3("objectColor", frameColor);
-    glBindVertexArray(objectShape->frameVAO);
-    glDrawElements(GL_LINE_STRIP, objectShape->frameIndices.size(), GL_UNSIGNED_INT, (void*)0);
+    if (id != 0)  // 충돌점이 아닐 때
+    {
+        glm::vec3 frameColor(0.1f, 0.1f, 0.1f);
+        if (isSelected)
+            frameColor = glm::vec3(0.9f, 0.9f, 0.9f);
+        else if (isFixed)
+            frameColor = glm::vec3(1.0f, 0.0f, 0.0f);
+        objectShader.setVec3("objectColor", frameColor);
+        glBindVertexArray(objectShape->frameVAO);
+        glDrawElements(GL_LINE_STRIP, objectShape->frameIndices.size(), GL_UNSIGNED_INT, (void*)0);
+        if (typeid(*objectShape) == typeid(Sphere))
+        {
+            for (int i = 0; i < 3; ++i)
+            {
+                model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+                objectShader.setMat4("model", model);
+                glDrawElements(GL_LINE_STRIP, objectShape->frameIndices.size(), GL_UNSIGNED_INT, (void*)0);
+            }
+            model = glm::make_mat4(modelMatrix);
+            model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+            objectShader.setMat4("model", model);
+            glDrawElements(GL_LINE_STRIP, objectShape->frameIndices.size(), GL_UNSIGNED_INT, (void*)0);
+            model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+            objectShader.setMat4("model", model);
+            glDrawElements(GL_LINE_STRIP, objectShape->frameIndices.size(), GL_UNSIGNED_INT, (void*)0);
+        }
+    }
 
     glBindVertexArray(0);
 }
@@ -243,6 +277,149 @@ void Renderer::renderBackground()
     glBindVertexArray(0);
 }
 
+void Renderer::renderContactInfo(ContactInfo* info)
+{
+    /* 충돌점 렌더 */
+
+    /* 변환 행렬 설정 */
+    glm::mat4 view = camera.getViewMatrix();
+    glm::mat4 projection = glm::perspective(
+        glm::radians(camera.getFov()),
+        ((float) sceneWidth) / sceneHeight,
+        PERSPECTIVE_NEAR,
+        PERSPECTIVE_FAR
+    );
+    glm::mat4 model(1.0f);
+    model = glm::translate(model, glm::vec3(info->pointX, info->pointY, info->pointZ));
+    model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
+
+    /* 셰이더 설정 */
+    objectShader.use();
+    objectShader.setMat4("model", model);
+    objectShader.setMat4("view", view);
+    objectShader.setMat4("projection", projection);
+    objectShader.setVec3("objectColor", glm::vec3(1.0f, 1.0f, 1.0f));
+    objectShader.setVec3("viewPos", camera.getPosition());
+
+    Shape *objectShape = shapes.find(0)->second;
+    glDisable(GL_DEPTH_TEST);
+    glBindVertexArray(objectShape->polygonVAO);
+    glDrawElements(GL_TRIANGLES, objectShape->polygonIndices.size(), GL_UNSIGNED_INT, (void*)0);
+    
+    /* 충돌 법선 렌더 */
+    glm::vec3 defaultNormal(0.0f, 1.0f, 0.0f);
+    glm::vec3 contactNormal(info->normalX, info->normalY, info->normalZ);
+    glm::vec3 rotateAxis = glm::cross(contactNormal, defaultNormal);
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(info->pointX, info->pointY, info->pointZ));
+    if (glm::length(rotateAxis) != 0.0f)
+    {
+        model = glm::rotate(
+            model,
+            glm::asin(glm::length(rotateAxis)),
+            glm::normalize(rotateAxis)
+        );
+    }
+    objectShader.setMat4("model", model);
+
+    glBindVertexArray(worldYaxisVAO);
+    glDrawArrays(GL_LINES, 0, 2);
+    glBindVertexArray(0);
+    glEnable(GL_DEPTH_TEST);
+}
+
+void Renderer::renderWorldAxisAt(int axisIdx, float posX, float posY, float posZ)
+{
+    /* 변환 행렬 설정 */
+    glm::mat4 view = camera.getViewMatrix();
+    glm::mat4 projection = glm::perspective(
+        glm::radians(camera.getFov()),
+        ((float) sceneWidth) / sceneHeight,
+        PERSPECTIVE_NEAR,
+        PERSPECTIVE_FAR
+    );
+    glm::mat4 model(1.0f);
+    model = glm::translate(model, glm::vec3(posX, posY, posZ));
+    glm::vec3 color(1.0f, 1.0f, 1.0f);
+    switch (axisIdx)
+    {
+    case 0:  // x 축
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+        break;
+
+    case 1:  // y 축
+        break;
+
+    case 2:  // z 축
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        break;
+
+    default:
+        break;
+    }
+    
+    /* 셰이더 설정 */
+    objectShader.use();
+    objectShader.setMat4("model", model);
+    objectShader.setMat4("view", view);
+    objectShader.setMat4("projection", projection);
+    objectShader.setVec3("objectColor", color);
+    objectShader.setVec3("viewPos", camera.getPosition());
+
+    glDisable(GL_DEPTH_TEST);
+    glBindVertexArray(worldYaxisVAO);
+    glDrawArrays(GL_LINES, 0, 2);
+    glBindVertexArray(0);
+    glEnable(GL_DEPTH_TEST);
+}
+
+void Renderer::renderObjectAxis(int axisIdx, float modelMatrix[])
+{
+    /* 변환 행렬 설정 */
+    glm::mat4 view = camera.getViewMatrix();
+    glm::mat4 projection = glm::perspective(
+        glm::radians(camera.getFov()),
+        ((float) sceneWidth) / sceneHeight,
+        PERSPECTIVE_NEAR,
+        PERSPECTIVE_FAR
+    );
+    glm::mat4 model = glm::make_mat4(modelMatrix);
+    glm::vec3 color(0.0f, 0.0f, 0.0f);
+    switch (axisIdx)
+    {
+    case 0:  // x 축
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+        color.x = 1.0f;
+        break;
+
+    case 1:  // y 축
+        color.y = 1.0f;
+        break;
+
+    case 2:  // z 축
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        color.z = 1.0f;
+        break;
+
+    default:
+        break;
+    }
+
+    /* 셰이더 설정 */
+    objectShader.use();
+    objectShader.setMat4("model", model);
+    objectShader.setMat4("view", view);
+    objectShader.setMat4("projection", projection);
+    objectShader.setVec3("objectColor", color);
+    objectShader.setVec3("viewPos", camera.getPosition());
+
+    glDisable(GL_DEPTH_TEST);
+    glBindVertexArray(worldYaxisVAO);
+    glDrawArrays(GL_LINES, 0, 2);
+    glBindVertexArray(0);
+    glEnable(GL_DEPTH_TEST);
+}
+
 void Renderer::updateWindowSize()
 {
     glfwGetFramebufferSize(window, &windowWidth, &windowHeight);
@@ -269,86 +446,44 @@ void Renderer::setWindowViewport()
     glViewport(0, 0, windowWidth, windowHeight);
 }
 
-void Renderer::cursorPosCallback(GLFWwindow *window, double xPos, double yPos)
-{    
-    static bool isLeftButtonClickedOutside = false;
-    static bool isRightButtonClickedOutside = false;
-
-    /* Scene 외부를 클릭하여 드래그하였는지 검사 */
-    if ((xPos > (double) sceneWidth || yPos > (double) sceneHeight || xPos < 0.0f || yPos < 0.0f)
-            && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-        isLeftButtonClickedOutside = true;
-    else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
-        isLeftButtonClickedOutside = false;
-    
-    if ((xPos > (double) sceneWidth || yPos > (double) sceneHeight || xPos < 0.0f || yPos < 0.0f)
-            && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
-        isRightButtonClickedOutside = true;
-    else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE)
-        isRightButtonClickedOutside = false;
-
-    if (isLeftButtonClickedOutside || isRightButtonClickedOutside)
-        return;
-
-    /* 직전 호출에서의 커서 위치 저장 */
-    static double xPosPrev = SCENE_WIDTH / 2.0f;
-    static double yPosPrev = SCENE_HEIGHT / 2.0f;
-    /* 커서의 이동 거리 */
-    double xOffset = xPos - xPosPrev;
-    double yOffset = yPosPrev - yPos;
-    /* 커서가 이동하지 않았다면 종료 */
-    if (xOffset == 0 && yOffset == 0)
-        return;
-
-    /* 왼클릭 -> 카메라 panning */
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-    {        
-        camera.pan(xOffset, yOffset);
-    }
-    /* 오른클릭 -> 카메라 회전 */
-    else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
-    {
-        glm::vec3 end = convertScreenToWorld(glm::vec2(xPos, yPos));
-        glm::vec3 start = convertScreenToWorld(glm::vec2(xPosPrev, yPosPrev));
-        camera.rotate(start, end);
-    }
-
-    xPosPrev = xPos;
-    yPosPrev = yPos;
+void Renderer::moveCamera(glm::vec3 offset)
+{
+    camera.pan(offset.x, offset.y, offset.z);
 }
 
-void Renderer::mouseScrollCallback(GLFWwindow *window, double xOffset, double yOffset)
+void Renderer::rotateCamera(glm::vec3 axis, float angle)
 {
-    double xPos, yPos;
-    glfwGetCursorPos(window, &xPos, &yPos);
-    if (xPos > sceneWidth || yPos > sceneHeight)
-        return;
+    camera.rotate(axis, angle);
+}
 
-    camera.zoom((float) yOffset);
+void Renderer::zoomCamera(float degree)
+{
+    camera.zoom(degree);
 }
 
 glm::vec3 Renderer::convertScreenToWorld(glm::vec2 screenPt)
 {
-    /* 스크린 좌표계 -> 뷰 좌표계 */
-    glm::vec3 viewPt = glm::vec3(
-        (float) screenPt.x / sceneWidth * 2 - 1.0f,
-		(float) screenPt.y / sceneHeight * 2 - 1.0f,
-		0.0f
+    glm::mat4 projectionMat = glm::perspective(
+        glm::radians(camera.getFov()),
+        ((float) sceneWidth) / sceneHeight,
+        PERSPECTIVE_NEAR,
+        PERSPECTIVE_FAR
     );
-    viewPt.y = -viewPt.y;
-    float lengthSquared = viewPt.x * viewPt.x + viewPt.y * viewPt.y;
-    if (lengthSquared <= 1.0f)
-    {
-        viewPt.z = glm::sqrt(1.0f - lengthSquared);
-    }
-    else
-    {
-        viewPt = glm::normalize(viewPt);
-    }
+    glm::mat4 viewMat = camera.getViewMatrix();
+    glm::mat4 inverseTransformMat = glm::inverse(projectionMat * viewMat);
 
-    /* 뷰 좌표계 -> 월드 좌표계 */
-    glm::vec3 worldPt;
-    worldPt = glm::inverse(camera.getViewMatrix()) * glm::vec4(viewPt, 1.0f);
+    glm::vec4 clickedPt;
+    clickedPt.w = 1.0f;
+    clickedPt.x = screenPt.x / sceneWidth * 2.0f - 1.0f;
+    clickedPt.y = screenPt.y / sceneHeight * 2.0f - 1.0f;
+    clickedPt.y *= -1.0f;
+    clickedPt.z = -1.0f;
 
-    return worldPt;
+    glm::vec4 worldPt = inverseTransformMat * clickedPt;
+    worldPt.w = 1.0f / worldPt.w;
+    worldPt.x *= worldPt.w;
+    worldPt.y *= worldPt.w;
+    worldPt.z *= worldPt.w;
+
+    return glm::vec3(worldPt.x, worldPt.y, worldPt.z);
 }

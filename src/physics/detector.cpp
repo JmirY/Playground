@@ -1,48 +1,8 @@
-#include <physics/collision.h>
+#include <physics/detector.h>
 #include <cmath>
-#include <iostream>
-#include <limits>
-#include <cstdarg>
+#include <cfloat>
 
 using namespace physics;
-
-SphereCollider::SphereCollider(RigidBody* _body, float _radius)
-{
-    body = _body;
-    radius = _radius;
-}
-
-void SphereCollider::setGeometricData(double value, ...)
-{
-    radius = value;
-}
-
-BoxCollider::BoxCollider(RigidBody* _body, float _halfX, float _halfY, float _halfZ)
-{
-    body = _body;
-    halfX = _halfX;
-    halfY = _halfY;
-    halfZ = _halfZ;
-}
-
-void BoxCollider::setGeometricData(double value, ...)
-{
-    halfX = value;
-
-    va_list args;
-    va_start(args, value);
-    
-    halfY = va_arg(args, double);
-    halfZ = va_arg(args, double);
-
-    va_end(args);
-}
-
-PlaneCollider::PlaneCollider(Vector3 _normal, float _offset)
-{
-    normal = _normal;
-    offset = _offset;
-}
 
 bool CollisionDetector::sphereAndBox(
     std::vector<Contact*>& contacts,
@@ -57,24 +17,24 @@ bool CollisionDetector::sphereAndBox(
     /* 구의 중심과 가장 가까운 직육면체 위의 점을 찾는다 */
     Vector3 closestPoint;
     /* x 축 성분 비교 */
-    if (sphereInBoxLocal.x > box.halfX)
-        closestPoint.x = box.halfX;
-    else if (sphereInBoxLocal.x < -box.halfX)
-        closestPoint.x = -box.halfX;
+    if (sphereInBoxLocal.x > box.halfSize.x)
+        closestPoint.x = box.halfSize.x;
+    else if (sphereInBoxLocal.x < -box.halfSize.x)
+        closestPoint.x = -box.halfSize.x;
     else
         closestPoint.x = sphereInBoxLocal.x;
     /* y 축 성분 비교 */
-    if (sphereInBoxLocal.y > box.halfY)
-        closestPoint.y = box.halfY;
-    else if (sphereInBoxLocal.y < -box.halfY)
-        closestPoint.y = -box.halfY;
+    if (sphereInBoxLocal.y > box.halfSize.y)
+        closestPoint.y = box.halfSize.y;
+    else if (sphereInBoxLocal.y < -box.halfSize.y)
+        closestPoint.y = -box.halfSize.y;
     else
         closestPoint.y = sphereInBoxLocal.y;
     /* z 축 성분 비교 */
-    if (sphereInBoxLocal.z > box.halfZ)
-        closestPoint.z = box.halfZ;
-    else if (sphereInBoxLocal.z < -box.halfZ)
-        closestPoint.z = -box.halfZ;
+    if (sphereInBoxLocal.z > box.halfSize.z)
+        closestPoint.z = box.halfSize.z;
+    else if (sphereInBoxLocal.z < -box.halfSize.z)
+        closestPoint.z = -box.halfSize.z;
     else
         closestPoint.z = sphereInBoxLocal.z;
 
@@ -94,7 +54,8 @@ bool CollisionDetector::sphereAndBox(
         newContact->normal.normalize();
         newContact->contactPoint = closestPointWorld;
         newContact->penetration = sphere.radius - sqrtf(distanceSquared);
-        newContact->restitution = RESTITUTION_OBJECT;
+        newContact->restitution = objectRestitution;
+        newContact->friction = friction;
 
         contacts.push_back(newContact);
         return true;
@@ -127,7 +88,8 @@ bool CollisionDetector::sphereAndSphere(
         newContact->normal.normalize();
         newContact->contactPoint = sphere1.body->getPosition() - centerToCenter * 0.5f;
         newContact->penetration = radiusSum - sqrtf(distanceSquared);
-        newContact->restitution = RESTITUTION_OBJECT;
+        newContact->restitution = objectRestitution;
+        newContact->friction = friction;
 
         contacts.push_back(newContact);
         return true;
@@ -156,7 +118,8 @@ bool CollisionDetector::sphereAndPlane(
         newContact->normal = plane.normal;
         newContact->contactPoint = sphere.body->getPosition() - plane.normal * distance;
         newContact->penetration = sphere.radius - distance;
-        newContact->restitution = RESTITUTION_PLANE;
+        newContact->restitution = groundRestitution;
+        newContact->friction = friction;
 
         contacts.push_back(newContact);
         return true;
@@ -193,7 +156,7 @@ bool CollisionDetector::boxAndBox(
         }
     }
 
-    float minPenetration = std::numeric_limits<float>::max();
+    float minPenetration = FLT_MAX;
     int minAxisIdx = 0;
 
     /* 모든 축에 대해 겹침 검사 */
@@ -218,7 +181,8 @@ bool CollisionDetector::boxAndBox(
     newContact->bodies[0] = box1.body;
     newContact->bodies[1] = box2.body;
     newContact->penetration = minPenetration;
-    newContact->restitution = RESTITUTION_OBJECT;
+    newContact->restitution = objectRestitution;
+    newContact->friction = friction;
 
     /* 충돌 법선을 방향에 유의하여 설정한다 */
     Vector3 centerToCenter = box2.body->getPosition() - box1.body->getPosition();
@@ -249,15 +213,15 @@ bool CollisionDetector::boxAndPlane(
 {
     /* 직육면체를 이루는 로컬 좌표계의 정점들 */
     Vector3 vertices[8];
-    vertices[0] = Vector3(-box.halfX, box.halfY, box.halfZ);
-    vertices[1] = Vector3(-box.halfX, -box.halfY, box.halfZ);
-    vertices[2] = Vector3(box.halfX, -box.halfY, box.halfZ);
-    vertices[3] = Vector3(box.halfX, box.halfY, box.halfZ);
+    vertices[0] = Vector3(-box.halfSize.x, box.halfSize.y, box.halfSize.z);
+    vertices[1] = Vector3(-box.halfSize.x, -box.halfSize.y, box.halfSize.z);
+    vertices[2] = Vector3(box.halfSize.x, -box.halfSize.y, box.halfSize.z);
+    vertices[3] = Vector3(box.halfSize.x, box.halfSize.y, box.halfSize.z);
 
-    vertices[4] = Vector3(-box.halfX, box.halfY, -box.halfZ);
-    vertices[5] = Vector3(-box.halfX, -box.halfY, -box.halfZ);
-    vertices[6] = Vector3(box.halfX, -box.halfY, -box.halfZ);
-    vertices[7] = Vector3(box.halfX, box.halfY, -box.halfZ);
+    vertices[4] = Vector3(-box.halfSize.x, box.halfSize.y, -box.halfSize.z);
+    vertices[5] = Vector3(-box.halfSize.x, -box.halfSize.y, -box.halfSize.z);
+    vertices[6] = Vector3(box.halfSize.x, -box.halfSize.y, -box.halfSize.z);
+    vertices[7] = Vector3(box.halfSize.x, box.halfSize.y, -box.halfSize.z);
 
     /* 정점들을 월드 좌표계로 변환한다 */
     for (int i = 0; i < 8; ++i)
@@ -275,13 +239,14 @@ bool CollisionDetector::boxAndPlane(
         if (distance < 0)
         {
             /* 충돌을 생성한다 */
-            Contact* newContact = new Contact;;
+            Contact* newContact = new Contact;
             newContact->bodies[0] = box.body;
             newContact->bodies[1] = nullptr;
             newContact->normal = plane.normal;
             newContact->contactPoint = vertices[i];
             newContact->penetration = -distance;
-            newContact->restitution = RESTITUTION_PLANE;
+            newContact->restitution = groundRestitution;
+            newContact->friction = friction;
 
             contacts.push_back(newContact);
             hasContacted = true;
@@ -291,6 +256,71 @@ bool CollisionDetector::boxAndPlane(
     return hasContacted;
 }
 
+float CollisionDetector::rayAndSphere(
+    const Vector3& origin,
+    const Vector3& direction,
+    const SphereCollider& sphere
+)
+{
+    Vector3 originToSphere = sphere.body->getPosition() - origin;
+    float originToSphereProjected = originToSphere.dot(direction);
+    float orthogonalDistanceSquared =
+        originToSphere.magnitudeSquared() - originToSphereProjected * originToSphereProjected;
+    if (orthogonalDistanceSquared > sphere.radius*sphere.radius)
+        return -1.0f;
+
+    float t1 = sqrtf(sphere.radius*sphere.radius - orthogonalDistanceSquared);
+    float hitPointDistance = originToSphereProjected - t1;
+
+    return hitPointDistance;
+}
+
+float CollisionDetector::rayAndBox(
+    const Vector3& origin,
+    const Vector3& direction,
+    const BoxCollider& box
+)
+{
+    Vector3 originToBox = box.body->getPosition() - origin;
+    float tNearMax = 0.0f;     // 가까운 평면과 ray 의 원점 사이의 거리 최댓값
+    float tFarMin = FLT_MAX;  // 먼 평면과 ray 의 원점 사이의 거리 최솟값
+    
+    for (int i = 0; i < 3; ++i)
+    {
+        Vector3 axis = box.body->getAxis(i);
+        float originToBoxProjected = axis.dot(originToBox);
+        float rayDirectionProjected = axis.dot(direction);
+
+        if (fabs(rayDirectionProjected) > 0.001f)
+        {
+            float t1 = (originToBoxProjected - box.halfSize[i]) / rayDirectionProjected;
+            float t2 = (originToBoxProjected + box.halfSize[i]) / rayDirectionProjected;
+            /* t1 이 가까운 평면에 대한 값이어야 하므로
+                t1 가 t2 보다 크다면 두 변수를 swap 한다 */
+            if (t1 > t2)
+            {
+                float temp = t1;
+                t1 = t2;
+                t2 = temp;
+            }
+            if (t1 > tNearMax)
+                tNearMax = t1;
+            if (t2 < tFarMin)
+                tFarMin = t2;
+            if (tFarMin < tNearMax)
+                return -1.0f;
+        }
+        else
+        {
+            if (-originToBoxProjected - box.halfSize[i] > 0.0f
+                    || -originToBoxProjected + box.halfSize[i] < 0.0f)
+                return -1.0f;
+        }
+    }
+
+    return tNearMax;
+}
+
 float CollisionDetector::calcPenetration(const BoxCollider& box1, const BoxCollider& box2, const Vector3& axis)
 {
     /* 두 박스의 중심 간 거리를 계산한다 */
@@ -298,12 +328,12 @@ float CollisionDetector::calcPenetration(const BoxCollider& box1, const BoxColli
     float projectedCenterToCenter = centerToCenter.dot(axis);
 
     /* 두 박스를 주어진 축에 사영시킨 길이의 합을 계산한다 */
-    float projectedSum = fabs((box1.body->getAxis(0) * box1.halfX).dot(axis))
-        + fabs((box1.body->getAxis(1) * box1.halfY).dot(axis))
-        + fabs((box1.body->getAxis(2) * box1.halfZ).dot(axis))
-        + fabs((box2.body->getAxis(0) * box2.halfX).dot(axis))
-        + fabs((box2.body->getAxis(1) * box2.halfY).dot(axis))
-        + fabs((box2.body->getAxis(2) * box2.halfZ).dot(axis));
+    float projectedSum = fabs((box1.body->getAxis(0) * box1.halfSize.x).dot(axis))
+        + fabs((box1.body->getAxis(1) * box1.halfSize.y).dot(axis))
+        + fabs((box1.body->getAxis(2) * box1.halfSize.z).dot(axis))
+        + fabs((box2.body->getAxis(0) * box2.halfSize.x).dot(axis))
+        + fabs((box2.body->getAxis(1) * box2.halfSize.y).dot(axis))
+        + fabs((box2.body->getAxis(2) * box2.halfSize.z).dot(axis));
 
     /* "사영시킨 길이의 합 - 중심 간 거리" 가 겹친 정도이다 */
     return projectedSum - projectedCenterToCenter;
@@ -321,7 +351,7 @@ Vector3 CollisionDetector::calcContactPointOnPlane(
 
     if (minAxisIdx < 3) // 충돌면이 box1 의 면일 때
     {
-        vertex = Vector3(box2.halfX, box2.halfY, box2.halfZ);
+        vertex = Vector3(box2.halfSize.x, box2.halfSize.y, box2.halfSize.z);
 
         if (box2.body->getAxis(0).dot(contactNormal) < 0)
             vertex.x *= -1.0f;
@@ -335,7 +365,7 @@ Vector3 CollisionDetector::calcContactPointOnPlane(
     }
     else // 충돌면이 box2 의 면일 때
     {
-        vertex = Vector3(box1.halfX, box1.halfY, box1.halfZ);
+        vertex = Vector3(box1.halfSize.x, box1.halfSize.y, box1.halfSize.z);
 
         if (box1.body->getAxis(0).dot(contactNormal) > 0)
             vertex.x *= -1.0f;
@@ -359,8 +389,8 @@ Vector3 CollisionDetector::calcContactPointOnLine(
 )
 {
     /* 접촉한 변 위의 정점을 찾는다 */
-    Vector3 vertexOne(box1.halfX, box1.halfY, box1.halfZ);
-    Vector3 vertexTwo(box2.halfX, box2.halfY, box2.halfZ);
+    Vector3 vertexOne(box1.halfSize.x, box1.halfSize.y, box1.halfSize.z);
+    Vector3 vertexTwo(box2.halfSize.x, box2.halfSize.y, box2.halfSize.z);
 
     if (box1.body->getAxis(0).dot(contactNormal) > 0)
         vertexOne.x *= -1.0f;
@@ -383,65 +413,65 @@ Vector3 CollisionDetector::calcContactPointOnLine(
     {
     case 6: // box1 의 x 축 X box2 의 x 축
         directionOne = box1.body->getAxis(0);
-        if (vertexOne.x > 0) directionOne * -1.0f;
+        if (vertexOne.x > 0) directionOne *= -1.0f;
         directionTwo = box2.body->getAxis(0);
-        if (vertexTwo.x > 0) directionTwo * -1.0f;
+        if (vertexTwo.x > 0) directionTwo *= -1.0f;
         break;
 
     case 7: // box1 의 x 축 X box2 의 y 축
         directionOne = box1.body->getAxis(0);
-        if (vertexOne.x > 0) directionOne * -1.0f;
+        if (vertexOne.x > 0) directionOne *= -1.0f;
         directionTwo = box2.body->getAxis(1);
-        if (vertexTwo.y > 0) directionTwo * -1.0f;
+        if (vertexTwo.y > 0) directionTwo *= -1.0f;
         break;
 
     case 8: // box1 의 x 축 X box2 의 z 축
         directionOne = box1.body->getAxis(0);
-        if (vertexOne.x > 0) directionOne * -1.0f;
+        if (vertexOne.x > 0) directionOne *= -1.0f;
         directionTwo = box2.body->getAxis(2);
-        if (vertexTwo.z > 0) directionTwo * -1.0f;
+        if (vertexTwo.z > 0) directionTwo *= -1.0f;
         break;
 
     case 9: // box1 의 y 축 X box2 의 x 축
         directionOne = box1.body->getAxis(1);
-        if (vertexOne.y > 0) directionOne * -1.0f;
+        if (vertexOne.y > 0) directionOne *= -1.0f;
         directionTwo = box2.body->getAxis(0);
-        if (vertexTwo.x > 0) directionTwo * -1.0f;
+        if (vertexTwo.x > 0) directionTwo *= -1.0f;
         break;
 
     case 10: // box1 의 y 축 X box2 의 y 축
         directionOne = box1.body->getAxis(1);
-        if (vertexOne.y > 0) directionOne * -1.0f;
+        if (vertexOne.y > 0) directionOne *= -1.0f;
         directionTwo = box2.body->getAxis(1);
-        if (vertexTwo.y > 0) directionTwo * -1.0f;
+        if (vertexTwo.y > 0) directionTwo *= -1.0f;
         break;
     
     case 11: // box1 의 y 축 X box2 의 z 축
         directionOne = box1.body->getAxis(1);
-        if (vertexOne.y > 0) directionOne * -1.0f;
+        if (vertexOne.y > 0) directionOne *= -1.0f;
         directionTwo = box2.body->getAxis(2);
-        if (vertexTwo.z > 0) directionTwo * -1.0f;
+        if (vertexTwo.z > 0) directionTwo *= -1.0f;
         break;
     
     case 12: // box1 의 z 축 X box2 의 x 축
         directionOne = box1.body->getAxis(2);
-        if (vertexOne.z > 0) directionOne * -1.0f;
+        if (vertexOne.z > 0) directionOne *= -1.0f;
         directionTwo = box2.body->getAxis(0);
-        if (vertexTwo.x > 0) directionTwo * -1.0f;
+        if (vertexTwo.x > 0) directionTwo *= -1.0f;
         break;
     
     case 13: // box1 의 z 축 X box2 의 y 축
         directionOne = box1.body->getAxis(2);
-        if (vertexOne.z > 0) directionOne * -1.0f;
+        if (vertexOne.z > 0) directionOne *= -1.0f;
         directionTwo = box2.body->getAxis(1);
-        if (vertexTwo.y > 0) directionTwo * -1.0f;
+        if (vertexTwo.y > 0) directionTwo *= -1.0f;
         break;
     
     case 14: // box1 의 z 축 X box2 의 z 축
         directionOne = box1.body->getAxis(2);
-        if (vertexOne.z > 0) directionOne * -1.0f;
+        if (vertexOne.z > 0) directionOne *= -1.0f;
         directionTwo = box2.body->getAxis(2);
-        if (vertexTwo.z > 0) directionTwo * -1.0f;
+        if (vertexTwo.z > 0) directionTwo *= -1.0f;
         break;
     
     default:

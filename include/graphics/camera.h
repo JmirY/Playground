@@ -22,17 +22,17 @@ namespace graphics
         float rotateSensitivity;
 
     public:
-        /* 생성자 */
         Camera();
 
         /* 현재 상태를 기준으로 뷰 매트릭스 리턴 */
-        glm::mat4 getViewMatrix();
+        glm::mat4 getViewMatrix() const;
+        glm::vec3 getViewPlaneNormal() const;
 
         /* 카메라 상하좌우 이동 */
-        void pan(float xOffset, float yOffset);
+        void pan(float xOffset, float yOffset, float zOffset);
 
         /* 카메라 뷰의 중앙을 기준으로 회전 */
-        void rotate(glm::vec3 start, glm::vec3 end);
+        void rotate(glm::vec3 axis, float angle);
 
         /* FOV 값 수정을 통한 zoom 효과 */
         void zoom(float yOffset);
