@@ -13,6 +13,10 @@
 - 충격량 (*Impulse*) 기반 충돌 처리
 - GUI 를 통한 시뮬레이션 조작  
   
+## 의존성
+- [GLFW](https://www.glfw.org) (3.3 버전에서 작동 확인)
+- [Dear ImGui](https://github.com/ocornut/imgui) (1.79 버전에서 작동 확인)
+  
 ## 빌드하기  
 아래의 명령어를 터미널에 입력합니다.  
 ```shell
