@@ -7,15 +7,15 @@
 #include "../playground/geometry.h"
 #include "../playground/contact_info.h"
 #include <vector>
-#include <map>
+#include <unordered_map>
 
 namespace physics
 {
     class Simulator
     {
     public:
-        typedef std::map<unsigned int, RigidBody*> RigidBodies;
-        typedef std::map<unsigned int, Collider*> Colliders;
+        typedef std::unordered_map<unsigned int, RigidBody*> RigidBodies;
+        typedef std::unordered_map<unsigned int, Collider*> Colliders;
         typedef std::vector<Contact*> Contacts;
 
     private:

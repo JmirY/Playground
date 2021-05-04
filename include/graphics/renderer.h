@@ -8,7 +8,7 @@
 #include "../playground/geometry.h"
 #include "../playground/contact_info.h"
 #include <GLFW/glfw3.h>
-#include <map>
+#include <unordered_map>
 
 namespace graphics
 {
@@ -46,7 +46,7 @@ namespace graphics
     class Renderer
     {
     public:
-        typedef std::map<unsigned int, Shape*> Shapes;
+        typedef std::unordered_map<unsigned int, Shape*> Shapes;
 
     private:
         int windowWidth, windowHeight;

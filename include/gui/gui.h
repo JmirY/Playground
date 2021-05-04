@@ -5,14 +5,14 @@
 #include "imgui/imgui_impl_opengl3.h"
 #include "../playground/event_queue.h"
 #include "../playground/object.h"
-#include <map>
+#include <unordered_map>
 #include <vector>
 
 namespace gui
 {
     class GUI
     {
-        typedef std::map<unsigned int, Object*> Objects;
+        typedef std::unordered_map<unsigned int, Object*> Objects;
 
     private:
         unsigned int textureBufferID;
