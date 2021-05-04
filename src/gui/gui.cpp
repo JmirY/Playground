@@ -435,7 +435,7 @@ void GUI::renderObjectAttribute(
             ImGui::Text("Radius"); ImGui::SameLine(0.0f, 10.0f);
             if (ImGui::Button("Reset##radius"))
             {
-                vecBuffer[0] = 0.5f;
+                vecBuffer[0] = 1.0f;
                 eventQueue.push(new ObjectGeometricDataChangedEvent(selectedObjectIDs[0], vecBuffer));
             }
             if (ImGui::DragFloat("##Radius", &vecBuffer[0], 0.01f, 0.1f, FLT_MAX))
