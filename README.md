@@ -55,6 +55,7 @@ g++ -o playground src/main.cpp src/playground/* src/physics/* src/graphics/* src
 - **시뮬레이션 설정**  
 
     <img src="./img/simulation_setting.png" alt="Orientation" width="200"/>  
+      
     - **Render contact info.**  
     충돌 정보(충돌점, 충돌 법선 벡터)의 출력 여부를 결정합니다.  
     - **중력(Gravity)**  
