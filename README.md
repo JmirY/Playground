@@ -64,3 +64,9 @@ g++ -o playground src/main.cpp src/playground/* src/physics/* src/graphics/* src
     오브젝트와 지면 사이 충돌의 반발 계수를 변경합니다.  
     - **오브젝트 간 반발 계수(Object Restitution)**  
     오브젝트 간 충돌의 반발 계수를 변경합니다.  
+  
+---  
+  
+>  
+> [Wiki](https://github.com/JmirY/Playground/wiki) 를 읽고 Playground 에 대해 더 알아보세요.  
+>   
