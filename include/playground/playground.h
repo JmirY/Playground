@@ -6,13 +6,13 @@
 #include "gui/gui.h"
 #include "object.h"
 #include "event_queue.h"
-#include <map>
+#include <unordered_map>
 #include <vector>
 
 class Playground
 {
 public:
-    typedef std::map<unsigned int, Object*> Objects;
+    typedef std::unordered_map<unsigned int, Object*> Objects;
 
 private:
     physics::Simulator simulator;
