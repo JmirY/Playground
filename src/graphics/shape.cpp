@@ -119,6 +119,8 @@ Sphere::Sphere()
     generateVAOs();
 }
 
+/* 아래의 코드는 http://www.songho.ca/opengl/gl_sphere.html 을 참고했음을 밝힙니다 */
+
 void Sphere::generateVertices(double radius, ...)
 {
     float x, y, z, xy;
