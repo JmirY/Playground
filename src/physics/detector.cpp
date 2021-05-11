@@ -79,14 +79,14 @@ bool CollisionDetector::sphereAndSphere(
     if (distanceSquared < radiusSum*radiusSum)
     {
         Vector3 centerToCenter = sphere1.body->getPosition() - sphere2.body->getPosition();
+        centerToCenter.normalize();
         
         /* 충돌 정보를 생성한다 */
         Contact* newContact = new Contact;
         newContact->bodies[0] = sphere1.body;
         newContact->bodies[1] = sphere2.body;
         newContact->normal = centerToCenter;
-        newContact->normal.normalize();
-        newContact->contactPoint = sphere1.body->getPosition() - centerToCenter * 0.5f;
+        newContact->contactPoint = sphere2.body->getPosition() + centerToCenter * sphere2.radius;
         newContact->penetration = radiusSum - sqrtf(distanceSquared);
         newContact->restitution = objectRestitution;
         newContact->friction = friction;
