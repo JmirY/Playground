@@ -5,12 +5,10 @@
 
 namespace physics
 {
-    class Matrix4
+    struct Matrix4
     {
-    public:
         float entries[16];
 
-    public:
         /* 생성자 */
         Matrix4();            // 단위행렬로 초기화
         Matrix4(float value); // 행렬의 대각성분 (diagonal entry) 을 주어진 값으로 초기화

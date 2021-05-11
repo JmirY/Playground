@@ -6,14 +6,8 @@
 namespace physics
 {
     /* 충돌 정보를 저장하는 구조체 */
-    class Contact
+    struct Contact
     {
-    public:
-        friend class CollisionDetector;
-        friend class CollisionResolver;
-        friend class Simulator;
-
-    private:
         RigidBody* bodies[2];
         Vector3 normal;
         Vector3 contactPoint;

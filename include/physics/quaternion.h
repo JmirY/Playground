@@ -6,15 +6,13 @@
 namespace physics
 {
     /* 크기가 1 인 단위 사원수만 3차원 회전을 표현할 수 있다 */
-    class Quaternion
+    struct Quaternion
     {
-    public:
         float w;
         float x;
         float y;
         float z;
 
-    public:
         /* 생성자 */
         Quaternion() : w(1.0f), x(0.0f), y(0.0f), z(0.0f) {}
         Quaternion(float _w, float _x, float _y, float _z)
