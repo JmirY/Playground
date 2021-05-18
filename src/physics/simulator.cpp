@@ -29,7 +29,7 @@ void Simulator::simulate(float duration, std::vector<ContactInfo*>& contactInfo)
     }
 
     /* 물체 간 충돌을 검출한다 */
-    detectCollision();
+    detector.detectCollision(contacts, colliders, groundCollider);
 
     /* 충돌 정보를 복사한다 */
     getContactInfo(contactInfo);
@@ -37,7 +37,7 @@ void Simulator::simulate(float duration, std::vector<ContactInfo*>& contactInfo)
     /* 충돌들을 처리한다 */
     for (auto& contact : contacts)
     {
-        resolver.resolveContact(contact);
+        resolver.resolveCollision(contact);
         delete contact;
     }
     contacts.clear();
@@ -149,56 +149,4 @@ void Simulator::setGravity(float value)
     gravity = value;
     for (auto& body : bodies)
         body.second->setAcceleration(0.0f, -gravity, 0.0f);
-}
-
-void Simulator::detectCollision()
-{
-    for (Colliders::iterator i = colliders.begin(); i != colliders.end(); ++i)
-    {
-        Collider* colliderPtrI = i->second;
-        for (Colliders::iterator j = std::next(i, 1); j != colliders.end(); ++j)
-        {
-            Collider* colliderPtrJ = j->second;
-            if (typeid(*colliderPtrI) == typeid(SphereCollider))
-            {
-                SphereCollider* collider1 = static_cast<SphereCollider*>(colliderPtrI);
-                if (typeid(*colliderPtrJ) == typeid(SphereCollider)) // 구 - 구 충돌
-                {
-                    SphereCollider* collider2 = static_cast<SphereCollider*>(colliderPtrJ);
-                    detector.sphereAndSphere(contacts, *collider1, *collider2);
-                }
-                else if (typeid(*colliderPtrJ) == typeid(BoxCollider)) // 구 - 직육면체 충돌
-                {
-                    BoxCollider* collider2 = static_cast<BoxCollider*>(colliderPtrJ);
-                    detector.sphereAndBox(contacts, *collider1, *collider2);
-                }
-            }
-            else if (typeid(*colliderPtrI) == typeid(BoxCollider))
-            {
-                BoxCollider* collider1 = static_cast<BoxCollider*>(colliderPtrI);
-                if (typeid(*colliderPtrJ) == typeid(SphereCollider)) // 구 - 직육면체 충돌
-                {
-                    SphereCollider* collider2 = static_cast<SphereCollider*>(colliderPtrJ);
-                    detector.sphereAndBox(contacts, *collider2, *collider1);
-                }
-                else if (typeid(*colliderPtrJ) == typeid(BoxCollider)) // 직육면체 - 직육면체 충돌
-                {
-                    BoxCollider* collider2 = static_cast<BoxCollider*>(colliderPtrJ);
-                    detector.boxAndBox(contacts, *collider1, *collider2);
-                }
-            }
-        }
-
-        /* 지면과의 충돌 검사 */
-        if (typeid(*colliderPtrI) == typeid(SphereCollider))
-        {
-            SphereCollider* sphereCollider = static_cast<SphereCollider*>(i->second);
-            detector.sphereAndPlane(contacts, *sphereCollider, groundCollider);
-        }
-        else if (typeid(*colliderPtrI) == typeid(BoxCollider))
-        {
-            BoxCollider* boxCollider = static_cast<BoxCollider*>(i->second);
-            detector.boxAndPlane(contacts, *boxCollider, groundCollider);
-        }
-    }
 }

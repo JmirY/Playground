@@ -4,7 +4,7 @@
 
 using namespace physics;
 
-void CollisionResolver::resolveContact(Contact* contact)
+void CollisionResolver::resolveCollision(Contact* contact)
 {
     resolveVelocity(contact);
     resolvePenetration(contact);

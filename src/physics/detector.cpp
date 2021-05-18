@@ -4,6 +4,62 @@
 
 using namespace physics;
 
+void CollisionDetector::detectCollision(
+    std::vector<Contact*>& contacts,
+    std::unordered_map<unsigned int, Collider*>& colliders,
+    PlaneCollider& groundCollider
+)
+{
+    for (auto i = colliders.begin(); i != colliders.end(); ++i)
+    {
+        Collider* colliderPtrI = i->second;
+        for (auto j = std::next(i, 1); j != colliders.end(); ++j)
+        {
+            Collider* colliderPtrJ = j->second;
+            if (typeid(*colliderPtrI) == typeid(SphereCollider))
+            {
+                SphereCollider* collider1 = static_cast<SphereCollider*>(colliderPtrI);
+                if (typeid(*colliderPtrJ) == typeid(SphereCollider)) // 구 - 구 충돌
+                {
+                    SphereCollider* collider2 = static_cast<SphereCollider*>(colliderPtrJ);
+                    sphereAndSphere(contacts, *collider1, *collider2);
+                }
+                else if (typeid(*colliderPtrJ) == typeid(BoxCollider)) // 구 - 직육면체 충돌
+                {
+                    BoxCollider* collider2 = static_cast<BoxCollider*>(colliderPtrJ);
+                    sphereAndBox(contacts, *collider1, *collider2);
+                }
+            }
+            else if (typeid(*colliderPtrI) == typeid(BoxCollider))
+            {
+                BoxCollider* collider1 = static_cast<BoxCollider*>(colliderPtrI);
+                if (typeid(*colliderPtrJ) == typeid(SphereCollider)) // 구 - 직육면체 충돌
+                {
+                    SphereCollider* collider2 = static_cast<SphereCollider*>(colliderPtrJ);
+                    sphereAndBox(contacts, *collider2, *collider1);
+                }
+                else if (typeid(*colliderPtrJ) == typeid(BoxCollider)) // 직육면체 - 직육면체 충돌
+                {
+                    BoxCollider* collider2 = static_cast<BoxCollider*>(colliderPtrJ);
+                    boxAndBox(contacts, *collider1, *collider2);
+                }
+            }
+        }
+
+        /* 지면과의 충돌 검사 */
+        if (typeid(*colliderPtrI) == typeid(SphereCollider))
+        {
+            SphereCollider* sphereCollider = static_cast<SphereCollider*>(i->second);
+            sphereAndPlane(contacts, *sphereCollider, groundCollider);
+        }
+        else if (typeid(*colliderPtrI) == typeid(BoxCollider))
+        {
+            BoxCollider* boxCollider = static_cast<BoxCollider*>(i->second);
+            boxAndPlane(contacts, *boxCollider, groundCollider);
+        }
+    }
+}
+
 bool CollisionDetector::sphereAndBox(
     std::vector<Contact*>& contacts,
     const SphereCollider& sphere,

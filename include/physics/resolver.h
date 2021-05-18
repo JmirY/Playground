@@ -8,7 +8,7 @@ namespace physics
     class CollisionResolver
     {
     public:
-        void resolveContact(Contact*);
+        void resolveCollision(Contact*);
 
     public:
         void resolveVelocity(Contact*);

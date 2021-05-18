@@ -3,6 +3,7 @@
 
 #include "collider.h"
 #include <vector>
+#include <unordered_map>
 
 namespace physics
 {
@@ -19,6 +20,14 @@ namespace physics
         CollisionDetector()
             : friction(0.6f), objectRestitution(0.3f), groundRestitution(0.2f) {}
     
+        /* 충돌을 검출하고 충돌 정보를 contacts 에 저장한다 */
+        void detectCollision(
+            std::vector<Contact*>& contacts,
+            std::unordered_map<unsigned int, Collider*>& colliders,
+            PlaneCollider& groundCollider
+        );
+    
+    private:
         /* 충돌 검사 함수들.
             충돌이 있다면 충돌 정보 구조체를 생성하고 contacts 에 푸쉬하고 true 를 반환한다.
             총돌이 없다면 false 를 반환한다 */

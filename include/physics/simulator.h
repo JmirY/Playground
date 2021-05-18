@@ -56,10 +56,6 @@ namespace physics
         void setGroundRestitution(float value);
         void setObjectRestitution(float value);
         void setGravity(float value);
-
-    private:
-        /* 충돌을 검출하고 충돌 정보를 contacts 에 저장한다 */
-        void detectCollision();
     };
 } // namespace physics
 
