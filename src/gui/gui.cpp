@@ -74,7 +74,7 @@ void GUI::renderScene(
         );
 
         const ImGuiIO& io = ImGui::GetIO();
-        /* 왼쪽 마우스 드래그 */
+        /* 왼쪽 마우스 드래그 & 클릭 캡처 */
         ImVec2 clickedPos = io.MouseClickedPos[0];
         if (isInScene(clickedPos))
         {
@@ -90,7 +90,7 @@ void GUI::renderScene(
             }
         }
 
-        /* 오른쪽 마우스 드래그 */
+        /* 오른쪽 마우스 드래그 캡처 */
         clickedPos = io.MouseClickedPos[1];
         if (isInScene(clickedPos) && ImGui::IsMouseDragging(1))
         {
@@ -105,7 +105,7 @@ void GUI::renderScene(
                 ));
             }
         }
-        /* 마우스 휠 스크롤 */
+        /* 마우스 휠 스크롤 캡처 */
         ImVec2 mousePos = ImGui::GetMousePos();
         if (isInScene(mousePos))
         {
