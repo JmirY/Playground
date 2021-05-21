@@ -49,7 +49,9 @@ void CollisionResolver::sequentialImpulse(Contact* contact, float deltaTime)
     }
 
     /* bias 계산 */
-    float bias = -0.1f / deltaTime * contact->penetration;  // Baumgarte Stabilization
+    float bias = (-0.1f / deltaTime) * contact->penetration;  // Baumgarte Stabilization
+    /* bias 에 restitution term 추가 */
+    bias -= contact->restitution * lambda;
 
     lambda = -(lambda + bias) / effectiveMass;
 
