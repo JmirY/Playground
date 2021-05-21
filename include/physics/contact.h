@@ -14,6 +14,8 @@ namespace physics
         float penetration;
         float restitution;
         float friction;
+        /* 누적 충격량 (충돌 해소 시 사용) */
+        float normalImpulseSum;
     };
 } // namespace physics
 

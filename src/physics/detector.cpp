@@ -112,6 +112,7 @@ bool CollisionDetector::sphereAndBox(
         newContact->penetration = sphere.radius - sqrtf(distanceSquared);
         newContact->restitution = objectRestitution;
         newContact->friction = friction;
+        newContact->normalImpulseSum = 0.0f;
 
         contacts.push_back(newContact);
         return true;
@@ -146,6 +147,7 @@ bool CollisionDetector::sphereAndSphere(
         newContact->penetration = radiusSum - sqrtf(distanceSquared);
         newContact->restitution = objectRestitution;
         newContact->friction = friction;
+        newContact->normalImpulseSum = 0.0f;
 
         contacts.push_back(newContact);
         return true;
@@ -176,6 +178,7 @@ bool CollisionDetector::sphereAndPlane(
         newContact->penetration = sphere.radius - distance;
         newContact->restitution = groundRestitution;
         newContact->friction = friction;
+        newContact->normalImpulseSum = 0.0f;
 
         contacts.push_back(newContact);
         return true;
@@ -239,6 +242,7 @@ bool CollisionDetector::boxAndBox(
     newContact->penetration = minPenetration;
     newContact->restitution = objectRestitution;
     newContact->friction = friction;
+    newContact->normalImpulseSum = 0.0f;
 
     /* 충돌 법선을 방향에 유의하여 설정한다 */
     Vector3 centerToCenter = box2.body->getPosition() - box1.body->getPosition();
@@ -303,6 +307,7 @@ bool CollisionDetector::boxAndPlane(
             newContact->penetration = -distance;
             newContact->restitution = groundRestitution;
             newContact->friction = friction;
+            newContact->normalImpulseSum = 0.0f;
 
             contacts.push_back(newContact);
             hasContacted = true;

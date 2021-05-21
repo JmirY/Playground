@@ -35,11 +35,9 @@ void Simulator::simulate(float duration, std::vector<ContactInfo*>& contactInfo)
     getContactInfo(contactInfo);
 
     /* 충돌들을 처리한다 */
-    for (auto& contact : contacts)
-    {
-        resolver.resolveCollision(contact);
-        delete contact;
-    }
+    resolver.resolveCollision(contacts, duration);
+    for (auto& c : contacts)
+        delete c;
     contacts.clear();
 }
 
