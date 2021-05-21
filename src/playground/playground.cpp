@@ -131,12 +131,23 @@ Playground::Objects::iterator Playground::removeObject(unsigned int id)
 {
     /* 물리 데이터를 제거한다 */
     simulator.removePhysicsObject(id);
-
     /* 그래픽 데이터를 제거한다 */
     renderer.removeShape(id);
 
-    /* 오브젝트를 objects 에서 제거하고 메모리에서 해제한다 */
     Objects::iterator objectIter = objects.find(id);
+    /* 선택된 오브젝트였다면 selectedObjectIDs 에서 제거한다 */
+    if (objectIter->second->isSelected)
+    {
+        for (auto it = selectedObjectIDs.begin(); it != selectedObjectIDs.end(); ++it)
+        {
+            if (*it == objectIter->second->id)
+            {
+                selectedObjectIDs.erase(it);
+                break;
+            }
+        }
+    }
+    /* 오브젝트를 objects 에서 제거하고 메모리에서 해제한다 */
     delete objectIter->second;
     return objects.erase(objectIter);
 }
