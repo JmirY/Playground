@@ -56,11 +56,11 @@ void CollisionResolver::sequentialImpulse(Contact* contact, float deltaTime)
     lambda = -(lambda + bias) / effectiveMass;
 
     /* 람다의 누적값을 clamp */
-    float prevNormalImpulseSum = contact->normalImpulseSum;
+    float prevImpulseSum = contact->normalImpulseSum;
     contact->normalImpulseSum += lambda;
     if (contact->normalImpulseSum < 0.0f)
         contact->normalImpulseSum *= -1.0f;
-    lambda = contact->normalImpulseSum - prevNormalImpulseSum;
+    lambda = contact->normalImpulseSum - prevImpulseSum;
 
     /* 속도 & 각속도 변화 */
     Vector3 deltaVelocity = contact->normal * contact->bodies[0]->getInverseMass() * lambda;
@@ -77,6 +77,118 @@ void CollisionResolver::sequentialImpulse(Contact* contact, float deltaTime)
         deltaVelocity = contact->normal * -1.0f * contact->bodies[1]->getInverseMass() * lambda;
         deltaRotation = contact->bodies[0]->getInverseInertiaTensorWorld()
             * (contactPointFromCenter1.cross(contact->normal * -1.0f)) * lambda;
+        contact->bodies[1]->setVelocity(
+            contact->bodies[1]->getVelocity() + deltaVelocity
+        );
+        contact->bodies[1]->setRotation(
+            contact->bodies[1]->getRotation() + deltaRotation
+        );
+    }
+
+    /* 충돌 법선에 수직하는 벡터 찾기 */
+    Vector3 tangent1, tangent2;
+    if (contact->normal.x > contact->normal.y)
+        tangent1 = contact->normal.cross(Vector3(0.0f, 1.0f, 0.0f));
+    else
+        tangent1 = contact->normal.cross(Vector3(1.0f, 0.0f, 0.0f));
+    tangent1.normalize();
+    tangent2 = contact->normal.cross(tangent1);
+    tangent2.normalize();
+
+    /* tangent1 벡터에 대한 마찰 계산 */
+    termInDenominator1 = (contact->bodies[0]->getInverseInertiaTensorWorld() * (contactPointFromCenter1.cross(tangent1)))
+        .cross(contactPointFromCenter1);
+    if (contact->bodies[1] != nullptr) {
+        termInDenominator2 =
+            (contact->bodies[1]->getInverseInertiaTensorWorld() * (contactPointFromCenter2.cross(tangent1)))
+                .cross(contactPointFromCenter2);
+    }
+    effectiveMass = totalInvMass + (termInDenominator1 + termInDenominator2).dot(tangent1);
+
+    lambda = tangent1.dot(contact->bodies[0]->getVelocity())
+        + contact->bodies[0]->getRotation().dot(contactPointFromCenter1.cross(tangent1));
+    if (contact->bodies[1] != nullptr)
+    {
+        lambda -= tangent1.dot(contact->bodies[1]->getVelocity())
+            + contact->bodies[1]->getRotation().dot(contactPointFromCenter2.cross(tangent1));
+    }
+    lambda = -lambda / effectiveMass;
+
+    /* 람다의 누적값을 clamp */
+    prevImpulseSum = contact->tangentImpulseSum1;
+    contact->tangentImpulseSum1 += lambda;
+    if (contact->tangentImpulseSum1 < (-contact->friction * contact->normalImpulseSum))
+        contact->tangentImpulseSum1 = -contact->friction * contact->normalImpulseSum;
+    else if (contact->tangentImpulseSum1 > (contact->friction * contact->normalImpulseSum))
+        contact->tangentImpulseSum1 = contact->friction * contact->normalImpulseSum;
+    lambda = contact->tangentImpulseSum1 - prevImpulseSum;
+
+    /* 속도 & 각속도 변화 */
+    deltaVelocity = tangent1 * contact->bodies[0]->getInverseMass() * lambda;
+    deltaRotation = contact->bodies[0]->getInverseInertiaTensorWorld()
+        * (contactPointFromCenter1.cross(tangent1)) * lambda;
+    contact->bodies[0]->setVelocity(
+        contact->bodies[0]->getVelocity() + deltaVelocity
+    );
+    contact->bodies[0]->setRotation(
+        contact->bodies[0]->getRotation() + deltaRotation
+    );
+    if (contact->bodies[1] != nullptr)
+    {
+        deltaVelocity = tangent1 * -1.0f * contact->bodies[1]->getInverseMass() * lambda;
+        deltaRotation = contact->bodies[0]->getInverseInertiaTensorWorld()
+            * (contactPointFromCenter1.cross(tangent1 * -1.0f)) * lambda;
+        contact->bodies[1]->setVelocity(
+            contact->bodies[1]->getVelocity() + deltaVelocity
+        );
+        contact->bodies[1]->setRotation(
+            contact->bodies[1]->getRotation() + deltaRotation
+        );
+    }
+
+    /* tangent2 벡터에 대한 마찰 계산 */
+    termInDenominator1 = (contact->bodies[0]->getInverseInertiaTensorWorld() * (contactPointFromCenter1.cross(tangent2)))
+        .cross(contactPointFromCenter1);
+    if (contact->bodies[1] != nullptr) {
+        termInDenominator2 =
+            (contact->bodies[1]->getInverseInertiaTensorWorld() * (contactPointFromCenter2.cross(tangent2)))
+                .cross(contactPointFromCenter2);
+    }
+    effectiveMass = totalInvMass + (termInDenominator1 + termInDenominator2).dot(tangent2);
+
+    lambda = tangent2.dot(contact->bodies[0]->getVelocity())
+        + contact->bodies[0]->getRotation().dot(contactPointFromCenter1.cross(tangent2));
+    if (contact->bodies[1] != nullptr)
+    {
+        lambda -= tangent2.dot(contact->bodies[1]->getVelocity())
+            + contact->bodies[1]->getRotation().dot(contactPointFromCenter2.cross(tangent2));
+    }
+    lambda = -lambda / effectiveMass;
+
+    /* 람다의 누적값을 clamp */
+    prevImpulseSum = contact->tangentImpulseSum2;
+    contact->tangentImpulseSum2 += lambda;
+    if (contact->tangentImpulseSum2 < (-contact->friction * contact->normalImpulseSum))
+        contact->tangentImpulseSum2 = -contact->friction * contact->normalImpulseSum;
+    else if (contact->tangentImpulseSum2 > (contact->friction * contact->normalImpulseSum))
+        contact->tangentImpulseSum2 = contact->friction * contact->normalImpulseSum;
+    lambda = contact->tangentImpulseSum2 - prevImpulseSum;
+
+    /* 속도 & 각속도 변화 */
+    deltaVelocity = tangent2 * contact->bodies[0]->getInverseMass() * lambda;
+    deltaRotation = contact->bodies[0]->getInverseInertiaTensorWorld()
+        * (contactPointFromCenter1.cross(tangent2)) * lambda;
+    contact->bodies[0]->setVelocity(
+        contact->bodies[0]->getVelocity() + deltaVelocity
+    );
+    contact->bodies[0]->setRotation(
+        contact->bodies[0]->getRotation() + deltaRotation
+    );
+    if (contact->bodies[1] != nullptr)
+    {
+        deltaVelocity = tangent2 * -1.0f * contact->bodies[1]->getInverseMass() * lambda;
+        deltaRotation = contact->bodies[0]->getInverseInertiaTensorWorld()
+            * (contactPointFromCenter1.cross(tangent2 * -1.0f)) * lambda;
         contact->bodies[1]->setVelocity(
             contact->bodies[1]->getVelocity() + deltaVelocity
         );

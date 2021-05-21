@@ -16,6 +16,8 @@ namespace physics
         float friction;
         /* 누적 충격량 (충돌 해소 시 사용) */
         float normalImpulseSum;
+        float tangentImpulseSum1;
+        float tangentImpulseSum2;
     };
 } // namespace physics
 

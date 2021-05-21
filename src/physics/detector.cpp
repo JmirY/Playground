@@ -113,6 +113,8 @@ bool CollisionDetector::sphereAndBox(
         newContact->restitution = objectRestitution;
         newContact->friction = friction;
         newContact->normalImpulseSum = 0.0f;
+        newContact->tangentImpulseSum1 = 0.0f;
+        newContact->tangentImpulseSum2 = 0.0f;
 
         contacts.push_back(newContact);
         return true;
@@ -148,6 +150,8 @@ bool CollisionDetector::sphereAndSphere(
         newContact->restitution = objectRestitution;
         newContact->friction = friction;
         newContact->normalImpulseSum = 0.0f;
+        newContact->tangentImpulseSum1 = 0.0f;
+        newContact->tangentImpulseSum2 = 0.0f;
 
         contacts.push_back(newContact);
         return true;
@@ -179,6 +183,8 @@ bool CollisionDetector::sphereAndPlane(
         newContact->restitution = groundRestitution;
         newContact->friction = friction;
         newContact->normalImpulseSum = 0.0f;
+        newContact->tangentImpulseSum1 = 0.0f;
+        newContact->tangentImpulseSum2 = 0.0f;
 
         contacts.push_back(newContact);
         return true;
@@ -243,6 +249,8 @@ bool CollisionDetector::boxAndBox(
     newContact->restitution = objectRestitution;
     newContact->friction = friction;
     newContact->normalImpulseSum = 0.0f;
+    newContact->tangentImpulseSum1 = 0.0f;
+    newContact->tangentImpulseSum2 = 0.0f;
 
     /* 충돌 법선을 방향에 유의하여 설정한다 */
     Vector3 centerToCenter = box2.body->getPosition() - box1.body->getPosition();
@@ -308,6 +316,8 @@ bool CollisionDetector::boxAndPlane(
             newContact->restitution = groundRestitution;
             newContact->friction = friction;
             newContact->normalImpulseSum = 0.0f;
+            newContact->tangentImpulseSum1 = 0.0f;
+            newContact->tangentImpulseSum2 = 0.0f;
 
             contacts.push_back(newContact);
             hasContacted = true;
