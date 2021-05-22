@@ -71,6 +71,8 @@ namespace physics
         /* 주어진 사원수만큼 강체의 방향을 변경한다 */
         void rotateByQuat(const Quaternion&);
 
+        bool isFixed() {return inverseMass == 0.0f ? true : false;}
+
     private:    
         /* 현재 상태를 참고하여 변환 행렬을 업데이트한다 */
         void updateTransformMatrix();
