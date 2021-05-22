@@ -312,6 +312,7 @@ void Renderer::renderContactInfo(ContactInfo* info)
     glm::vec3 rotateAxis = glm::cross(contactNormal, defaultNormal);
     model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(info->pointX, info->pointY, info->pointZ));
+    model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
     if (glm::length(rotateAxis) != 0.0f)
     {
         model = glm::rotate(
