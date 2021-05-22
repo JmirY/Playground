@@ -49,7 +49,7 @@ void CollisionResolver::sequentialImpulse(Contact* contact, float deltaTime)
     }
 
     /* bias 계산 */
-    float bias = (-0.1f / deltaTime) * contact->penetration;  // Baumgarte Stabilization
+    float bias = (-0.05f / deltaTime) * contact->penetration;  // Baumgarte Stabilization
     /* bias 에 restitution term 추가 */
     bias -= contact->restitution * lambda;
 
@@ -66,13 +66,16 @@ void CollisionResolver::sequentialImpulse(Contact* contact, float deltaTime)
     Vector3 deltaVelocity = contact->normal * contact->bodies[0]->getInverseMass() * lambda;
     Vector3 deltaRotation = contact->bodies[0]->getInverseInertiaTensorWorld()
         * (contactPointFromCenter1.cross(contact->normal)) * lambda;
-    contact->bodies[0]->setVelocity(
-        contact->bodies[0]->getVelocity() + deltaVelocity
-    );
-    contact->bodies[0]->setRotation(
-        contact->bodies[0]->getRotation() + deltaRotation
-    );
-    if (contact->bodies[1] != nullptr)
+    if (!contact->bodies[0]->isFixed())
+    {
+        contact->bodies[0]->setVelocity(
+            contact->bodies[0]->getVelocity() + deltaVelocity
+        );
+        contact->bodies[0]->setRotation(
+            contact->bodies[0]->getRotation() + deltaRotation
+        );
+    }
+    if (contact->bodies[1] != nullptr && !contact->bodies[1]->isFixed())
     {
         deltaVelocity = contact->normal * -1.0f * contact->bodies[1]->getInverseMass() * lambda;
         deltaRotation = contact->bodies[0]->getInverseInertiaTensorWorld()
@@ -127,13 +130,16 @@ void CollisionResolver::sequentialImpulse(Contact* contact, float deltaTime)
     deltaVelocity = tangent1 * contact->bodies[0]->getInverseMass() * lambda;
     deltaRotation = contact->bodies[0]->getInverseInertiaTensorWorld()
         * (contactPointFromCenter1.cross(tangent1)) * lambda;
-    contact->bodies[0]->setVelocity(
-        contact->bodies[0]->getVelocity() + deltaVelocity
-    );
-    contact->bodies[0]->setRotation(
-        contact->bodies[0]->getRotation() + deltaRotation
-    );
-    if (contact->bodies[1] != nullptr)
+    if (!contact->bodies[0]->isFixed())
+    {
+        contact->bodies[0]->setVelocity(
+            contact->bodies[0]->getVelocity() + deltaVelocity
+        );
+        contact->bodies[0]->setRotation(
+            contact->bodies[0]->getRotation() + deltaRotation
+        );
+    }
+    if (contact->bodies[1] != nullptr && !contact->bodies[1]->isFixed())
     {
         deltaVelocity = tangent1 * -1.0f * contact->bodies[1]->getInverseMass() * lambda;
         deltaRotation = contact->bodies[0]->getInverseInertiaTensorWorld()
@@ -178,13 +184,16 @@ void CollisionResolver::sequentialImpulse(Contact* contact, float deltaTime)
     deltaVelocity = tangent2 * contact->bodies[0]->getInverseMass() * lambda;
     deltaRotation = contact->bodies[0]->getInverseInertiaTensorWorld()
         * (contactPointFromCenter1.cross(tangent2)) * lambda;
-    contact->bodies[0]->setVelocity(
-        contact->bodies[0]->getVelocity() + deltaVelocity
-    );
-    contact->bodies[0]->setRotation(
-        contact->bodies[0]->getRotation() + deltaRotation
-    );
-    if (contact->bodies[1] != nullptr)
+    if (!contact->bodies[0]->isFixed())
+    {
+        contact->bodies[0]->setVelocity(
+            contact->bodies[0]->getVelocity() + deltaVelocity
+        );
+        contact->bodies[0]->setRotation(
+            contact->bodies[0]->getRotation() + deltaRotation
+        );
+    }
+    if (contact->bodies[1] != nullptr && !contact->bodies[1]->isFixed())
     {
         deltaVelocity = tangent2 * -1.0f * contact->bodies[1]->getInverseMass() * lambda;
         deltaRotation = contact->bodies[0]->getInverseInertiaTensorWorld()
