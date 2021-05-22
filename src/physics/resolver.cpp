@@ -88,15 +88,15 @@ void CollisionResolver::sequentialImpulse(Contact* contact, float deltaTime)
         );
     }
 
-    /* 충돌 법선에 수직하는 벡터 찾기 */
+    /* 충돌 법선에 수직하는 벡터 찾기(erin catto 방법) */
     Vector3 tangent1, tangent2;
-    if (abs(contact->normal.x) > abs(contact->normal.y))
-        tangent1 = contact->normal.cross(Vector3(0.0f, 1.0f, 0.0f));
+    if (contact->normal.x >= 0.57735f)
+        tangent1 = Vector3(contact->normal.y, -contact->normal.x, 0.0f);
     else
-        tangent1 = contact->normal.cross(Vector3(1.0f, 0.0f, 0.0f));
+        tangent1 = Vector3(0.0f, contact->normal.z, -contact->normal.y);
+    
     tangent1.normalize();
     tangent2 = contact->normal.cross(tangent1);
-    tangent2.normalize();
 
     /* tangent1 벡터에 대한 마찰 계산 */
     termInDenominator1 = (contact->bodies[0]->getInverseInertiaTensorWorld() * (contactPointFromCenter1.cross(tangent1)))
