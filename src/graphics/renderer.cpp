@@ -291,7 +291,7 @@ void Renderer::renderContactInfo(ContactInfo* info)
     );
     glm::mat4 model(1.0f);
     model = glm::translate(model, glm::vec3(info->pointX, info->pointY, info->pointZ));
-    model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
+    model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
 
     /* 셰이더 설정 */
     objectShader.use();
