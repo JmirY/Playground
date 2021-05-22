@@ -25,10 +25,10 @@ void CollisionResolver::sequentialImpulse(Contact* contact, float deltaTime)
     if (totalInvMass == 0.0f)
         return;
 
-    Vector3 contactPointFromCenter1 = contact->contactPoint - contact->bodies[0]->getPosition();
+    Vector3 contactPointFromCenter1 = *contact->contactPoint[0] - contact->bodies[0]->getPosition();
     Vector3 contactPointFromCenter2;
     if (contact->bodies[1] != nullptr)
-        contactPointFromCenter2 = contact->contactPoint - contact->bodies[1]->getPosition();
+        contactPointFromCenter2 = *contact->contactPoint[1] - contact->bodies[1]->getPosition();
 
     Vector3 termInDenominator1 = (contact->bodies[0]->getInverseInertiaTensorWorld() * (contactPointFromCenter1.cross(contact->normal)))
         .cross(contactPointFromCenter1);
@@ -87,7 +87,7 @@ void CollisionResolver::sequentialImpulse(Contact* contact, float deltaTime)
 
     /* 충돌 법선에 수직하는 벡터 찾기 */
     Vector3 tangent1, tangent2;
-    if (contact->normal.x > contact->normal.y)
+    if (abs(contact->normal.x) > abs(contact->normal.y))
         tangent1 = contact->normal.cross(Vector3(0.0f, 1.0f, 0.0f));
     else
         tangent1 = contact->normal.cross(Vector3(1.0f, 0.0f, 0.0f));

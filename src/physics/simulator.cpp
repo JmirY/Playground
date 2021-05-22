@@ -37,7 +37,11 @@ void Simulator::simulate(float duration, std::vector<ContactInfo*>& contactInfo)
     /* 충돌들을 처리한다 */
     resolver.resolveCollision(contacts, duration);
     for (auto& c : contacts)
+    {
+        for (auto& cp : c->contactPoint)
+            delete cp;
         delete c;
+    }
     contacts.clear();
 }
 
@@ -119,16 +123,20 @@ void Simulator::getContactInfo(std::vector<ContactInfo*>& contactInfo) const
 {
     for (const auto& contact : contacts)
     {
-        ContactInfo* newContactInfo = new ContactInfo;
-
-        newContactInfo->pointX = contact->contactPoint.x;
-        newContactInfo->pointY = contact->contactPoint.y;
-        newContactInfo->pointZ = contact->contactPoint.z;
-        newContactInfo->normalX = contact->normal.x;
-        newContactInfo->normalY = contact->normal.y;
-        newContactInfo->normalZ = contact->normal.z;
-
-        contactInfo.push_back(newContactInfo);
+        for (const auto& cp : contact->contactPoint)
+        {
+            if (cp == nullptr)
+                continue;
+                
+            ContactInfo* newContactInfo = new ContactInfo;
+            newContactInfo->pointX = cp->x;
+            newContactInfo->pointY = cp->y;
+            newContactInfo->pointZ = cp->z;
+            newContactInfo->normalX = contact->normal.x;
+            newContactInfo->normalY = contact->normal.y;
+            newContactInfo->normalZ = contact->normal.z;
+            contactInfo.push_back(newContactInfo);
+        }
     }
 }
 

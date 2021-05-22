@@ -108,7 +108,9 @@ bool CollisionDetector::sphereAndBox(
         newContact->bodies[1] = box.body;
         newContact->normal = sphere.body->getPosition() - closestPointWorld;
         newContact->normal.normalize();
-        newContact->contactPoint = closestPointWorld;
+        newContact->contactPoint[0] =
+            new Vector3(sphere.body->getPosition() - newContact->normal * sphere.radius);
+        newContact->contactPoint[1] = new Vector3(closestPointWorld);
         newContact->penetration = sphere.radius - sqrtf(distanceSquared);
         newContact->restitution = objectRestitution;
         newContact->friction = friction;
@@ -145,7 +147,10 @@ bool CollisionDetector::sphereAndSphere(
         newContact->bodies[0] = sphere1.body;
         newContact->bodies[1] = sphere2.body;
         newContact->normal = centerToCenter;
-        newContact->contactPoint = sphere2.body->getPosition() + centerToCenter * sphere2.radius;
+        newContact->contactPoint[0] =
+            new Vector3(sphere1.body->getPosition() - centerToCenter * sphere1.radius);
+        newContact->contactPoint[1] =
+            new Vector3(sphere2.body->getPosition() + centerToCenter * sphere2.radius);
         newContact->penetration = radiusSum - sqrtf(distanceSquared);
         newContact->restitution = objectRestitution;
         newContact->friction = friction;
@@ -178,7 +183,8 @@ bool CollisionDetector::sphereAndPlane(
         newContact->bodies[0] = sphere.body;
         newContact->bodies[1] = nullptr;
         newContact->normal = plane.normal;
-        newContact->contactPoint = sphere.body->getPosition() - plane.normal * distance;
+        newContact->contactPoint[0] = new Vector3(sphere.body->getPosition() - plane.normal * distance);
+        newContact->contactPoint[1] = nullptr;
         newContact->penetration = sphere.radius - distance;
         newContact->restitution = groundRestitution;
         newContact->friction = friction;
@@ -262,11 +268,13 @@ bool CollisionDetector::boxAndBox(
     /* 충돌 지점을 찾는다 */
     if (minAxisIdx < 6) // 면-점 접촉일 때
     {
-        newContact->contactPoint = calcContactPointOnPlane(box1, box2, newContact->normal, minAxisIdx);
+        newContact->contactPoint[0] = new Vector3(calcContactPointOnPlane(box1, box2, newContact->normal, minAxisIdx));
+        newContact->contactPoint[1] = new Vector3(calcContactPointOnPlane(box1, box2, newContact->normal, minAxisIdx));
     }
     else // 선-선 접촉일 때
     {
-        newContact->contactPoint = calcContactPointOnLine(box1, box2, newContact->normal, minAxisIdx);
+        newContact->contactPoint[0] = new Vector3(calcContactPointOnLine(box1, box2, newContact->normal, minAxisIdx));
+        newContact->contactPoint[1] = new Vector3(calcContactPointOnLine(box1, box2, newContact->normal, minAxisIdx));
     }
     
     contacts.push_back(newContact);
@@ -311,7 +319,8 @@ bool CollisionDetector::boxAndPlane(
             newContact->bodies[0] = box.body;
             newContact->bodies[1] = nullptr;
             newContact->normal = plane.normal;
-            newContact->contactPoint = vertices[i];
+            newContact->contactPoint[0] = new Vector3(vertices[i]);
+            newContact->contactPoint[1] = nullptr;
             newContact->penetration = -distance;
             newContact->restitution = groundRestitution;
             newContact->friction = friction;
