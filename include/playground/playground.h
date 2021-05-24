@@ -30,6 +30,8 @@ private:
     EventQueue eventQueue;
     bool isSimulating;
     bool shouldRenderContactInfo;
+    /* 시뮬레이션 타임 스텝 조정 */
+    float timeStepMultiplier;
 
 public:
     Playground();
@@ -37,7 +39,8 @@ public:
     /* 메인 루프를 실행한다 */
     void run();
 
-    void addObject(Geometry);
+    /* 시뮬레이션에 오브젝트를 추가하고 ID 를 반환 */
+    unsigned int addObject(Geometry, float posX = 0.0f, float posY = 3.0f, float posZ = 0.0f);
     Objects::iterator removeObject(unsigned int id);
 
     void handleEvent(Event*);
@@ -45,6 +48,8 @@ public:
 
 private:
     void clearSelectedObjectIDs();
+    void loadPreset1();
+    void loadPreset2();
 
     void handleObjectAddedEvent(ObjectAddedEvent*);
     void handleObjectSelectedEvent(ObjectSelectedEvent*);
@@ -68,6 +73,7 @@ private:
     void handleOrientationResetEvent(OrientationResetEvent*);
     void handleShouldRenderWorldAxis(ShouldRenderWorldAxis*);
     void handleRemoveUnfixedObjectsEvent(RemoveUnfixedObjectsEvent*);
+    void handleTimeStepChangedEvent(TimeStepChangedEvent*);
 };
 
 #endif // PLAYGROUND_H

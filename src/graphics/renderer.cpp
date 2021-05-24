@@ -309,7 +309,11 @@ void Renderer::renderContactInfo(ContactInfo* info)
     /* 충돌 법선 렌더 */
     glm::vec3 defaultNormal(0.0f, 1.0f, 0.0f);
     glm::vec3 contactNormal(info->normalX, info->normalY, info->normalZ);
-    glm::vec3 rotateAxis = glm::cross(contactNormal, defaultNormal);
+    glm::vec3 rotateAxis;
+    if (glm::dot(defaultNormal, contactNormal) > 0.0f)
+        rotateAxis = glm::cross(defaultNormal, contactNormal);
+    else
+        rotateAxis = glm::cross(contactNormal, defaultNormal);
     model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(info->pointX, info->pointY, info->pointZ));
     model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
