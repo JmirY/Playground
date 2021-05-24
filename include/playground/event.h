@@ -208,4 +208,13 @@ public:
 
 class RemoveUnfixedObjectsEvent : public Event {};
 
+class TimeStepChangedEvent : public Event
+{
+public:
+    float value;
+
+    TimeStepChangedEvent(float _value)
+        : value(_value) {}
+};
+
 #endif // EVENT_H

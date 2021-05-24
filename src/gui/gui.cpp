@@ -447,7 +447,8 @@ void GUI::renderObjectAttribute(
 void GUI::renderGlobalAttribute(EventQueue& eventQueue)
 {
     static bool shouldRenderContactInfo = false;
-    static float gravity = 9.0f;
+    static float timeStep = 1.0f;
+    static float gravity = 9.8f;
     static float groundRestitution = 0.2f;
     static float objectRestitution = 0.3f;
 
@@ -457,9 +458,26 @@ void GUI::renderGlobalAttribute(EventQueue& eventQueue)
     } ImGui::Spacing();
 
     ImGui::AlignTextToFramePadding();
+    ImGui::Text("Time step");
+    if (ImGui::SliderFloat("##TimeStep", &timeStep, 0.3f, 1.0f))
+    {
+        eventQueue.push(new TimeStepChangedEvent(timeStep));
+    } ImGui::SameLine();
+    if (ImGui::Button("Reset##TimeStep"))
+    {
+        timeStep = 1.0f;
+        eventQueue.push(new TimeStepChangedEvent(timeStep));
+    }
+
+    ImGui::AlignTextToFramePadding();
     ImGui::Text("Gravity");
     if (ImGui::SliderFloat("##Gravity", &gravity, 0.0f, 30.0f))
     {
+        eventQueue.push(new GravityChangedEvent(gravity));
+    } ImGui::SameLine();
+    if (ImGui::Button("Reset##Gravity"))
+    {
+        gravity = 9.8f;
         eventQueue.push(new GravityChangedEvent(gravity));
     }
 
@@ -468,12 +486,22 @@ void GUI::renderGlobalAttribute(EventQueue& eventQueue)
     if (ImGui::SliderFloat("##Ground_Restitution", &groundRestitution, 0.0f, 1.0f))
     {
         eventQueue.push(new GroundRestitutionChangedEvent(groundRestitution));
+    } ImGui::SameLine();
+    if (ImGui::Button("Reset##GroundRestitution"))
+    {
+        groundRestitution = 0.2f;
+        eventQueue.push(new GroundRestitutionChangedEvent(groundRestitution));
     }
 
     ImGui::AlignTextToFramePadding();
     ImGui::Text("Object Restituion");
     if (ImGui::SliderFloat("##Object_Restitution", &objectRestitution, 0.0f, 1.0f))
     {
+        eventQueue.push(new ObjectRestitutionChangedEvent(objectRestitution));
+    } ImGui::SameLine();
+    if (ImGui::Button("Reset##ObjectRestitution"))
+    {
+        objectRestitution = 0.3f;
         eventQueue.push(new ObjectRestitutionChangedEvent(objectRestitution));
     }
 }

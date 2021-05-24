@@ -30,6 +30,8 @@ private:
     EventQueue eventQueue;
     bool isSimulating;
     bool shouldRenderContactInfo;
+    /* 시뮬레이션 타임 스텝 조정 */
+    float timeStepMultiplier;
 
 public:
     Playground();
@@ -71,6 +73,7 @@ private:
     void handleOrientationResetEvent(OrientationResetEvent*);
     void handleShouldRenderWorldAxis(ShouldRenderWorldAxis*);
     void handleRemoveUnfixedObjectsEvent(RemoveUnfixedObjectsEvent*);
+    void handleTimeStepChangedEvent(TimeStepChangedEvent*);
 };
 
 #endif // PLAYGROUND_H

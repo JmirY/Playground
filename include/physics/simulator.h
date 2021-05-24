@@ -30,7 +30,7 @@ namespace physics
         float gravity;
 
     public:
-        Simulator() : groundCollider(Vector3(0.0f, 1.0f, 0.0f), 0.0f), gravity(9.0f) {}
+        Simulator() : groundCollider(Vector3(0.0f, 1.0f, 0.0f), 0.0f), gravity(9.8f) {}
         ~Simulator();
 
         /* 주어진 시간 동안의 물리 현상을 시뮬레이팅한다 */

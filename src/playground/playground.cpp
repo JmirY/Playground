@@ -10,6 +10,7 @@ Playground::Playground()
     newObjectID = 1;
     isSimulating = true;
     shouldRenderContactInfo = false;
+    timeStepMultiplier = 1.0f;
 }
 
 void Playground::run()
@@ -31,7 +32,7 @@ void Playground::run()
         /* 물리 시뮬레이션 */
         std::vector<ContactInfo*> contactInfo;
         if (isSimulating)
-            simulator.simulate(deltaTime, contactInfo);
+            simulator.simulate(deltaTime * timeStepMultiplier, contactInfo);
 
         renderer.updateWindowSize();
         
@@ -219,6 +220,9 @@ void Playground::handleEvent(Event* event)
 
     else if (typeid(*event) == typeid(RemoveUnfixedObjectsEvent))
         handleRemoveUnfixedObjectsEvent(static_cast<RemoveUnfixedObjectsEvent*>(event));
+
+    else if (typeid(*event) == typeid(TimeStepChangedEvent))
+        handleTimeStepChangedEvent(static_cast<TimeStepChangedEvent*>(event));
 
     delete event;
 }
@@ -615,4 +619,9 @@ void Playground::handleRemoveUnfixedObjectsEvent(RemoveUnfixedObjectsEvent* even
         else
             ++iter;
     }
+}
+
+void Playground::handleTimeStepChangedEvent(TimeStepChangedEvent* event)
+{
+    timeStepMultiplier = event->value;
 }
