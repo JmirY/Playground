@@ -45,12 +45,12 @@ void Simulator::simulate(float duration, std::vector<ContactInfo*>& contactInfo)
     contacts.clear();
 }
 
-RigidBody* Simulator::addRigidBody(unsigned int id, Geometry geometry)
+RigidBody* Simulator::addRigidBody(unsigned int id, Geometry geometry, float posX, float posY, float posZ)
 {
     /* 강체를 생성한다 */
     RigidBody* newBody = new RigidBody;
     newBody->setMass(5.0f);
-    newBody->setPosition(0.0f, 4.0f, 0.0f);
+    newBody->setPosition(posX, posY, posZ);
     newBody->setAcceleration(0.0f, -gravity, 0.0f);
 
     /* 강체의 관성 모멘트 텐서를 도형에 따라 결정한다 */

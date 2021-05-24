@@ -37,7 +37,7 @@ namespace physics
         void simulate(float duration, std::vector<ContactInfo*>&);
 
         /* 새로운 강체를 시뮬레이션에 추가하고 추가된 강체의 주소를 반환한다 */
-        RigidBody* addRigidBody(unsigned int id, Geometry);
+        RigidBody* addRigidBody(unsigned int id, Geometry, float posX, float posY, float posZ);
 
         /* 주어진 강체를 감싸는 충돌체를 시뮬레이션에 추가하고 추가된 충돌체의 주소를 반환한다 */
         Collider* addCollider(unsigned int id, Geometry, RigidBody*);
