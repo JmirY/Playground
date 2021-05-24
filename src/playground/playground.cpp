@@ -90,7 +90,7 @@ void Playground::run()
     }
 }
 
-void Playground::addObject(Geometry geometry)
+unsigned int Playground::addObject(Geometry geometry, float posX, float posY, float posZ)
 {
     Object* newObject;
 
@@ -110,7 +110,7 @@ void Playground::addObject(Geometry geometry)
     newObject->id = newObjectID;
     
     /* 강체와 충돌체를 추가한다 */
-    newObject->body = simulator.addRigidBody(newObjectID, geometry);
+    newObject->body = simulator.addRigidBody(newObjectID, geometry, posX, posY, posZ);
     newObject->collider = simulator.addCollider(newObjectID, geometry, newObject->body);
 
     /* 색상은 무작위로 설정한다 */
@@ -124,7 +124,7 @@ void Playground::addObject(Geometry geometry)
     newObject->shape = renderer.addShape(newObjectID, geometry);
 
     objects[newObjectID] = newObject;
-    ++newObjectID;
+    return newObjectID++;
 }
 
 Playground::Objects::iterator Playground::removeObject(unsigned int id)
@@ -246,17 +246,30 @@ void Playground::handleKeyboardInput()
     renderer.moveCamera(offset);
     
     /* 시뮬레이션 멈춤 혹은 재개 */
-    static bool isRepeated = false;
+    static bool isSpaceRepeated = false;
     if (glfwGetKey(renderer.getWindow(), GLFW_KEY_SPACE) == GLFW_PRESS)
     {
-        if (!isRepeated)
+        if (!isSpaceRepeated)
         {
             isSimulating = !isSimulating;
-            isRepeated = true;
+            isSpaceRepeated = true;
         }
     }
     else if (glfwGetKey(renderer.getWindow(), GLFW_KEY_SPACE) == GLFW_RELEASE)
-        isRepeated = false;
+        isSpaceRepeated = false;
+
+    /* 프리셋 불러오기 */
+    static bool isOneRepeated = false;
+    if (glfwGetKey(renderer.getWindow(), GLFW_KEY_F1) == GLFW_PRESS)
+    {
+        if (!isOneRepeated)
+        {
+            loadPreset1();
+            isOneRepeated = true;
+        }
+    }
+    else if (glfwGetKey(renderer.getWindow(), GLFW_KEY_SPACE) == GLFW_RELEASE)
+        isOneRepeated = false;
 }
 
 void Playground::clearSelectedObjectIDs()
@@ -265,6 +278,22 @@ void Playground::clearSelectedObjectIDs()
         objects.find(id)->second->isSelected = false;
     
     selectedObjectIDs.clear();
+}
+
+void Playground::loadPreset1()
+{
+    isSimulating = false;
+    handleAllObjectRemovedEvent(nullptr);
+
+    unsigned int sphereID = addObject(SPHERE, 0.0f, 1.0f, 7.0f);
+    addObject(BOX, 0.0f, 0.5f, 0.0f);
+    addObject(BOX, 1.2f, 0.5f, 0.0f);
+    addObject(BOX, -1.2f, 0.5f, 0.0f);
+    addObject(BOX, 0.7f, 1.5f, 0.0f);
+    addObject(BOX, -0.7f, 1.5f, 0.0f);
+    addObject(BOX, 0.0f, 2.5f, 0.0f);
+
+    objects.find(sphereID)->second->body->setVelocity(0.0f, 0.0f, -30.0f);
 }
 
 void Playground::handleObjectAddedEvent(ObjectAddedEvent* event)
