@@ -47,6 +47,7 @@ public:
 private:
     void clearSelectedObjectIDs();
     void loadPreset1();
+    void loadPreset2();
 
     void handleObjectAddedEvent(ObjectAddedEvent*);
     void handleObjectSelectedEvent(ObjectSelectedEvent*);

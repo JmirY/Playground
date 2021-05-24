@@ -268,8 +268,20 @@ void Playground::handleKeyboardInput()
             isOneRepeated = true;
         }
     }
-    else if (glfwGetKey(renderer.getWindow(), GLFW_KEY_SPACE) == GLFW_RELEASE)
+    else if (glfwGetKey(renderer.getWindow(), GLFW_KEY_F1) == GLFW_RELEASE)
         isOneRepeated = false;
+
+    static bool isTwoRepeated = false;
+    if (glfwGetKey(renderer.getWindow(), GLFW_KEY_F2) == GLFW_PRESS)
+    {
+        if (!isTwoRepeated)
+        {
+            loadPreset2();
+            isTwoRepeated = true;
+        }
+    }
+    else if (glfwGetKey(renderer.getWindow(), GLFW_KEY_F2) == GLFW_RELEASE)
+        isTwoRepeated = false;
 }
 
 void Playground::clearSelectedObjectIDs()
@@ -286,6 +298,9 @@ void Playground::loadPreset1()
     handleAllObjectRemovedEvent(nullptr);
 
     unsigned int sphereID = addObject(SPHERE, 0.0f, 1.0f, 7.0f);
+    objects.find(sphereID)->second->setGeometricData(0.7f);
+    objects.find(sphereID)->second->updateDerivedData();
+
     addObject(BOX, 0.0f, 0.5f, 0.0f);
     addObject(BOX, 1.2f, 0.5f, 0.0f);
     addObject(BOX, -1.2f, 0.5f, 0.0f);
@@ -294,6 +309,43 @@ void Playground::loadPreset1()
     addObject(BOX, 0.0f, 2.5f, 0.0f);
 
     objects.find(sphereID)->second->body->setVelocity(0.0f, 0.0f, -30.0f);
+}
+
+void Playground::loadPreset2()
+{
+    isSimulating = false;
+    handleAllObjectRemovedEvent(nullptr);
+
+    unsigned int id = addObject(BOX, 0.0f, 5.0f, -2.0f);
+    float rotateAngle = 30.0f * PI / 180.0f;
+    ObjectPositionFixedEvent* event = new ObjectPositionFixedEvent(id, true);
+    handleObjectPositionFixedEvent(event);
+    delete event;
+    objects.find(id)->second->body->setOrientation(
+        physics::Quaternion(cos(rotateAngle * 0.5f), sin(rotateAngle * 0.5f), 0.0f, 0.0f)
+    );
+    objects.find(id)->second->setGeometricData(3.0f, 0.1f, 3.0f);
+    objects.find(id)->second->updateDerivedData();
+
+    id = addObject(BOX, 0.0f, 2.0f, 2.5f);
+    event = new ObjectPositionFixedEvent(id, true);
+    handleObjectPositionFixedEvent(event);
+    delete event;
+    objects.find(id)->second->body->setOrientation(
+        physics::Quaternion(cos(rotateAngle * -0.5f), sin(rotateAngle * -0.5f), 0.0f, 0.0f)
+    );
+    objects.find(id)->second->setGeometricData(3.0f, 0.1f, 3.0f);
+    objects.find(id)->second->updateDerivedData();
+
+    addObject(SPHERE, -2.0f, 7.0f, -3.0f);
+
+    id = addObject(SPHERE, 0.0f, 7.0f, -3.0f);
+    objects.find(id)->second->setGeometricData(0.7f);
+    objects.find(id)->second->updateDerivedData();
+
+    id = addObject(SPHERE, 1.5f, 7.0f, -3.0f);
+    objects.find(id)->second->setGeometricData(0.3f);
+    objects.find(id)->second->updateDerivedData();
 }
 
 void Playground::handleObjectAddedEvent(ObjectAddedEvent* event)
