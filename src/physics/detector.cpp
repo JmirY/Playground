@@ -235,7 +235,7 @@ bool CollisionDetector::boxAndBox(
     {
         float penetration = calcPenetration(box1, box2, axes[i]);
 
-        /* 한 축에 대해서라도 겹치지 않으면 충돌이 발생하지 않은 것이다 */
+        /* 한 축이라도 겹치지 않으면 충돌이 발생하지 않은 것이다 */
         if (penetration <= 0.0f)
             return false;
 
@@ -405,15 +405,15 @@ float CollisionDetector::calcPenetration(const BoxCollider& box1, const BoxColli
 {
     /* 두 박스의 중심 간 거리를 계산한다 */
     Vector3 centerToCenter = box2.body->getPosition() - box1.body->getPosition();
-    float projectedCenterToCenter = centerToCenter.dot(axis);
+    float projectedCenterToCenter = abs(centerToCenter.dot(axis));
 
     /* 두 박스를 주어진 축에 사영시킨 길이의 합을 계산한다 */
-    float projectedSum = fabs((box1.body->getAxis(0) * box1.halfSize.x).dot(axis))
-        + fabs((box1.body->getAxis(1) * box1.halfSize.y).dot(axis))
-        + fabs((box1.body->getAxis(2) * box1.halfSize.z).dot(axis))
-        + fabs((box2.body->getAxis(0) * box2.halfSize.x).dot(axis))
-        + fabs((box2.body->getAxis(1) * box2.halfSize.y).dot(axis))
-        + fabs((box2.body->getAxis(2) * box2.halfSize.z).dot(axis));
+    float projectedSum = abs((box1.body->getAxis(0) * box1.halfSize.x).dot(axis))
+        + abs((box1.body->getAxis(1) * box1.halfSize.y).dot(axis))
+        + abs((box1.body->getAxis(2) * box1.halfSize.z).dot(axis))
+        + abs((box2.body->getAxis(0) * box2.halfSize.x).dot(axis))
+        + abs((box2.body->getAxis(1) * box2.halfSize.y).dot(axis))
+        + abs((box2.body->getAxis(2) * box2.halfSize.z).dot(axis));
 
     /* "사영시킨 길이의 합 - 중심 간 거리" 가 겹친 정도이다 */
     return projectedSum - projectedCenterToCenter;
