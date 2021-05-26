@@ -272,8 +272,7 @@ bool CollisionDetector::boxAndBox(
     }
     else // 선-선 접촉일 때
     {
-        newContact->contactPoint[0] = new Vector3(calcContactPointOnLine(box1, box2, newContact->normal, minAxisIdx));
-        newContact->contactPoint[1] = new Vector3(calcContactPointOnLine(box1, box2, newContact->normal, minAxisIdx));
+        calcContactPointOnLine(box1, box2, minAxisIdx, newContact);
     }
     
     contacts.push_back(newContact);
@@ -466,29 +465,29 @@ void CollisionDetector::calcContactPointOnPlane(
     contact->contactPoint[1] = contactPoint2;
 }
 
-Vector3 CollisionDetector::calcContactPointOnLine(
+void CollisionDetector::calcContactPointOnLine(
     const BoxCollider& box1,
     const BoxCollider& box2,
-    const Vector3& contactNormal,
-    int minAxisIdx
+    int minAxisIdx,
+    Contact* contact
 )
 {
     /* 접촉한 변 위의 정점을 찾는다 */
     Vector3 vertexOne(box1.halfSize.x, box1.halfSize.y, box1.halfSize.z);
     Vector3 vertexTwo(box2.halfSize.x, box2.halfSize.y, box2.halfSize.z);
 
-    if (box1.body->getAxis(0).dot(contactNormal) > 0)
+    if (box1.body->getAxis(0).dot(contact->normal) > 0)
         vertexOne.x *= -1.0f;
-    if (box1.body->getAxis(1).dot(contactNormal) > 0)
+    if (box1.body->getAxis(1).dot(contact->normal) > 0)
         vertexOne.y *= -1.0f;
-    if (box1.body->getAxis(2).dot(contactNormal) > 0)
+    if (box1.body->getAxis(2).dot(contact->normal) > 0)
         vertexOne.z *= -1.0f;
 
-    if (box2.body->getAxis(0).dot(contactNormal) < 0)
+    if (box2.body->getAxis(0).dot(contact->normal) < 0)
         vertexTwo.x *= -1.0f;
-    if (box2.body->getAxis(1).dot(contactNormal) < 0)
+    if (box2.body->getAxis(1).dot(contact->normal) < 0)
         vertexTwo.y *= -1.0f;
-    if (box2.body->getAxis(2).dot(contactNormal) < 0)
+    if (box2.body->getAxis(2).dot(contact->normal) < 0)
         vertexTwo.z *= -1.0f;
 
     /* 변의 방향을 찾는다 */
@@ -569,13 +568,13 @@ Vector3 CollisionDetector::calcContactPointOnLine(
 
     /* box2 의 변과 가장 가까운 box1 위의 점을 찾는다 */
     float k = directionOne.dot(directionTwo);
-    Vector3 closestPointOne =
-        vertexOne + directionOne * ((vertexTwo-vertexOne).dot(directionOne-directionTwo*k)/(1-k*k));
+    Vector3* closestPointOne =
+        new Vector3(vertexOne + directionOne * ((vertexTwo-vertexOne).dot(directionOne-directionTwo*k)/(1-k*k)));
     
     /* box1 의 변과 가장 가까운 box2 위의 점을 찾는다 */
-    Vector3 closestPointTwo =
-        vertexTwo + directionTwo * ((closestPointOne-vertexTwo).dot(directionTwo));
+    Vector3* closestPointTwo =
+        new Vector3(vertexTwo + directionTwo * ((*closestPointOne-vertexTwo).dot(directionTwo)));
 
-    /* 두 점의 중간 지점을 반환한다 */
-    return (closestPointOne + closestPointTwo) * 0.5f;
+    contact->contactPoint[0] = closestPointOne;
+    contact->contactPoint[1] = closestPointTwo;
 }
