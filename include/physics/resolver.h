@@ -15,7 +15,7 @@ namespace physics
 
     public:
         CollisionResolver()
-            : iterationLimit(10), penetrationTolerance(0.005f), closingSpeedTolerance(0.5f) {}
+            : iterationLimit(30), penetrationTolerance(0.0005f), closingSpeedTolerance(0.005f) {}
     
         void resolveCollision(std::vector<Contact*>&, float deltaTime);
 
