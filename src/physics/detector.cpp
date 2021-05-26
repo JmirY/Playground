@@ -108,10 +108,15 @@ bool CollisionDetector::sphereAndBox(
         newContact->bodies[1] = box.body;
         newContact->normal = sphere.body->getPosition() - closestPointWorld;
         newContact->normal.normalize();
-        newContact->contactPoint = closestPointWorld;
+        newContact->contactPoint[0] =
+            new Vector3(sphere.body->getPosition() - newContact->normal * sphere.radius);
+        newContact->contactPoint[1] = new Vector3(closestPointWorld);
         newContact->penetration = sphere.radius - sqrtf(distanceSquared);
         newContact->restitution = objectRestitution;
         newContact->friction = friction;
+        newContact->normalImpulseSum = 0.0f;
+        newContact->tangentImpulseSum1 = 0.0f;
+        newContact->tangentImpulseSum2 = 0.0f;
 
         contacts.push_back(newContact);
         return true;
@@ -142,10 +147,16 @@ bool CollisionDetector::sphereAndSphere(
         newContact->bodies[0] = sphere1.body;
         newContact->bodies[1] = sphere2.body;
         newContact->normal = centerToCenter;
-        newContact->contactPoint = sphere2.body->getPosition() + centerToCenter * sphere2.radius;
+        newContact->contactPoint[0] =
+            new Vector3(sphere1.body->getPosition() - centerToCenter * sphere1.radius);
+        newContact->contactPoint[1] =
+            new Vector3(sphere2.body->getPosition() + centerToCenter * sphere2.radius);
         newContact->penetration = radiusSum - sqrtf(distanceSquared);
         newContact->restitution = objectRestitution;
         newContact->friction = friction;
+        newContact->normalImpulseSum = 0.0f;
+        newContact->tangentImpulseSum1 = 0.0f;
+        newContact->tangentImpulseSum2 = 0.0f;
 
         contacts.push_back(newContact);
         return true;
@@ -172,10 +183,14 @@ bool CollisionDetector::sphereAndPlane(
         newContact->bodies[0] = sphere.body;
         newContact->bodies[1] = nullptr;
         newContact->normal = plane.normal;
-        newContact->contactPoint = sphere.body->getPosition() - plane.normal * distance;
+        newContact->contactPoint[0] = new Vector3(sphere.body->getPosition() - plane.normal * distance);
+        newContact->contactPoint[1] = nullptr;
         newContact->penetration = sphere.radius - distance;
         newContact->restitution = groundRestitution;
         newContact->friction = friction;
+        newContact->normalImpulseSum = 0.0f;
+        newContact->tangentImpulseSum1 = 0.0f;
+        newContact->tangentImpulseSum2 = 0.0f;
 
         contacts.push_back(newContact);
         return true;
@@ -220,7 +235,7 @@ bool CollisionDetector::boxAndBox(
     {
         float penetration = calcPenetration(box1, box2, axes[i]);
 
-        /* 한 축에 대해서라도 겹치지 않으면 충돌이 발생하지 않은 것이다 */
+        /* 한 축이라도 겹치지 않으면 충돌이 발생하지 않은 것이다 */
         if (penetration <= 0.0f)
             return false;
 
@@ -239,6 +254,9 @@ bool CollisionDetector::boxAndBox(
     newContact->penetration = minPenetration;
     newContact->restitution = objectRestitution;
     newContact->friction = friction;
+    newContact->normalImpulseSum = 0.0f;
+    newContact->tangentImpulseSum1 = 0.0f;
+    newContact->tangentImpulseSum2 = 0.0f;
 
     /* 충돌 법선을 방향에 유의하여 설정한다 */
     Vector3 centerToCenter = box2.body->getPosition() - box1.body->getPosition();
@@ -250,11 +268,11 @@ bool CollisionDetector::boxAndBox(
     /* 충돌 지점을 찾는다 */
     if (minAxisIdx < 6) // 면-점 접촉일 때
     {
-        newContact->contactPoint = calcContactPointOnPlane(box1, box2, newContact->normal, minAxisIdx);
+        calcContactPointOnPlane(box1, box2, minAxisIdx, newContact);
     }
     else // 선-선 접촉일 때
     {
-        newContact->contactPoint = calcContactPointOnLine(box1, box2, newContact->normal, minAxisIdx);
+        calcContactPointOnLine(box1, box2, minAxisIdx, newContact);
     }
     
     contacts.push_back(newContact);
@@ -299,10 +317,14 @@ bool CollisionDetector::boxAndPlane(
             newContact->bodies[0] = box.body;
             newContact->bodies[1] = nullptr;
             newContact->normal = plane.normal;
-            newContact->contactPoint = vertices[i];
+            newContact->contactPoint[0] = new Vector3(vertices[i]);
+            newContact->contactPoint[1] = nullptr;
             newContact->penetration = -distance;
             newContact->restitution = groundRestitution;
             newContact->friction = friction;
+            newContact->normalImpulseSum = 0.0f;
+            newContact->tangentImpulseSum1 = 0.0f;
+            newContact->tangentImpulseSum2 = 0.0f;
 
             contacts.push_back(newContact);
             hasContacted = true;
@@ -381,85 +403,91 @@ float CollisionDetector::calcPenetration(const BoxCollider& box1, const BoxColli
 {
     /* 두 박스의 중심 간 거리를 계산한다 */
     Vector3 centerToCenter = box2.body->getPosition() - box1.body->getPosition();
-    float projectedCenterToCenter = centerToCenter.dot(axis);
+    float projectedCenterToCenter = abs(centerToCenter.dot(axis));
 
     /* 두 박스를 주어진 축에 사영시킨 길이의 합을 계산한다 */
-    float projectedSum = fabs((box1.body->getAxis(0) * box1.halfSize.x).dot(axis))
-        + fabs((box1.body->getAxis(1) * box1.halfSize.y).dot(axis))
-        + fabs((box1.body->getAxis(2) * box1.halfSize.z).dot(axis))
-        + fabs((box2.body->getAxis(0) * box2.halfSize.x).dot(axis))
-        + fabs((box2.body->getAxis(1) * box2.halfSize.y).dot(axis))
-        + fabs((box2.body->getAxis(2) * box2.halfSize.z).dot(axis));
+    float projectedSum = abs((box1.body->getAxis(0) * box1.halfSize.x).dot(axis))
+        + abs((box1.body->getAxis(1) * box1.halfSize.y).dot(axis))
+        + abs((box1.body->getAxis(2) * box1.halfSize.z).dot(axis))
+        + abs((box2.body->getAxis(0) * box2.halfSize.x).dot(axis))
+        + abs((box2.body->getAxis(1) * box2.halfSize.y).dot(axis))
+        + abs((box2.body->getAxis(2) * box2.halfSize.z).dot(axis));
 
     /* "사영시킨 길이의 합 - 중심 간 거리" 가 겹친 정도이다 */
     return projectedSum - projectedCenterToCenter;
 }
 
-Vector3 CollisionDetector::calcContactPointOnPlane(
+void CollisionDetector::calcContactPointOnPlane(
     const BoxCollider& box1,
     const BoxCollider& box2,
-    const Vector3& contactNormal,
-    int minAxisIdx
+    int minAxisIdx,
+    Contact* contact
 )
 {
     /* 충돌 정점 */
-    Vector3 vertex;
+    Vector3* contactPoint1;
+    Vector3* contactPoint2;
 
     if (minAxisIdx < 3) // 충돌면이 box1 의 면일 때
     {
-        vertex = Vector3(box2.halfSize.x, box2.halfSize.y, box2.halfSize.z);
+        contactPoint2 = new Vector3(box2.halfSize.x, box2.halfSize.y, box2.halfSize.z);
 
-        if (box2.body->getAxis(0).dot(contactNormal) < 0)
-            vertex.x *= -1.0f;
-        if (box2.body->getAxis(1).dot(contactNormal) < 0)
-            vertex.y *= -1.0f;
-        if (box2.body->getAxis(2).dot(contactNormal) < 0)
-            vertex.z *= -1.0f;
+        if (box2.body->getAxis(0).dot(contact->normal) < 0)
+            contactPoint2->x *= -1.0f;
+        if (box2.body->getAxis(1).dot(contact->normal) < 0)
+            contactPoint2->y *= -1.0f;
+        if (box2.body->getAxis(2).dot(contact->normal) < 0)
+            contactPoint2->z *= -1.0f;
 
         /* 월드 좌표로 변환한다 */
-        vertex = box2.body->getTransformMatrix() * vertex;
+        *contactPoint2 = box2.body->getTransformMatrix() * (*contactPoint2);
+
+        contactPoint1 = new Vector3(*contactPoint2 - contact->normal * contact->penetration);
     }
     else // 충돌면이 box2 의 면일 때
     {
-        vertex = Vector3(box1.halfSize.x, box1.halfSize.y, box1.halfSize.z);
+        contactPoint1 = new Vector3(box1.halfSize.x, box1.halfSize.y, box1.halfSize.z);
 
-        if (box1.body->getAxis(0).dot(contactNormal) > 0)
-            vertex.x *= -1.0f;
-        if (box1.body->getAxis(1).dot(contactNormal) > 0)
-            vertex.y *= -1.0f;
-        if (box1.body->getAxis(2).dot(contactNormal) > 0)
-            vertex.z *= -1.0f;
+        if (box1.body->getAxis(0).dot(contact->normal) > 0)
+            contactPoint1->x *= -1.0f;
+        if (box1.body->getAxis(1).dot(contact->normal) > 0)
+            contactPoint1->y *= -1.0f;
+        if (box1.body->getAxis(2).dot(contact->normal) > 0)
+            contactPoint1->z *= -1.0f;
 
         /* 월드 좌표로 변환한다 */
-        vertex = box1.body->getTransformMatrix() * vertex;
+        *contactPoint1 = box1.body->getTransformMatrix() * (*contactPoint1);
+
+        contactPoint2 = new Vector3(*contactPoint1 - contact->normal * contact->penetration);
     }
 
-    return vertex;
+    contact->contactPoint[0] = contactPoint1;
+    contact->contactPoint[1] = contactPoint2;
 }
 
-Vector3 CollisionDetector::calcContactPointOnLine(
+void CollisionDetector::calcContactPointOnLine(
     const BoxCollider& box1,
     const BoxCollider& box2,
-    const Vector3& contactNormal,
-    int minAxisIdx
+    int minAxisIdx,
+    Contact* contact
 )
 {
     /* 접촉한 변 위의 정점을 찾는다 */
     Vector3 vertexOne(box1.halfSize.x, box1.halfSize.y, box1.halfSize.z);
     Vector3 vertexTwo(box2.halfSize.x, box2.halfSize.y, box2.halfSize.z);
 
-    if (box1.body->getAxis(0).dot(contactNormal) > 0)
+    if (box1.body->getAxis(0).dot(contact->normal) > 0)
         vertexOne.x *= -1.0f;
-    if (box1.body->getAxis(1).dot(contactNormal) > 0)
+    if (box1.body->getAxis(1).dot(contact->normal) > 0)
         vertexOne.y *= -1.0f;
-    if (box1.body->getAxis(2).dot(contactNormal) > 0)
+    if (box1.body->getAxis(2).dot(contact->normal) > 0)
         vertexOne.z *= -1.0f;
 
-    if (box2.body->getAxis(0).dot(contactNormal) < 0)
+    if (box2.body->getAxis(0).dot(contact->normal) < 0)
         vertexTwo.x *= -1.0f;
-    if (box2.body->getAxis(1).dot(contactNormal) < 0)
+    if (box2.body->getAxis(1).dot(contact->normal) < 0)
         vertexTwo.y *= -1.0f;
-    if (box2.body->getAxis(2).dot(contactNormal) < 0)
+    if (box2.body->getAxis(2).dot(contact->normal) < 0)
         vertexTwo.z *= -1.0f;
 
     /* 변의 방향을 찾는다 */
@@ -540,13 +568,13 @@ Vector3 CollisionDetector::calcContactPointOnLine(
 
     /* box2 의 변과 가장 가까운 box1 위의 점을 찾는다 */
     float k = directionOne.dot(directionTwo);
-    Vector3 closestPointOne =
-        vertexOne + directionOne * ((vertexTwo-vertexOne).dot(directionOne-directionTwo*k)/(1-k*k));
+    Vector3* closestPointOne =
+        new Vector3(vertexOne + directionOne * ((vertexTwo-vertexOne).dot(directionOne-directionTwo*k)/(1-k*k)));
     
     /* box1 의 변과 가장 가까운 box2 위의 점을 찾는다 */
-    Vector3 closestPointTwo =
-        vertexTwo + directionTwo * ((closestPointOne-vertexTwo).dot(directionTwo));
+    Vector3* closestPointTwo =
+        new Vector3(vertexTwo + directionTwo * ((*closestPointOne-vertexTwo).dot(directionTwo)));
 
-    /* 두 점의 중간 지점을 반환한다 */
-    return (closestPointOne + closestPointTwo) * 0.5f;
+    contact->contactPoint[0] = closestPointOne;
+    contact->contactPoint[1] = closestPointTwo;
 }

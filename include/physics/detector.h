@@ -82,19 +82,19 @@ namespace physics
         );
         
         /* 직육면체의 면-점 접촉일 때 충돌점을 찾는다 */
-        Vector3 calcContactPointOnPlane(
+        void calcContactPointOnPlane(
             const BoxCollider& box1,
             const BoxCollider& box2,
-            const Vector3& contactNormal,
-            int minPenetrationAxisIdx
+            int minPenetrationAxisIdx,
+            Contact* contact
         );
 
         /* 직육면체의 선-선 접촉일 때 충돌점을 찾는다 */
-        Vector3 calcContactPointOnLine(
+        void calcContactPointOnLine(
             const BoxCollider& box1,
             const BoxCollider& box2,
-            const Vector3& contactNormal,
-            int minPenetrationAxisIdx
+            int minPenetrationAxisIdx,
+            Contact* contact
         );
     };
 } // namespace physics

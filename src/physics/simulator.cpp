@@ -35,20 +35,22 @@ void Simulator::simulate(float duration, std::vector<ContactInfo*>& contactInfo)
     getContactInfo(contactInfo);
 
     /* 충돌들을 처리한다 */
-    for (auto& contact : contacts)
+    resolver.resolveCollision(contacts, duration);
+    for (auto& c : contacts)
     {
-        resolver.resolveCollision(contact);
-        delete contact;
+        for (auto& cp : c->contactPoint)
+            delete cp;
+        delete c;
     }
     contacts.clear();
 }
 
-RigidBody* Simulator::addRigidBody(unsigned int id, Geometry geometry)
+RigidBody* Simulator::addRigidBody(unsigned int id, Geometry geometry, float posX, float posY, float posZ)
 {
     /* 강체를 생성한다 */
     RigidBody* newBody = new RigidBody;
     newBody->setMass(5.0f);
-    newBody->setPosition(0.0f, 4.0f, 0.0f);
+    newBody->setPosition(posX, posY, posZ);
     newBody->setAcceleration(0.0f, -gravity, 0.0f);
 
     /* 강체의 관성 모멘트 텐서를 도형에 따라 결정한다 */
@@ -121,16 +123,20 @@ void Simulator::getContactInfo(std::vector<ContactInfo*>& contactInfo) const
 {
     for (const auto& contact : contacts)
     {
-        ContactInfo* newContactInfo = new ContactInfo;
-
-        newContactInfo->pointX = contact->contactPoint.x;
-        newContactInfo->pointY = contact->contactPoint.y;
-        newContactInfo->pointZ = contact->contactPoint.z;
-        newContactInfo->normalX = contact->normal.x;
-        newContactInfo->normalY = contact->normal.y;
-        newContactInfo->normalZ = contact->normal.z;
-
-        contactInfo.push_back(newContactInfo);
+        for (const auto& cp : contact->contactPoint)
+        {
+            if (cp == nullptr)
+                continue;
+                
+            ContactInfo* newContactInfo = new ContactInfo;
+            newContactInfo->pointX = cp->x;
+            newContactInfo->pointY = cp->y;
+            newContactInfo->pointZ = cp->z;
+            newContactInfo->normalX = contact->normal.x;
+            newContactInfo->normalY = contact->normal.y;
+            newContactInfo->normalZ = contact->normal.z;
+            contactInfo.push_back(newContactInfo);
+        }
     }
 }
 

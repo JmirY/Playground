@@ -30,14 +30,14 @@ namespace physics
         float gravity;
 
     public:
-        Simulator() : groundCollider(Vector3(0.0f, 1.0f, 0.0f), 0.0f), gravity(9.0f) {}
+        Simulator() : groundCollider(Vector3(0.0f, 1.0f, 0.0f), 0.0f), gravity(9.8f) {}
         ~Simulator();
 
         /* 주어진 시간 동안의 물리 현상을 시뮬레이팅한다 */
         void simulate(float duration, std::vector<ContactInfo*>&);
 
         /* 새로운 강체를 시뮬레이션에 추가하고 추가된 강체의 주소를 반환한다 */
-        RigidBody* addRigidBody(unsigned int id, Geometry);
+        RigidBody* addRigidBody(unsigned int id, Geometry, float posX, float posY, float posZ);
 
         /* 주어진 강체를 감싸는 충돌체를 시뮬레이션에 추가하고 추가된 충돌체의 주소를 반환한다 */
         Collider* addCollider(unsigned int id, Geometry, RigidBody*);

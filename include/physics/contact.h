@@ -10,10 +10,14 @@ namespace physics
     {
         RigidBody* bodies[2];
         Vector3 normal;
-        Vector3 contactPoint;
+        Vector3* contactPoint[2];
         float penetration;
         float restitution;
         float friction;
+        /* 누적 충격량 (충돌 해소 시 사용) */
+        float normalImpulseSum;
+        float tangentImpulseSum1;
+        float tangentImpulseSum2;
     };
 } // namespace physics
 

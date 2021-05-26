@@ -24,7 +24,7 @@ namespace graphics
     /* 충돌 법선 vertices */
     const std::vector<float> CONTACT_NORMAL_VERTICES = {
         0.0f, 0.0f, 0.0f,
-        0.0f, 1.5f, 0.0f
+        0.0f, 1.0f, 0.0f
     };
 
     /******************************
