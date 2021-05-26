@@ -10,9 +10,12 @@ namespace physics
     {
     private:
         int iterationLimit;
+        float penetrationTolerance;
+        float closingSpeedTolerance;
 
     public:
-        CollisionResolver() : iterationLimit(10) {}
+        CollisionResolver()
+            : iterationLimit(30), penetrationTolerance(0.0005f), closingSpeedTolerance(0.005f) {}
     
         void resolveCollision(std::vector<Contact*>&, float deltaTime);
 
