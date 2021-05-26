@@ -268,8 +268,7 @@ bool CollisionDetector::boxAndBox(
     /* 충돌 지점을 찾는다 */
     if (minAxisIdx < 6) // 면-점 접촉일 때
     {
-        newContact->contactPoint[0] = new Vector3(calcContactPointOnPlane(box1, box2, newContact->normal, minAxisIdx));
-        newContact->contactPoint[1] = new Vector3(calcContactPointOnPlane(box1, box2, newContact->normal, minAxisIdx));
+        calcContactPointOnPlane(box1, box2, minAxisIdx, newContact);
     }
     else // 선-선 접촉일 때
     {
@@ -419,46 +418,52 @@ float CollisionDetector::calcPenetration(const BoxCollider& box1, const BoxColli
     return projectedSum - projectedCenterToCenter;
 }
 
-Vector3 CollisionDetector::calcContactPointOnPlane(
+void CollisionDetector::calcContactPointOnPlane(
     const BoxCollider& box1,
     const BoxCollider& box2,
-    const Vector3& contactNormal,
-    int minAxisIdx
+    int minAxisIdx,
+    Contact* contact
 )
 {
     /* 충돌 정점 */
-    Vector3 vertex;
+    Vector3* contactPoint1;
+    Vector3* contactPoint2;
 
     if (minAxisIdx < 3) // 충돌면이 box1 의 면일 때
     {
-        vertex = Vector3(box2.halfSize.x, box2.halfSize.y, box2.halfSize.z);
+        contactPoint2 = new Vector3(box2.halfSize.x, box2.halfSize.y, box2.halfSize.z);
 
-        if (box2.body->getAxis(0).dot(contactNormal) < 0)
-            vertex.x *= -1.0f;
-        if (box2.body->getAxis(1).dot(contactNormal) < 0)
-            vertex.y *= -1.0f;
-        if (box2.body->getAxis(2).dot(contactNormal) < 0)
-            vertex.z *= -1.0f;
+        if (box2.body->getAxis(0).dot(contact->normal) < 0)
+            contactPoint2->x *= -1.0f;
+        if (box2.body->getAxis(1).dot(contact->normal) < 0)
+            contactPoint2->y *= -1.0f;
+        if (box2.body->getAxis(2).dot(contact->normal) < 0)
+            contactPoint2->z *= -1.0f;
 
         /* 월드 좌표로 변환한다 */
-        vertex = box2.body->getTransformMatrix() * vertex;
+        *contactPoint2 = box2.body->getTransformMatrix() * (*contactPoint2);
+
+        contactPoint1 = new Vector3(*contactPoint2 - contact->normal * contact->penetration);
     }
     else // 충돌면이 box2 의 면일 때
     {
-        vertex = Vector3(box1.halfSize.x, box1.halfSize.y, box1.halfSize.z);
+        contactPoint1 = new Vector3(box1.halfSize.x, box1.halfSize.y, box1.halfSize.z);
 
-        if (box1.body->getAxis(0).dot(contactNormal) > 0)
-            vertex.x *= -1.0f;
-        if (box1.body->getAxis(1).dot(contactNormal) > 0)
-            vertex.y *= -1.0f;
-        if (box1.body->getAxis(2).dot(contactNormal) > 0)
-            vertex.z *= -1.0f;
+        if (box1.body->getAxis(0).dot(contact->normal) > 0)
+            contactPoint1->x *= -1.0f;
+        if (box1.body->getAxis(1).dot(contact->normal) > 0)
+            contactPoint1->y *= -1.0f;
+        if (box1.body->getAxis(2).dot(contact->normal) > 0)
+            contactPoint1->z *= -1.0f;
 
         /* 월드 좌표로 변환한다 */
-        vertex = box1.body->getTransformMatrix() * vertex;
+        *contactPoint1 = box1.body->getTransformMatrix() * (*contactPoint1);
+
+        contactPoint2 = new Vector3(*contactPoint1 - contact->normal * contact->penetration);
     }
 
-    return vertex;
+    contact->contactPoint[0] = contactPoint1;
+    contact->contactPoint[1] = contactPoint2;
 }
 
 Vector3 CollisionDetector::calcContactPointOnLine(
