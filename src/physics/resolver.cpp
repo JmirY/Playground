@@ -39,6 +39,8 @@ void CollisionResolver::sequentialImpulse(Contact* contact, float deltaTime)
                 .cross(contactPointFromCenter2);
     }
     effectiveMass = totalInvMass + (termInDenominator1 + termInDenominator2).dot(contact->normal);
+    if (effectiveMass == 0.0f)
+        return;
 
     float lambda = contact->normal.dot(contact->bodies[0]->getVelocity())
         + contact->bodies[0]->getRotation().dot(contactPointFromCenter1.cross(contact->normal));
@@ -54,6 +56,11 @@ void CollisionResolver::sequentialImpulse(Contact* contact, float deltaTime)
     bias -= contact->restitution * lambda;
 
     lambda = -(lambda + bias) / effectiveMass;
+    if (isnan(lambda) != 0)
+    {
+        std::cout << "ERROR::CollisionResolver::sequentialImpulse()::impulse is nan" << std::endl;
+        return;
+    }
 
     /* 람다의 누적값을 clamp */
     float prevImpulseSum = contact->normalImpulseSum;
@@ -89,8 +96,6 @@ void CollisionResolver::sequentialImpulse(Contact* contact, float deltaTime)
         tangent1 = Vector3(contact->normal.y, -contact->normal.x, 0.0f);
     else
         tangent1 = Vector3(0.0f, contact->normal.z, -contact->normal.y);
-    
-    tangent1.normalize();
     tangent2 = contact->normal.cross(tangent1);
 
     /* tangent1 벡터에 대한 마찰 계산 */
@@ -111,6 +116,11 @@ void CollisionResolver::sequentialImpulse(Contact* contact, float deltaTime)
             + contact->bodies[1]->getRotation().dot(contactPointFromCenter2.cross(tangent1));
     }
     lambda = -lambda / effectiveMass;
+    if (isnan(lambda) != 0)
+    {
+        std::cout << "ERROR::CollisionResolver::sequentialImpulse()::tangential impulse1 is nan" << std::endl;
+        return;
+    }
 
     /* 람다의 누적값을 clamp */
     prevImpulseSum = contact->tangentImpulseSum1;
@@ -160,6 +170,11 @@ void CollisionResolver::sequentialImpulse(Contact* contact, float deltaTime)
             + contact->bodies[1]->getRotation().dot(contactPointFromCenter2.cross(tangent2));
     }
     lambda = -lambda / effectiveMass;
+    if (isnan(lambda) != 0)
+    {
+        std::cout << "ERROR::CollisionResolver::sequentialImpulse()::tangential impulse2 is nan" << std::endl;
+        return;
+    }
 
     /* 람다의 누적값을 clamp */
     prevImpulseSum = contact->tangentImpulseSum2;
