@@ -2,6 +2,7 @@
 #include <iterator>
 #include <typeinfo>
 #include <cmath>
+#include <iostream>
 
 using namespace physics;
 
@@ -89,11 +90,21 @@ void Simulator::removePhysicsObject(unsigned int id)
     RigidBodies::iterator bodyIter = bodies.find(id);
     Colliders::iterator colliderIter = colliders.find(id);
 
-    delete bodyIter->second;
-    delete colliderIter->second;
-
-    bodies.erase(bodyIter);
-    colliders.erase(colliderIter);
+    if (bodyIter != bodies.end())
+    {
+        delete bodyIter->second;
+        bodies.erase(bodyIter);
+    }
+    else
+        std::cout << "ERROR::Simulator::removePhysicsObject()::can't find RigidBody id: " << id << std::endl;
+    
+    if (colliderIter != colliders.end())
+    {
+        delete colliderIter->second;
+        colliders.erase(colliderIter);
+    }
+    else
+        std::cout << "ERROR::Simulator::removePhysicsObject()::can't find Collider id: " << id << std::endl;
 }
 
 float Simulator::calcDistanceBetweenRayAndObject(
