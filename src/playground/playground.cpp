@@ -23,12 +23,6 @@ void Playground::run()
     {
         /* 키보드 입력 처리 */
         handleKeyboardInput();
-
-        /* GUI 이벤트 처리 */
-        while (!eventQueue.isEmpty())
-        {
-            handleEvent(eventQueue.pop());
-        }
         
         /* 시간 계산 */
         curTime = glfwGetTime();
@@ -41,7 +35,6 @@ void Playground::run()
             simulator.simulate(deltaTime * timeStepMultiplier, contactInfo);
 
         renderer.updateWindowSize();
-        
         renderer.bindSceneFrameBuffer();
         renderer.setSceneViewport();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -80,6 +73,12 @@ void Playground::run()
             delete info;
         }
         contactInfo.clear();
+
+        /* GUI 이벤트 처리 */
+        while (!eventQueue.isEmpty())
+        {
+            handleEvent(eventQueue.pop());
+        }
 
         renderer.bindDefaultFrameBuffer();
         renderer.setWindowViewport();
