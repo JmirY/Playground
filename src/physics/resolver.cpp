@@ -131,7 +131,7 @@ void CollisionResolver::sequentialImpulse(Contact* contact, float deltaTime)
         return;
     }
 
-    /* 람다의 누적값을 clamp */
+    /* 충격량의 누적값을 clamp */
     prevImpulseSum = contact->tangentImpulseSum1;
     contact->tangentImpulseSum1 += impulse;
     if (contact->tangentImpulseSum1 < (-contact->friction * contact->normalImpulseSum))
@@ -185,7 +185,7 @@ void CollisionResolver::sequentialImpulse(Contact* contact, float deltaTime)
         return;
     }
 
-    /* 람다의 누적값을 clamp */
+    /* 충격량의 누적값을 clamp */
     prevImpulseSum = contact->tangentImpulseSum2;
     contact->tangentImpulseSum2 += impulse;
     if (contact->tangentImpulseSum2 < (-contact->friction * contact->normalImpulseSum))
