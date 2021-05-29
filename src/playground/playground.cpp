@@ -100,11 +100,13 @@ unsigned int Playground::addObject(Geometry geometry, float posX, float posY, fl
     {
         newObject = new SphereObject;
         newObject->geometry = SPHERE;
+        std::cout << "DEBUG::Playground::add sphere object id: " << newObjectID << std::endl;
     }
     else if (geometry == BOX)
     {
         newObject = new BoxObject;
         newObject->geometry = BOX;
+        std::cout << "DEBUG::Playground::add box object id: " << newObjectID << std::endl;
     }
 
     /* id 를 부여한다 */
@@ -136,21 +138,12 @@ Playground::Objects::iterator Playground::removeObject(unsigned int id)
     /* 그래픽 데이터를 제거한다 */
     renderer.removeShape(id);
 
-    Objects::iterator objectIter = objects.find(id);
-    /* 선택된 오브젝트였다면 selectedObjectIDs 에서 제거한다 */
-    if (objectIter->second->isSelected)
-    {
-        for (auto it = selectedObjectIDs.begin(); it != selectedObjectIDs.end(); ++it)
-        {
-            if (*it == objectIter->second->id)
-            {
-                selectedObjectIDs.erase(it);
-                break;
-            }
-        }
-    }
     /* 오브젝트를 objects 에서 제거하고 메모리에서 해제한다 */
-    delete objectIter->second;
+    Objects::iterator objectIter = objects.find(id);
+    if (objectIter != objects.end())
+        delete objectIter->second;
+    else
+        std::cout << "ERROR::Playground::removeObject()::can't find Object id: " << id << std::endl;
     return objects.erase(objectIter);
 }
 
@@ -612,6 +605,15 @@ void Playground::handleShouldRenderWorldAxis(ShouldRenderWorldAxis* event)
 
 void Playground::handleRemoveUnfixedObjectsEvent(RemoveUnfixedObjectsEvent* event)
 {
+    auto it = selectedObjectIDs.begin();
+    while (it != selectedObjectIDs.end())
+    {
+        if (!objects.find(*it)->second->isFixed)
+            it = selectedObjectIDs.erase(it);
+        else
+            ++it;
+    }
+    
     Objects::iterator iter = objects.begin();
     while (iter != objects.end())
     {
