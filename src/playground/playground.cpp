@@ -23,6 +23,12 @@ void Playground::run()
     {
         /* 키보드 입력 처리 */
         handleKeyboardInput();
+
+        /* GUI 이벤트 처리 */
+        while (!eventQueue.isEmpty())
+        {
+            handleEvent(eventQueue.pop());
+        }
         
         /* 시간 계산 */
         curTime = glfwGetTime();
@@ -75,12 +81,6 @@ void Playground::run()
         }
         contactInfo.clear();
 
-        /* GUI 이벤트 처리 */
-        while (!eventQueue.isEmpty())
-        {
-            handleEvent(eventQueue.pop());
-        }
-
         renderer.bindDefaultFrameBuffer();
         renderer.setWindowViewport();
 
@@ -130,6 +130,7 @@ unsigned int Playground::addObject(Geometry geometry, float posX, float posY, fl
 
 Playground::Objects::iterator Playground::removeObject(unsigned int id)
 {
+    std::cout << "DEBUG::Playground::remove object id: " << id << std::endl;
     /* 물리 데이터를 제거한다 */
     simulator.removePhysicsObject(id);
     /* 그래픽 데이터를 제거한다 */
@@ -369,8 +370,7 @@ void Playground::handleObjectSelectedEvent(ObjectSelectedEvent* event)
     bool& isSelected = objects.find(event->id)->second->isSelected;
     if (isSelected) // TODO: 로직 개선
     {
-        std::vector<unsigned int>::iterator it = selectedObjectIDs.begin();
-        for (; it != selectedObjectIDs.end(); ++it)
+        for (auto it = selectedObjectIDs.begin(); it != selectedObjectIDs.end(); ++it)
         {
             if (*it == event->id)
             {
@@ -382,6 +382,7 @@ void Playground::handleObjectSelectedEvent(ObjectSelectedEvent* event)
     }
     else
     {
+        std::cout << "DEBUG::Playground::object selected. id: " << event->id << std::endl;
         selectedObjectIDs.push_back(event->id);
         isSelected = true;
     }
