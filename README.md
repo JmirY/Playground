@@ -3,18 +3,19 @@
 ---
   
 
-![Simulation Demo](./img/simulation_demo.gif)
+![Simulation Demo](./img/simulation_demo1.gif)
+![Simulation Demo](./img/simulation_demo2.gif)
 
   
-**Playground** 는 C++ 로 개발된 3D 강체 물리 엔진입니다.  
-기본적인 수준의 물리 시뮬레이션, 그래픽 렌더링, 사용자 상호작용을 지원합니다.  
+**Playground** 는 C++ 로 개발된 물리 엔진입니다.  
+3차원 강체 물리 시뮬레이션, 그래픽 렌더링, 사용자 상호작용을 지원합니다.  
 
 ## 지원 기능  
 - **물리 시뮬레이션**  
   
   - 강체(구 & 직육면체) 시뮬레이션
-  - 충돌 감지 (*Separating Axis Test*)
-  - 충격량 (*Impulse*) 기반 충돌 처리  
+  - 실시간 충돌 감지 (*Separating Axis Test*)
+  - Sequential Impulse Solver 기반 충돌 처리  
   
 - **그래픽**  
   
@@ -32,7 +33,7 @@
 g++ -o playground src/main.cpp src/playground/* src/physics/* src/graphics/* src/gui/* -std=c++11 -framework OpenGL -lglfw -I include -DIMGUI_IMPL_OPENGL_LOADER_GLAD
 ```  
   
-## 조작법  
+<!-- ## 조작법  
   
 - **카메라**   
 
@@ -72,7 +73,7 @@ g++ -o playground src/main.cpp src/playground/* src/physics/* src/graphics/* src
     - **오브젝트-지면 간 반발 계수(Ground Restitution)**  
     오브젝트와 지면 사이 충돌의 반발 계수를 변경합니다.  
     - **오브젝트 간 반발 계수(Object Restitution)**  
-    오브젝트 간 충돌의 반발 계수를 변경합니다.  
+    오브젝트 간 충돌의 반발 계수를 변경합니다.   -->
   
 ---  
   
