@@ -2,31 +2,25 @@
 #define RESOLVER_H
 
 #include "contact.h"
+#include <vector>
 
 namespace physics
 {
     class CollisionResolver
     {
-    public:
-        void resolveContact(Contact*);
+    private:
+        int iterationLimit;
+        float penetrationTolerance;
+        float closingSpeedTolerance;
 
     public:
-        void resolveVelocity(Contact*);
-        void resolvePenetration(Contact*);
+        CollisionResolver()
+            : iterationLimit(30), penetrationTolerance(0.0005f), closingSpeedTolerance(0.005f) {}
     
-        Matrix3 calcWorldToContactMat(const Vector3& contactNormal);
-        float calcDeltaVelocityPerUnitImpulse(
-            RigidBody* (&bodies)[2],
-            const Vector3& contactNoraml,
-            const Vector3& contactPoint,
-            const Matrix3& worldToContact
-        );
-        float calcDeltaVelocity(
-            RigidBody* (&bodies)[2],
-            const Vector3& contactPoint,
-            const float restitution,
-            const Matrix3& worldToContact
-        );
+        void resolveCollision(std::vector<Contact*>&, float deltaTime);
+
+    private:
+        void sequentialImpulse(Contact*, float deltaTime);
     };
 } // namespace physics
 

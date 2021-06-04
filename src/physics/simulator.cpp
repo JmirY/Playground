@@ -2,6 +2,7 @@
 #include <iterator>
 #include <typeinfo>
 #include <cmath>
+#include <iostream>
 
 using namespace physics;
 
@@ -29,26 +30,28 @@ void Simulator::simulate(float duration, std::vector<ContactInfo*>& contactInfo)
     }
 
     /* 물체 간 충돌을 검출한다 */
-    detectCollision();
+    detector.detectCollision(contacts, colliders, groundCollider);
 
     /* 충돌 정보를 복사한다 */
     getContactInfo(contactInfo);
 
     /* 충돌들을 처리한다 */
-    for (auto& contact : contacts)
+    resolver.resolveCollision(contacts, duration);
+    for (auto& c : contacts)
     {
-        resolver.resolveContact(contact);
-        delete contact;
+        for (auto& cp : c->contactPoint)
+            delete cp;
+        delete c;
     }
     contacts.clear();
 }
 
-RigidBody* Simulator::addRigidBody(unsigned int id, Geometry geometry)
+RigidBody* Simulator::addRigidBody(unsigned int id, Geometry geometry, float posX, float posY, float posZ)
 {
     /* 강체를 생성한다 */
     RigidBody* newBody = new RigidBody;
     newBody->setMass(5.0f);
-    newBody->setPosition(0.0f, 4.0f, 0.0f);
+    newBody->setPosition(posX, posY, posZ);
     newBody->setAcceleration(0.0f, -gravity, 0.0f);
 
     /* 강체의 관성 모멘트 텐서를 도형에 따라 결정한다 */
@@ -87,11 +90,21 @@ void Simulator::removePhysicsObject(unsigned int id)
     RigidBodies::iterator bodyIter = bodies.find(id);
     Colliders::iterator colliderIter = colliders.find(id);
 
-    delete bodyIter->second;
-    delete colliderIter->second;
-
-    bodies.erase(bodyIter);
-    colliders.erase(colliderIter);
+    if (bodyIter != bodies.end())
+    {
+        delete bodyIter->second;
+        bodies.erase(bodyIter);
+    }
+    else
+        std::cout << "ERROR::Simulator::removePhysicsObject()::can't find RigidBody id: " << id << std::endl;
+    
+    if (colliderIter != colliders.end())
+    {
+        delete colliderIter->second;
+        colliders.erase(colliderIter);
+    }
+    else
+        std::cout << "ERROR::Simulator::removePhysicsObject()::can't find Collider id: " << id << std::endl;
 }
 
 float Simulator::calcDistanceBetweenRayAndObject(
@@ -121,16 +134,20 @@ void Simulator::getContactInfo(std::vector<ContactInfo*>& contactInfo) const
 {
     for (const auto& contact : contacts)
     {
-        ContactInfo* newContactInfo = new ContactInfo;
-
-        newContactInfo->pointX = contact->contactPoint.x;
-        newContactInfo->pointY = contact->contactPoint.y;
-        newContactInfo->pointZ = contact->contactPoint.z;
-        newContactInfo->normalX = contact->normal.x;
-        newContactInfo->normalY = contact->normal.y;
-        newContactInfo->normalZ = contact->normal.z;
-
-        contactInfo.push_back(newContactInfo);
+        for (const auto& cp : contact->contactPoint)
+        {
+            if (cp == nullptr)
+                continue;
+                
+            ContactInfo* newContactInfo = new ContactInfo;
+            newContactInfo->pointX = cp->x;
+            newContactInfo->pointY = cp->y;
+            newContactInfo->pointZ = cp->z;
+            newContactInfo->normalX = contact->normal.x;
+            newContactInfo->normalY = contact->normal.y;
+            newContactInfo->normalZ = contact->normal.z;
+            contactInfo.push_back(newContactInfo);
+        }
     }
 }
 
@@ -149,56 +166,4 @@ void Simulator::setGravity(float value)
     gravity = value;
     for (auto& body : bodies)
         body.second->setAcceleration(0.0f, -gravity, 0.0f);
-}
-
-void Simulator::detectCollision()
-{
-    for (Colliders::iterator i = colliders.begin(); i != colliders.end(); ++i)
-    {
-        Collider* colliderPtrI = i->second;
-        for (Colliders::iterator j = std::next(i, 1); j != colliders.end(); ++j)
-        {
-            Collider* colliderPtrJ = j->second;
-            if (typeid(*colliderPtrI) == typeid(SphereCollider))
-            {
-                SphereCollider* collider1 = static_cast<SphereCollider*>(colliderPtrI);
-                if (typeid(*colliderPtrJ) == typeid(SphereCollider)) // 구 - 구 충돌
-                {
-                    SphereCollider* collider2 = static_cast<SphereCollider*>(colliderPtrJ);
-                    detector.sphereAndSphere(contacts, *collider1, *collider2);
-                }
-                else if (typeid(*colliderPtrJ) == typeid(BoxCollider)) // 구 - 직육면체 충돌
-                {
-                    BoxCollider* collider2 = static_cast<BoxCollider*>(colliderPtrJ);
-                    detector.sphereAndBox(contacts, *collider1, *collider2);
-                }
-            }
-            else if (typeid(*colliderPtrI) == typeid(BoxCollider))
-            {
-                BoxCollider* collider1 = static_cast<BoxCollider*>(colliderPtrI);
-                if (typeid(*colliderPtrJ) == typeid(SphereCollider)) // 구 - 직육면체 충돌
-                {
-                    SphereCollider* collider2 = static_cast<SphereCollider*>(colliderPtrJ);
-                    detector.sphereAndBox(contacts, *collider2, *collider1);
-                }
-                else if (typeid(*colliderPtrJ) == typeid(BoxCollider)) // 직육면체 - 직육면체 충돌
-                {
-                    BoxCollider* collider2 = static_cast<BoxCollider*>(colliderPtrJ);
-                    detector.boxAndBox(contacts, *collider1, *collider2);
-                }
-            }
-        }
-
-        /* 지면과의 충돌 검사 */
-        if (typeid(*colliderPtrI) == typeid(SphereCollider))
-        {
-            SphereCollider* sphereCollider = static_cast<SphereCollider*>(i->second);
-            detector.sphereAndPlane(contacts, *sphereCollider, groundCollider);
-        }
-        else if (typeid(*colliderPtrI) == typeid(BoxCollider))
-        {
-            BoxCollider* boxCollider = static_cast<BoxCollider*>(i->second);
-            detector.boxAndPlane(contacts, *boxCollider, groundCollider);
-        }
-    }
 }

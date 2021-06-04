@@ -10,6 +10,7 @@ Playground::Playground()
     newObjectID = 1;
     isSimulating = true;
     shouldRenderContactInfo = false;
+    timeStepMultiplier = 1.0f;
 }
 
 void Playground::run()
@@ -31,10 +32,9 @@ void Playground::run()
         /* 물리 시뮬레이션 */
         std::vector<ContactInfo*> contactInfo;
         if (isSimulating)
-            simulator.simulate(deltaTime, contactInfo);
+            simulator.simulate(deltaTime * timeStepMultiplier, contactInfo);
 
         renderer.updateWindowSize();
-        
         renderer.bindSceneFrameBuffer();
         renderer.setSceneViewport();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -90,7 +90,7 @@ void Playground::run()
     }
 }
 
-void Playground::addObject(Geometry geometry)
+unsigned int Playground::addObject(Geometry geometry, float posX, float posY, float posZ)
 {
     Object* newObject;
 
@@ -99,18 +99,20 @@ void Playground::addObject(Geometry geometry)
     {
         newObject = new SphereObject;
         newObject->geometry = SPHERE;
+        std::cout << "DEBUG::Playground::add sphere object id: " << newObjectID << std::endl;
     }
     else if (geometry == BOX)
     {
         newObject = new BoxObject;
         newObject->geometry = BOX;
+        std::cout << "DEBUG::Playground::add box object id: " << newObjectID << std::endl;
     }
 
     /* id 를 부여한다 */
     newObject->id = newObjectID;
     
     /* 강체와 충돌체를 추가한다 */
-    newObject->body = simulator.addRigidBody(newObjectID, geometry);
+    newObject->body = simulator.addRigidBody(newObjectID, geometry, posX, posY, posZ);
     newObject->collider = simulator.addCollider(newObjectID, geometry, newObject->body);
 
     /* 색상은 무작위로 설정한다 */
@@ -124,20 +126,23 @@ void Playground::addObject(Geometry geometry)
     newObject->shape = renderer.addShape(newObjectID, geometry);
 
     objects[newObjectID] = newObject;
-    ++newObjectID;
+    return newObjectID++;
 }
 
 Playground::Objects::iterator Playground::removeObject(unsigned int id)
 {
+    std::cout << "DEBUG::Playground::remove object id: " << id << std::endl;
     /* 물리 데이터를 제거한다 */
     simulator.removePhysicsObject(id);
-
     /* 그래픽 데이터를 제거한다 */
     renderer.removeShape(id);
 
     /* 오브젝트를 objects 에서 제거하고 메모리에서 해제한다 */
     Objects::iterator objectIter = objects.find(id);
-    delete objectIter->second;
+    if (objectIter != objects.end())
+        delete objectIter->second;
+    else
+        std::cout << "ERROR::Playground::removeObject()::can't find Object id: " << id << std::endl;
     return objects.erase(objectIter);
 }
 
@@ -209,6 +214,9 @@ void Playground::handleEvent(Event* event)
     else if (typeid(*event) == typeid(RemoveUnfixedObjectsEvent))
         handleRemoveUnfixedObjectsEvent(static_cast<RemoveUnfixedObjectsEvent*>(event));
 
+    else if (typeid(*event) == typeid(TimeStepChangedEvent))
+        handleTimeStepChangedEvent(static_cast<TimeStepChangedEvent*>(event));
+
     delete event;
 }
 
@@ -235,17 +243,42 @@ void Playground::handleKeyboardInput()
     renderer.moveCamera(offset);
     
     /* 시뮬레이션 멈춤 혹은 재개 */
-    static bool isRepeated = false;
+    static bool isSpaceRepeated = false;
     if (glfwGetKey(renderer.getWindow(), GLFW_KEY_SPACE) == GLFW_PRESS)
     {
-        if (!isRepeated)
+        if (!isSpaceRepeated)
         {
             isSimulating = !isSimulating;
-            isRepeated = true;
+            isSpaceRepeated = true;
         }
     }
     else if (glfwGetKey(renderer.getWindow(), GLFW_KEY_SPACE) == GLFW_RELEASE)
-        isRepeated = false;
+        isSpaceRepeated = false;
+
+    /* 프리셋 불러오기 */
+    static bool isOneRepeated = false;
+    if (glfwGetKey(renderer.getWindow(), GLFW_KEY_F1) == GLFW_PRESS)
+    {
+        if (!isOneRepeated)
+        {
+            loadPreset1();
+            isOneRepeated = true;
+        }
+    }
+    else if (glfwGetKey(renderer.getWindow(), GLFW_KEY_F1) == GLFW_RELEASE)
+        isOneRepeated = false;
+
+    static bool isTwoRepeated = false;
+    if (glfwGetKey(renderer.getWindow(), GLFW_KEY_F2) == GLFW_PRESS)
+    {
+        if (!isTwoRepeated)
+        {
+            loadPreset2();
+            isTwoRepeated = true;
+        }
+    }
+    else if (glfwGetKey(renderer.getWindow(), GLFW_KEY_F2) == GLFW_RELEASE)
+        isTwoRepeated = false;
 }
 
 void Playground::clearSelectedObjectIDs()
@@ -254,6 +287,62 @@ void Playground::clearSelectedObjectIDs()
         objects.find(id)->second->isSelected = false;
     
     selectedObjectIDs.clear();
+}
+
+void Playground::loadPreset1()
+{
+    isSimulating = false;
+    handleAllObjectRemovedEvent(nullptr);
+
+    unsigned int sphereID = addObject(SPHERE, 0.0f, 1.0f, 7.0f);
+    objects.find(sphereID)->second->setGeometricData(0.7f);
+    objects.find(sphereID)->second->updateDerivedData();
+
+    addObject(BOX, 0.0f, 0.5f, 0.0f);
+    addObject(BOX, 1.2f, 0.5f, 0.0f);
+    addObject(BOX, -1.2f, 0.5f, 0.0f);
+    addObject(BOX, 0.7f, 1.5f, 0.0f);
+    addObject(BOX, -0.7f, 1.5f, 0.0f);
+    addObject(BOX, 0.0f, 2.5f, 0.0f);
+
+    objects.find(sphereID)->second->body->setVelocity(0.0f, 0.0f, -30.0f);
+}
+
+void Playground::loadPreset2()
+{
+    isSimulating = false;
+    handleAllObjectRemovedEvent(nullptr);
+
+    unsigned int id = addObject(BOX, 0.0f, 5.0f, -2.0f);
+    float rotateAngle = 30.0f * PI / 180.0f;
+    ObjectPositionFixedEvent* event = new ObjectPositionFixedEvent(id, true);
+    handleObjectPositionFixedEvent(event);
+    delete event;
+    objects.find(id)->second->body->setOrientation(
+        physics::Quaternion(cos(rotateAngle * 0.5f), sin(rotateAngle * 0.5f), 0.0f, 0.0f)
+    );
+    objects.find(id)->second->setGeometricData(3.0f, 0.1f, 3.0f);
+    objects.find(id)->second->updateDerivedData();
+
+    id = addObject(BOX, 0.0f, 2.0f, 2.5f);
+    event = new ObjectPositionFixedEvent(id, true);
+    handleObjectPositionFixedEvent(event);
+    delete event;
+    objects.find(id)->second->body->setOrientation(
+        physics::Quaternion(cos(rotateAngle * -0.5f), sin(rotateAngle * -0.5f), 0.0f, 0.0f)
+    );
+    objects.find(id)->second->setGeometricData(3.0f, 0.1f, 3.0f);
+    objects.find(id)->second->updateDerivedData();
+
+    addObject(SPHERE, -2.0f, 7.0f, -3.0f);
+
+    id = addObject(SPHERE, 0.0f, 7.0f, -3.0f);
+    objects.find(id)->second->setGeometricData(0.7f);
+    objects.find(id)->second->updateDerivedData();
+
+    id = addObject(SPHERE, 1.5f, 7.0f, -3.0f);
+    objects.find(id)->second->setGeometricData(0.3f);
+    objects.find(id)->second->updateDerivedData();
 }
 
 void Playground::handleObjectAddedEvent(ObjectAddedEvent* event)
@@ -273,8 +362,7 @@ void Playground::handleObjectSelectedEvent(ObjectSelectedEvent* event)
     bool& isSelected = objects.find(event->id)->second->isSelected;
     if (isSelected) // TODO: 로직 개선
     {
-        std::vector<unsigned int>::iterator it = selectedObjectIDs.begin();
-        for (; it != selectedObjectIDs.end(); ++it)
+        for (auto it = selectedObjectIDs.begin(); it != selectedObjectIDs.end(); ++it)
         {
             if (*it == event->id)
             {
@@ -286,6 +374,7 @@ void Playground::handleObjectSelectedEvent(ObjectSelectedEvent* event)
     }
     else
     {
+        std::cout << "DEBUG::Playground::object selected. id: " << event->id << std::endl;
         selectedObjectIDs.push_back(event->id);
         isSelected = true;
     }
@@ -515,6 +604,15 @@ void Playground::handleShouldRenderWorldAxis(ShouldRenderWorldAxis* event)
 
 void Playground::handleRemoveUnfixedObjectsEvent(RemoveUnfixedObjectsEvent* event)
 {
+    auto it = selectedObjectIDs.begin();
+    while (it != selectedObjectIDs.end())
+    {
+        if (!objects.find(*it)->second->isFixed)
+            it = selectedObjectIDs.erase(it);
+        else
+            ++it;
+    }
+    
     Objects::iterator iter = objects.begin();
     while (iter != objects.end())
     {
@@ -523,4 +621,9 @@ void Playground::handleRemoveUnfixedObjectsEvent(RemoveUnfixedObjectsEvent* even
         else
             ++iter;
     }
+}
+
+void Playground::handleTimeStepChangedEvent(TimeStepChangedEvent* event)
+{
+    timeStepMultiplier = event->value;
 }
