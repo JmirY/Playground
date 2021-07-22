@@ -2,3 +2,4 @@ test*
 .vscode
 main
 imgui.ini
+.DS_Store
