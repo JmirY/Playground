@@ -17,5 +17,3 @@ Enter the following command in your terminal.
 ```shell
 g++ -o playground src/main.cpp src/playground/* src/physics/* src/graphics/* src/gui/* -std=c++11 -framework OpenGL -lglfw -I include -DIMGUI_IMPL_OPENGL_LOADER_GLAD
 ```  
-
->Read the [Wiki](https://github.com/JmirY/Playground/wiki) to learn more about Playground.
