@@ -3,3 +3,10 @@ test*
 main
 imgui.ini
 .DS_Store
+
+# CMake
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+build/
